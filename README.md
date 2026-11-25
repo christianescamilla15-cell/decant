@@ -20,7 +20,7 @@ el repositorio.
 | [`legado/TRAMPAS.md`](legado/TRAMPAS.md) | El catálogo de las 9 trampas sembradas, 3 defectos para decidir con negocio, 1 defecto que encontró la radiografía sin que nadie lo sembrara y la preparación de S3. La radiografía NO lo lee. |
 | [`legado/VOLUMEN.md`](legado/VOLUMEN.md) | El volumen que hace falta para que el control negativo no salga en 0 % y el piso de la paridad, medidos en inversiones, y los tiempos del ciclo. |
 | [`universo/`](universo) | Lo que ENTRA al replay: la partición por columna (entrada o resultado), la lectura de los archivos de interfaz con sus llaves reales (buzón del corresponsal y archivo de sucursales) y las noches del job. |
-| [`radiografia/`](radiografia) | La radiografía (Python): restaura el respaldo en un contenedor limpio, lo cuadra contra lo que el legado publicaba, mide el corte, inventaría y detecta por patrón genérico. Los detectores están congelados en el tag `detectores-v2`. [`informe/`](radiografia/informe) es su salida sobre el legado, con el veredicto medido de cada hallazgo, y [`CONTROL.md`](radiografia/CONTROL.md) sus dos controles públicos. |
+| [`radiografia/`](radiografia) | La radiografía (Python): restaura el respaldo en un contenedor limpio, lo cuadra contra lo que el legado publicaba, mide el corte, inventaría y detecta por patrón genérico. Los detectores están congelados en el tag `detectores-v3`. [`informe/`](radiografia/informe) es su salida sobre el legado, con el veredicto medido de cada hallazgo, y [`CONTROL.md`](radiografia/CONTROL.md) sus dos controles públicos. |
 | [`docs/adr/`](docs/adr) | Las decisiones de la semana 1. |
 
 ## Resultados de la semana 1
@@ -41,12 +41,24 @@ el repositorio.
   Con 250 por día salía en 0. El piso real, el respaldo restaurado contra lo que el legado PUBLICÓ al tomarlo, es
   de 18–25 % de empatados invertidos (tres corridas) y 0 de contrato. La lista con `TOP` sin `ORDER BY` ni siquiera devuelve las
   mismas filas en otra instancia (17 de 200 distintas).
-- **Controles públicos** ([CONTROL.md](radiografia/CONTROL.md)):
-  - WideWorldImporters es de entrenamiento: ahí se corrigió la v1, y su mojibake real («ChÃ¡vez» en 213
-    facturas) sigue apareciendo.
-  - AdventureWorks es el control APARTADO: se corrió una sola vez con los detectores congelados y se publica tal
-    cual. Los detectores de alta señal dan 0 falsos positivos; apareció un límite nuevo (4 IF EXISTS que sólo
-    escriben en una variable de tabla).
+- **Control a ciegas, ronda 1** ([CONTROL_CIEGO.md](radiografia/CONTROL_CIEGO.md)). Otra sesión sembró 3 trampas
+  sin que el autor de los detectores las conociera, y `detectores-v2` detectó **0 de 3**. Los detectores acertaban
+  en precisión pero no generalizaban más allá de la forma literal.
+- **`detectores-v3`** ([CONTROL.md](radiografia/CONTROL.md)) agrega los 3 arreglos genéricos que propuso quien
+  sembró:
+  - asignación desde varias filas, según las llaves únicas reales del esquema;
+  - reloj que entra a la regla por una variable;
+  - espacios finales medidos en el motor.
+
+  Con ellos, el catálogo propio sigue en 8 de 9. Las 3 trampas de la ronda 1 salen 3 de 3, pero **eso no cuenta
+  como control**: el catálogo ya era conocido.
+- **Controles públicos** ([CONTROL.md](radiografia/CONTROL.md)). Ninguno es ya de generalización:
+  WideWorldImporters es de entrenamiento y AdventureWorks fue el apartado de la v2.
+  - Con la v3 aparecen 14 hallazgos nuevos y los 14 tienen la forma real. 11 son valores con espacios finales de
+    verdad en WideWorldImporters.
+  - 3 son asignaciones en AdventureWorks que el detector marca por la razón equivocada: lee el WHERE y el filtro
+    está en el ON.
+  - Se publican tal cual, con los dos límites nuevos que muestran.
 - **Universo para el replay** ([ADR 0004](docs/adr/0004-universo-por-columna-y-archivos-de-interfaz.md)):
   - partición por columna;
   - el buzón del corresponsal con las 5,779 liquidaciones que el legado descartó;
@@ -55,26 +67,33 @@ el repositorio.
 - **Ciclo completo:** generar, cargar, respaldar, restaurar, radiografiar, medir veredictos y medir la detección
   toma ≈ 3.5 minutos ([tiempos](legado/VOLUMEN.md)).
 
-## Control a ciegas (pendiente)
+## Control a ciegas
 
-Quien escribe las trampas y quien escribe los detectores aquí es la misma persona: falta medir la radiografía
-contra trampas que su autor NO conozca. Procedimiento:
+Quien escribe las trampas y quien escribe los detectores aquí es la misma persona: hace falta medir la radiografía
+contra trampas que su autor NO conozca.
 
-1. **Detectores congelados.** El tag `detectores-v2` fija `radiografia/tsql.py`, `patrones.py` y `datos.py`. Sus
+| Ronda | Detectores | Catálogo sellado (sha256) | Resultado |
+|---|---|---|---|
+| 1 | `detectores-v2` | `b61937e5011df6576ad97bd9e560babd7e0ce3cac87adc937900eede03b90866` | **0 de 3** ([CONTROL_CIEGO.md](radiografia/CONTROL_CIEGO.md)) |
+| 2 | `detectores-v3` | *pendiente* | *en espera de la siembra* |
+
+Procedimiento (ronda 2):
+
+1. **Detectores congelados.** El tag `detectores-v3` fija `radiografia/tsql.py`, `patrones.py` y `datos.py`. Sus
    sha256 están en [`radiografia/CONTROL.md`](radiografia/CONTROL.md) y una prueba falla si cambian.
-2. **Siembra.** OTRA sesión crea la rama `siembra-ciega` desde `detectores-v2`. Ahí cambia SÓLO `legado/` (código
-   T-SQL, generador o datos) y escribe su catálogo en `legado/TRAMPAS_CIEGAS.md`, con el mismo formato de tabla de
-   medición que `legado/TRAMPAS.md` (señales `categoría → objeto`, o vacío si cree que no hay patrón).
-3. **Compromiso.** Antes de que nadie corra nada, publica SÓLO el sha256 de `TRAMPAS_CIEGAS.md` (en este README,
-   en un commit de `main`), sin el archivo.
+2. **Siembra.** OTRA sesión crea una rama desde `detectores-v3` (por ejemplo `siembra-ciega-2`). Ahí cambia SÓLO
+   `legado/` (código T-SQL, generador o datos) y escribe su catálogo en un archivo NUEVO,
+   `legado/TRAMPAS_CIEGAS_2.md`, con el mismo formato de tabla de medición que `legado/TRAMPAS.md` (señales
+   `categoría → objeto`, o vacío si cree que no hay patrón). No debe repetir las trampas de la ronda 1: ésas ya
+   son conocidas.
+3. **Compromiso.** Antes de que nadie corra nada, publica SÓLO el sha256 de su catálogo (en esta tabla, en un commit
+   de `main`), sin el archivo.
 4. **Corrida.** En la rama se corre `./ciclo.sh` sin cambiar `radiografia/`. El informe queda escrito sin que nadie
    haya visto el catálogo.
-5. **Revelación.** Se agrega `TRAMPAS_CIEGAS.md` y se verifica que su sha256 sea el publicado. Luego se mide con
-   `python -m radiografia.medicion --trampas legado/TRAMPAS_CIEGAS.md`.
+5. **Revelación.** Se agrega el catálogo y se verifica que su sha256 sea el publicado. Luego se mide con
+   `python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAMPAS_CIEGAS_2.md`.
 6. **Publicación tal cual:** el % de detección, lo que no detectó y los hallazgos fuera de su catálogo. Ningún
-   detector cambia antes de publicar; si después se mejora uno, es `detectores-v3` y pide otra siembra.
-
-sha256 del catálogo ciego: *pendiente.*
+   detector cambia antes de publicar; si después se mejora uno, es `detectores-v4` y pide otra siembra.
 
 ## Cómo ejecutar
 
@@ -101,19 +120,20 @@ python -m legado.vivo                       # delta del mismo día, escrituras t
 python -m legado.extraer_pantalla --fecha 2023-12-29 --salida legado/datos/delta_por_pantalla.jsonl
 python -m radiografia --manifiesto respaldos/respaldo_2023-12-29.json
 python -m radiografia.veredictos --manifiesto respaldos/respaldo_2023-12-29.json
-python -m radiografia.medicion              # % de detección contra legado/TRAMPAS.md, con los veredictos
+python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAMPAS_CIEGAS.md \
+    --conocido legado/TRAMPAS_CIEGAS.md     # % de detección por catálogo, con los veredictos
 ```
 
 ## Pruebas
 
-- `pytest`: 100 pruebas sin base. Cubren:
+- `pytest`: 114 pruebas sin base. Cubren:
   - el determinismo del generador (huella fija) y la existencia de cada trampa en los datos;
   - el universo: partición por columna, llaves reales del buzón, liquidaciones descartadas y nombres sanos en el
     archivo de sucursales;
   - el orden por inversiones;
   - cada detector con casos positivos y negativos, incluidas regresiones de los controles;
   - la no circularidad (ningún detector lee el catálogo) y el congelamiento de los detectores.
-- `pytest -m integracion`: 14 pruebas contra SQL Server real. Comprueban:
+- `pytest -m integracion`: 16 pruebas contra SQL Server real. Comprueban:
   - que el generador calcula lo mismo que los procedimientos del legado;
   - el criterio de salida contra el manifiesto;
   - el control negativo en inversiones;
@@ -122,7 +142,8 @@ python -m radiografia.medicion              # % de detección contra legado/TRAM
   - los veredictos;
   - los choques preparados para S3;
   - las liquidaciones del buzón;
-  - lo que pierde el delta por la pantalla.
+  - lo que pierde el delta por la pantalla;
+  - los espacios finales contados en el motor y la medición separada por catálogo.
 
 ## Seguridad
 
