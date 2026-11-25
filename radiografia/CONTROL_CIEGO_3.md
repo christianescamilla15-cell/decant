@@ -50,3 +50,22 @@ paridad SÍ compara).
 (control: por PK no se marca); literales concatenados que llegan a `sp_executesql`/`EXEC(…)` tratados como código para
 los detectores léxicos, y lo no resoluble como inventario `sql_dinamico`; `@@IDENTITY` tras INSERT a tabla con trigger
 AFTER INSERT que inserta en otra con identidad = defecto (control: `SCOPE_IDENTITY()` no se marca).
+
+## Medición a ciegas de la paridad (25-nov-2026)
+
+El job `paridad` del PR de esta ronda corrió con el código de la semana 2 tal como quedó en `main` (2949a09), que no
+conoce esta ronda, sobre un legado que sí trae las tres trampas. **Resultado: 0 de 3.** Los 11 veredictos salen ✔ y
+las cifras son IDÉNTICAS a las de la misma corrida sin la ronda 3 (PR de detectores-v4): R01–R12 al 100 %, reporte con
+0 defectos nuestros, 14,984 celdas de regla real y 181 de avance. Sólo cambia el piso de empatados invertidos
+(21.25 % → 13.71 %), que varía entre corridas por diseño.
+
+**La lectura de arriba se equivocó.** Decía que las tres trampas «cambian datos o salidas que la paridad SÍ compara». No
+es así: son tres procedimientos NUEVOS que nada del ciclo ejecuta (ni el job, ni la pantalla, ni el legado vivo). Su
+daño es real (medido ejecutándolos en una transacción revertida), pero latente: aparece cuando alguien los llama. La
+paridad sólo compara lo que el legado produjo; lo que no corrió no deja efecto que comparar.
+
+**Consecuencia.** Ni la radiografía (0 de 9) ni la paridad (0 de 3 en esta ronda) bastan solas. Lo que falta es saber
+QUÉ objetos tienen consumidor y compararlos a todos: es la puerta de cobertura de salidas de la semana 3 (inventario
+desde el código y desde lo que el servidor ejecuta de verdad, más la paridad de ESTADO de los procedimientos que
+escriben, corridos sobre el respaldo en una transacción revertida). Estas tres trampas son parte de su prueba de
+aceptación.
