@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Minimal API: composición, enlace de banderas y configuración por ambiente. -->
+  <PropertyGroup>
+    <RootNamespace>Decant.Api</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Decant.Infrastructure\Decant.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Decant.Api.Tests" />
+  </ItemGroup>
+</Project>
