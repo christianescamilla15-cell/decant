@@ -18,11 +18,12 @@ public sealed class ConsultasEnLoteEf(IDbContextFactory<DecantDbContext> fabrica
             .Where(o => o.FechaOperacion >= desde && o.FechaOperacion < hasta);
         if (despuesDe is not null)
         {
-            // timestamptz sólo admite parámetros en UTC; el orden es el de T1 (fecha y luego id).
+            // Comparación por fila de PostgreSQL, (fecha_operacion, id) > (@instante, @id): la misma llave y el mismo
+            // orden que T1. timestamptz sólo admite parámetros en UTC.
             var instante = despuesDe.FechaOperacion.ToUniversalTime();
             var id = despuesDe.Id;
-            operaciones = operaciones.Where(o =>
-                o.FechaOperacion > instante || (o.FechaOperacion == instante && o.Id > id));
+            operaciones = operaciones.Where(o => EF.Functions.GreaterThan(
+                ValueTuple.Create(o.FechaOperacion, o.Id), ValueTuple.Create(instante, id)));
         }
 
         var filas = await Proyecciones.OperacionesConMoneda(operaciones, contexto.Monedas.AsNoTracking())
@@ -41,11 +42,12 @@ public sealed class ConsultasEnLoteEf(IDbContextFactory<DecantDbContext> fabrica
             select new { Orden = o, Partida = p };
         if (despuesDe is not null)
         {
-            // La misma comparación que el ORDER BY (la colación de la base para el folio): nada se salta ni se repite.
+            // (fecha_valor, folio, renglon) > (@valor, @folio, @renglon): la misma llave, el mismo orden y la misma
+            // colación que el ORDER BY de T2, así que nada se salta ni se repite.
             var (valor, folio, renglon) = (despuesDe.FechaValor, despuesDe.Folio, despuesDe.Renglon);
-            renglones = renglones.Where(x => x.Orden.FechaValor > valor ||
-                (x.Orden.FechaValor == valor && (string.Compare(x.Orden.Folio, folio) > 0 ||
-                    (x.Orden.Folio == folio && x.Partida.Renglon > renglon))));
+            renglones = renglones.Where(x => EF.Functions.GreaterThan(
+                ValueTuple.Create(x.Orden.FechaValor, x.Orden.Folio, x.Partida.Renglon),
+                ValueTuple.Create(valor, folio, renglon)));
         }
 
         var filas = await renglones

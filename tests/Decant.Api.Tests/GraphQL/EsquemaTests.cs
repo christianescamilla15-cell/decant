@@ -142,14 +142,14 @@ public class EsquemaTests
     [Fact]
     public void La_configuracion_de_graphql_se_lee_estricta()
     {
-        foreach (var archivo in Directory.GetFiles(Repositorio.Ruta("src", "Decant.Api"), "appsettings*.json"))
-        {
-            using var json = JsonDocument.Parse(File.ReadAllText(archivo));
-            if (json.RootElement.TryGetProperty(OpcionesGraphQL.Seccion, out var seccion))
-            {
-                Assert.All(seccion.EnumerateObject(), c => Assert.Equal(nameof(OpcionesGraphQL.Introspeccion), c.Name));
-            }
-        }
+        var secciones = Directory.GetFiles(Repositorio.Ruta("src", "Decant.Api"), "appsettings*.json")
+            .Select(archivo => JsonSerializer.Deserialize<JsonElement>(File.ReadAllText(archivo)))
+            .Where(json => json.TryGetProperty(OpcionesGraphQL.Seccion, out _))
+            .Select(json => json.GetProperty(OpcionesGraphQL.Seccion))
+            .ToList();
+        Assert.Equal(4, secciones.Count); // appsettings.json y los tres ambientes la declaran explícitamente
+        Assert.All(secciones.SelectMany(s => s.EnumerateObject()),
+            c => Assert.Equal(nameof(OpcionesGraphQL.Introspeccion), c.Name));
 
         var configuracion = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?> { ["GraphQL:Introspeccion"] = "si" }).Build();

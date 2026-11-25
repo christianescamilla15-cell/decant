@@ -54,8 +54,11 @@ internal static class Cursores
 
     private static string Fecha(DateOnly fecha) => fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-    private static string Codificar(string consulta, params string[] valores) =>
-        Base64Url.EncodeToString(JsonSerializer.SerializeToUtf8Bytes((string[])[Version, consulta, .. valores]));
+    private static string Codificar(string consulta, params string[] valores)
+    {
+        string[] partes = [Version, consulta, .. valores];
+        return Base64Url.EncodeToString(JsonSerializer.SerializeToUtf8Bytes(partes));
+    }
 
     private static string[] Decodificar(string cursor, string consulta, int valores)
     {

@@ -39,18 +39,18 @@ public static class CambiosDeEsquema
         return cambios;
     }
 
-    private static Dictionary<string, ISyntaxNode> Definiciones(string sdl) =>
-        Utf8GraphQLParser.Parse(sdl).Definitions
-            .Select(d => d switch
-            {
-                INamedSyntaxNode n => (Nombre: n.Name.Value, Nodo: (ISyntaxNode)d),
-                DirectiveDefinitionNode dd => ("@" + dd.Name.Value, d),
-                SchemaDefinitionNode => ("schema", d),
-                _ => (d.ToString(), d),
-            })
-            .ToDictionary(x => x.Nombre, x => x.Nodo, StringComparer.Ordinal);
+    private static Dictionary<string, IDefinitionNode> Definiciones(string sdl) =>
+        Utf8GraphQLParser.Parse(sdl).Definitions.ToDictionary(Nombre, StringComparer.Ordinal);
 
-    private static IEnumerable<Cambio> CompararTipo(string nombre, ISyntaxNode viejo, ISyntaxNode actual) =>
+    private static string Nombre(IDefinitionNode definicion) => definicion switch
+    {
+        INamedSyntaxNode n => n.Name.Value,
+        DirectiveDefinitionNode d => "@" + d.Name.Value,
+        SchemaDefinitionNode => "schema",
+        _ => definicion.ToString(),
+    };
+
+    private static IEnumerable<Cambio> CompararTipo(string nombre, IDefinitionNode viejo, IDefinitionNode actual) =>
         (viejo, actual) switch
         {
             (ObjectTypeDefinitionNode a, ObjectTypeDefinitionNode b) => CompararCampos(nombre, a.Fields, b.Fields),
