@@ -1,6 +1,8 @@
-# Medición de la radiografía de `BFN_DIVISAS` contra `legado/TRAMPAS.md`
+# Medición de la radiografía de `BFN_DIVISAS`
 
-Los detectores corrieron sin leer el catálogo; esta tabla sólo cuenta qué señales esperadas aparecieron.
+Los detectores corrieron sin leer los catálogos; estas tablas sólo cuentan qué señales esperadas aparecieron. Cada catálogo se mide por separado.
+
+## `legado/TRAMPAS.md`
 
 **Detección: 8 de 9 trampas (88.9 %)**.
 
@@ -18,6 +20,18 @@ Los detectores corrieron sin leer el catálogo; esta tabla sólo cuenta qué se�
 | D1 | La comisión se trunca en vez de redondearse | detectada | round_trunca → dbo.sp_registrar_orden | round_trunca → dbo.sp_registrar_orden |
 | D2 | Los montos ignoran los decimales de ISO 4217 | sin patrón en S1 | — | — |
 | D3 | Liquidaciones descartadas en silencio | detectada | if_exists_sin_else → dbo.sp_registrar_liquidacion | if_exists_sin_else → dbo.sp_registrar_liquidacion |
+
+## `legado/TRAMPAS_CIEGAS.md`
+
+> Catálogo CONOCIDO: el autor de los detectores ya lo leyó, y los detectores de esta versión se escribieron después de verlo. Detectar estas trampas ahora NO cuenta como control; el control real de esta versión es una siembra a ciegas nueva.
+
+**Detección: 3 de 3 trampas (100.0 %)**.
+
+| Id | Trampa | Estado | Señales esperadas | Encontradas |
+|---|---|---|---|---|
+| T1 | Selección no determinista: variable asignada desde varias filas | detectada | top_sin_order_by → dbo.sp_reporte_posicion | top_sin_order_by → dbo.sp_reporte_posicion |
+| T2 | Reloj del servidor que entra a la regla por una variable | detectada | reloj_en_regla → dbo.sp_ordenes_por_vencer | reloj_en_regla → dbo.sp_ordenes_por_vencer |
+| T3 | Espacios finales que SQL Server ignora al comparar y PostgreSQL no | detectada | espacios_finales → dbo.partida_solicitada.referencia | espacios_finales → dbo.partida_solicitada.referencia |
 
 ## Hallazgos que no corresponden a ninguna trampa (11)
 

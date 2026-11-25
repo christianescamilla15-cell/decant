@@ -1,13 +1,13 @@
 # Radiografía de `BFN_DIVISAS`
 
-Generada 2026-11-25T02:25:02+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
+Generada 2026-11-25T03:07:15+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
 
 ## Restauración
 
 | Base restaurada | Archivo | sha256 contra el manifiesto | Verificación | Segundos |
 |---|---|---|---|---:|
-| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 3.0 |
-| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.8 |
+| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.8 |
+| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.5 |
 
 ## Criterio de salida
 
@@ -39,7 +39,7 @@ El orden se mide por inversiones con llave natural. Los pares con distinta llave
 
 | Salida | Renglones (comunes) | Mismo contenido | Pares contrato | Inversiones contrato | Pares empatados | Empatados invertidos | % posiciones distintas |
 |---|---:|---|---:|---:|---:|---:|---:|
-| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 384,445 (24.86 %) | 65.8 |
+| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 40,410 (2.61 %) | 5.6 |
 | lista_del_dia_anterior (`dbo.sp_lista_operaciones`) | 200 (183) | no: sin ORDER BY, otra instancia devuelve otras filas | 0 | 0 | 16,653 | 372 (2.23 %) | 69.0 |
 
 ## Corte medido en la fuente
@@ -59,7 +59,7 @@ Tabla principal `dbo.operacion`: MAX(id) = **412125** (IDENT_CURRENT 412125).
 
 ## Inventario
 
-7 tablas · 2,506,073 filas · 10 módulos · 1 triggers · 1 pasos de job.
+7 tablas · 2,506,073 filas · 12 módulos · 1 triggers · 1 pasos de job.
 
 | Tabla | Filas |
 |---|---:|
@@ -71,7 +71,7 @@ Tabla principal `dbo.operacion`: MAX(id) = **412125** (IDENT_CURRENT 412125).
 | `dbo.moneda` | 11 |
 | `dbo.folio` | 2 |
 
-Módulos: 1 job, 7 procedimiento, 1 trigger, 1 vista.
+Módulos: 1 job, 9 procedimiento, 1 trigger, 1 vista.
 
 Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
@@ -83,22 +83,23 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
 | Patrón | Hallazgos |
 |---|---:|
-| TOP sin ORDER BY | 5 |
+| Selección no determinista: TOP sin ORDER BY o asignación desde varias filas | 6 |
 | INNER JOIN a una tabla hija | 1 |
-| Reloj del servidor (GETDATE y similares) dentro de una regla | 1 |
+| Reloj del servidor (GETDATE y similares) en una regla, directo o por una variable | 3 |
 | IF EXISTS sin ELSE que escribe datos (camino silencioso) | 1 |
 | IF EXISTS sin ELSE con cuerpo de guarda o DDL (informativo) | 0 |
 | Conversión de zona con desfase fijo | 1 |
 | ROUND con tercer argumento: trunca en vez de redondear | 1 |
 | Centinelas en vez de NULL (por distribución de valores) | 3 |
 | Texto con mojibake (UTF-8 leído como latin-1) | 1 |
+| Espacios finales que SQL Server ignora al comparar y PostgreSQL no | 1 |
 | Re-registro: el mismo documento con otra llave interna | 3 |
 | Llave candidata con duplicados (no parece re-registro) | 1 |
 | Columnas que ningún módulo lee | 4 |
 | Tablas que ningún módulo lee | 1 |
-| Literales mágicos (números y códigos en duro) | 30 |
+| Literales mágicos (números y códigos en duro) | 35 |
 
-### TOP sin ORDER BY (5)
+### Selección no determinista: TOP sin ORDER BY o asignación desde varias filas (6)
 
 | Objeto | Línea | Detalle | Fragmento |
 |---|---:|---|---|
@@ -107,6 +108,7 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | `dbo.sp_lista_operaciones` | 15 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero | `SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,` |
 | `dbo.sp_registrar_liquidacion` | 15 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @id = id, @moneda = moneda FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';` |
 | `dbo.sp_registrar_orden` | 23 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @anterior = id, @folio = folio FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';` |
+| `dbo.sp_reporte_posicion` | 24 | asigna @tc_cierre desde dbo.operacion sin TOP ni agregado y sin filtro único (el WHERE iguala moneda; llaves únicas de la tabla: id): la variable se queda con la última fila que entregue el plan | `SELECT @tc_cierre = tipo_cambio` |
 
 ### INNER JOIN a una tabla hija (1)
 
@@ -114,11 +116,13 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 |---|---:|---|---|
 | `dbo.vw_reporte_ordenes` | 8 | INNER JOIN de dbo.orden_pago a su tabla hija dbo.partida_solicitada: descarta los registros de dbo.orden_pago sin dbo.partida_solicitada | `INNER JOIN dbo.partida_solicitada p ON p.orden_id = o.id` |
 
-### Reloj del servidor (GETDATE y similares) dentro de una regla (1)
+### Reloj del servidor (GETDATE y similares) en una regla, directo o por una variable (3)
 
 | Objeto | Línea | Detalle | Fragmento |
 |---|---:|---|---|
 | `dbo.sp_conciliar` | 21 | GETDATE() decide un resultado: reprocesar otro día da otra respuesta | `WHERE estatus = 'ENVIADA' AND fecha_envio < DATEADD(day, -3, GETDATE());` |
+| `dbo.sp_ordenes_por_vencer` | 11 | el reloj del servidor entra por la variable @limite (viene de @hoy) y decide un resultado: reprocesar otro día da otra respuesta | `CASE WHEN fecha_envio < DATEADD(day, -1, @limite) THEN 'VENCE HOY' ELSE 'VENCE MANANA' END AS aviso` |
+| `dbo.sp_ordenes_por_vencer` | 13 | el reloj del servidor entra por la variable @limite (viene de @hoy) y decide un resultado: reprocesar otro día da otra respuesta | `WHERE estatus = 'ENVIADA' AND fecha_envio < @limite` |
 
 ### IF EXISTS sin ELSE que escribe datos (camino silencioso) (1)
 
@@ -152,6 +156,12 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 |---|---:|---|---|
 | `dbo.operacion.cliente` |  | 21,189 filas con secuencias de UTF-8 leído como latin-1; en la muestra, 400 de 400 valores distintos se reparan al revertir la decodificación |  |
 
+### Espacios finales que SQL Server ignora al comparar y PostgreSQL no (1)
+
+| Objeto | Línea | Detalle | Fragmento |
+|---|---:|---|---|
+| `dbo.partida_solicitada.referencia` |  | 48,013 de 244,869 valores con espacios al final (19.6%), medidos con DATALENGTH en el motor: SQL Server los ignora al comparar (=, DISTINCT, GROUP BY) y LEN no los cuenta; PostgreSQL sí los distingue; ventana en fecha_hora: 2022-07-04 08:00:15 → 2023-01-27 17:54:05 (la tabla va de 2021-01-01 08:11:34 a 2023-12-28 17:58:52); concentrados en esa ventana |  |
+
 ### Re-registro: el mismo documento con otra llave interna (3)
 
 | Objeto | Línea | Detalle | Fragmento |
@@ -181,7 +191,7 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 |---|---:|---|---|
 | `dbo.bitacora` |  | ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación) |  |
 
-### Literales mágicos (números y códigos en duro) (30)
+### Literales mágicos (números y códigos en duro) (35)
 
 | Objeto | Literales distintos | Ejemplos |
 |---|---:|---|
@@ -189,10 +199,12 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | `dbo.sp_conciliar` | 7 | `5000`, `'LIQUIDADA'`, `60.0`, `'PRINCIPAL'`, `'VENCIDA'`, `'ENVIADA'`, `-3` |
 | `dbo.sp_registrar_operacion` | 6 | `'FX'`, `'V'`, `1.0035`, `0.9965`, `9`, `2` |
 | `dbo.sp_registrar_liquidacion` | 3 | `'ENVIADA'`, `2`, `'LIQUIDADA'` |
+| `dbo.sp_reporte_posicion` | 3 | `'C'`, `'V'`, `2` |
+| `dbo.sp_ordenes_por_vencer` | 2 | `-2`, `'ENVIADA'` |
 | `dbo.sp_detalle_operacion` | 1 | `'REEMPLAZADA'` |
 | `dbo.vw_reporte_ordenes` | 1 | `'REEMPLAZADA'` |
 
 ## Tiempos
 
-arranque_contenedor: 6.3 s · restauracion: 5.1 s · inventario: 0.9 s · patrones_codigo: 0.0 s · patrones_datos: 14.4 s · criterio_salida: 1.3 s · total: 28.3 s
+arranque_contenedor: 6.3 s · restauracion: 4.5 s · inventario: 1.2 s · patrones_codigo: 0.1 s · patrones_datos: 17.2 s · criterio_salida: 1.5 s · total: 31.3 s
 
