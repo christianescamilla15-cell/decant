@@ -17,6 +17,11 @@ partes, verificarse parte por parte y deshacerse sin tocar lo que no cargó.
   con margen ANTES del delta, y el delta se numera DESPUÉS: el legado siguió usando folios tras el congelamiento.
 - Cada mes deja su huella sha256 por tabla en origen y destino. El cuadre es mes a mes, no sólo de totales.
 - Primero se ensaya sobre una foto con los MISMOS índices únicos que producción; un choque ahí detiene el corte.
+- «Ya lo trabajó el TO-BE» se decide por la bitácora de ACCIONES de negocio, nunca por el token de concurrencia ni
+  la fecha de modificación: las escrituras informativas del sistema (marcas, validaciones) los cambian y harían que
+  la reversa se salte filas. `aplicar` se niega si hay automatismos del TO-BE encendidos.
+- El delta concilia por llave de negocio (documento + sucursal): un re-registro trae id nuevo, el viejo sale y no
+  queda ningún documento duplicado. Lo derivado por id se re-arma después de cada carga.
 
 ## Alternativas descartadas
 - **TRUNCATE + COPY del estado completo (S2):** no convive con lo capturado y su reversa es todo o nada.

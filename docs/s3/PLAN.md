@@ -29,15 +29,26 @@ que dejó S2: toda salida del legado con consumidor queda comparada, reemplazada
    sha256 por tabla, igual en origen y destino. 0 filas con id ≤ corte en destino tras cada mes.
 5. **Reversa probada:** generada ANTES de cada mes. Aplicar y luego revertir deja las 7 tablas, los consumibles y las
    secuencias con la huella previa, en 36 de 36 meses.
+   - Para saber qué ya trabajó el TO-BE, la reversa lee la bitácora de ACCIONES de negocio, no el token de
+     concurrencia ni la fecha de modificación: una marca automática del TO-BE no hace pasar una fila por trabajada.
+     Control negativo: una escritura informativa del sistema sobre una fila cargada no la saca de la reversa.
+   - Guarda: `aplicar` se niega si hay automatismos del TO-BE encendidos.
 6. **Grieta plantada:** detectada 1 de 1 por el cuadre mes a mes y NO por los totales globales (control negativo del
    propio cuadre).
 7. **Delta del mismo día tras el congelamiento:**
    - entran las 5 altas de la sucursal 0012 fechadas hacia atrás (ids 412,185–412,189);
    - las 4 órdenes registradas después del congelamiento quedan sin duplicar;
    - 0 choques de folio: los 4 de OP-000150851 a 854 ya los usó el legado, y los consumibles se suben con margen;
-   - el pendiente re-registrado el día del corte reaparece con el MISMO documento.
+   - el pendiente re-registrado el día del corte trae un id NUEVO: reaparece con el MISMO documento y el registro
+     viejo SALE. Se concilia por llave de negocio (documento + sucursal), no por id: 0 duplicados por documento;
+   - lo derivado por id (correcciones o enriquecimientos aplicados después de cargar) se RE-ARMA tras cada carga;
+     no se reusa.
 8. **Totales al cierre de TODAS las tablas:** las 7 del legado, catálogos (11 monedas) y consumibles (2 series de
    folio, 5 identidades). Origen = destino y cifras de control por documento firmadas (sha256) antes de cambiar.
+   - Las cifras van por documento + estado + mes, no sólo en totales: los totales globales no detectan los
+     desplazamientos.
+   - Lo que «no viaja» se cuenta por motivo (pendiente, sin detalle, duplicado, dato sucio) y la suma cuadra con el
+     origen: cargado + no viaja = origen.
 9. **Paridad de estado de los procedimientos que escriben:** 6 de 6, corridos sobre el respaldo en una transacción
    revertida, incluidos los «sin ejecución observada» (la contingencia de r3-T3 es uno): es la única forma de ver
    su efecto.
@@ -47,7 +58,11 @@ que dejó S2: toda salida del legado con consumidor queda comparada, reemplazada
     - las banderas se encienden en orden (marca → conciliar → vencer → avisar al emulador) y la prueba de humo pasa;
     - 3 noches en «sólo marca» contra la última bitácora del legado: 0 noches en que actúen los dos.
 11. **Runbook ejecutable** (`ensayo | aplicar | reversa`) corrido completo en el CI sobre una foto con los MISMOS
-    índices únicos. El job dura ≤ 15 min (hoy la paridad, 9–12 min).
+    índices únicos. El job dura ≤ 15 min (hoy la paridad, 9–12 min). Antes del día:
+    - la configuración de ensayo contra la de producción da 0 llaves sin explicar;
+    - todo queda PRECARGADO con los interruptores apagados: el día del corte sólo se enciende;
+    - hay una sonda de punta a punta por cada salto (una llamada firmada contra el vecino emulado), porque los
+      permisos entre sistemas sólo fallan así.
 12. «doc» **Reversa fijada antes y con números:** revierte cualquier diferencia de totales ≠ 0, cualquier mes que no cuadre,
     cualquier documento con cifra distinta o una noche con doble acción. Después del punto de no retorno, sólo hacia
     adelante.
@@ -63,7 +78,7 @@ que dejó S2: toda salida del legado con consumidor queda comparada, reemplazada
 | Grieta | un mes partido por la fecha UTC en vez de la local: las operaciones de la noche del último día del mes caen en el siguiente; los totales cuadran y el mes no | – |
 | Delta del mismo día | por id y por bitácora, no por fecha; incluye el día del corte | camino por pantalla: se mide lo que pierde, no se usa |
 | Convivencia (ADR 0016) | jobs con reloj apagados en el legado; noches en «sólo marca»; legado en sólo lectura con vigía; banderas en orden + humo | – |
-| Operación del día | – | redirect o DNS, punto de no retorno, ventana con negocio, permisos de quién aplica y quién revierte, comunicación |
+| Operación del día | la guarda de automatismos; temporizadores persistentes, que sobreviven a un reinicio; candados entre procesos por identificador, no por texto | redirect o DNS, punto de no retorno, ventana con negocio (sin lunes ni viernes), sesiones y credenciales que duren toda la ventana, permisos de quién aplica y quién revierte, comunicación |
 
 Se reusa lo que ya existe: la carga transaccional en bloque (S2) para el ensayo; `radiografia/veredictos.py` para
 correr procedimientos en una transacción revertida; el piso de inversiones con plan variado; el legado vivo (delta,
@@ -103,6 +118,12 @@ choques preparados) y el emulador del corresponsal.
   salidas vio 0 de 3 (la radiografía, 0 de 9 en las tres rondas). Mitigación: renglón para todo lo que está en el
   código y paridad de estado aunque no se haya observado su ejecución.
 - La ronda 3 vive en `paridad/` (su PR): S3 no la toca hasta que se fusione.
+- Lo que en un corte real salió caro (revisión del 25-nov), en orden:
+  - los candados o avisos entre procesos que casan por TEXTO: uno mal redactado deja el recurso «tomado» un día;
+  - configuración de producción distinta de la del ensayo;
+  - dependencias entre sistemas que sólo fallan con una llamada firmada de punta a punta;
+  - pendientes del legado que nadie va a terminar.
+  El plan responde con el criterio 11, la fila «Operación del día» y una decisión de negocio.
 
 ## Qué se pedirá validar, y a quién
 - **Negocio (dueño del proceso):**
@@ -110,7 +131,8 @@ choques preparados) y el emulador del corresponsal.
   - la ventana del corte;
   - qué hacer con los defectos que la paridad de estado mostrará: replicar o corregir r3-T1, el truncado de r2-T3 y el
     desempate del último minuto de r1-T1;
-  - dueño y fecha de cada objeto retirado.
+  - dueño y fecha de cada objeto retirado;
+  - quién procesa en el TO-BE los pendientes que el legado ya no va a terminar.
 - **Operación de la base:**
   - Query Store durante un ciclo con cierre;
   - apagar los jobs con reloj al cortar;
