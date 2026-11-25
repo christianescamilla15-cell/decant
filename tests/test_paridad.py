@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 
+from legado.generador import zonas as generador_zonas
 from legado.generador.simulacion import COLUMNAS
 from paridad import arbitraje, binding, esquema, mapeo, migracion, motor, oraculo, reporte, universo
+from paridad import zonas as paridad_zonas
 from universo.particion import PARTICION
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -59,14 +61,89 @@ def test_el_mapeo_es_valido_y_cubre_cada_columna_del_legado():
 
 
 def test_parches_t3_centinelas():
-    assert mapeo.aplicar(('char', 'T3_texto'), 'NA         ') is None
+    assert mapeo.aplicar(('char:11', 'T3_texto'), 'NA         ') is None
     assert mapeo.aplicar(('T3_texto',), '987320396284801163') == '987320396284801163'
     assert mapeo.aplicar(('T3_numero',), Decimal('0.000000')) is None
     assert mapeo.aplicar(('T3_numero',), Decimal('19.859734')) == Decimal('19.859734')
 
 
-def test_parche_ciega1_t3_recorta_solo_espacios_finales():
-    assert mapeo.aplicar(('ciega1_T3',), 'FICT220667399219' + ' ' * 19) == 'FICT220667399219'
+# ── parches EXACTOS: sólo el predicado del hallazgo; un defecto distinto sigue siendo diferencia ─────────────────
+
+_REF = 'FICT220667399219'
+_EN_VENTANA = {'fecha_hora': datetime(2022, 9, 1, 9, 30)}
+
+
+def test_ciega1_t3_quita_el_relleno_de_ancho_fijo_dentro_de_la_ventana():
+    assert mapeo.aplicar(('ciega1_T3',), _REF.ljust(35), fila=_EN_VENTANA) == _REF
+
+
+@pytest.mark.parametrize('valor, fila, por_que', [
+    (_REF.ljust(35), {'fecha_hora': datetime(2023, 3, 1, 9, 30)}, 'relleno fuera de la ventana'),
+    ((_REF + '\t').ljust(35), _EN_VENTANA, 'tabulador antes del relleno'),
+    (_REF + '   ', _EN_VENTANA, 'relleno que no llega al ancho fijo'),
+    (_REF.ljust(36), _EN_VENTANA, 'más ancho que la interfaz'),
+])
+def test_ciega1_t3_no_absuelve_un_defecto_distinto(valor, fila, por_que):
+    assert mapeo.aplicar(('ciega1_T3',), valor, fila=fila) == valor, por_que
+
+
+def test_char_sólo_quita_el_relleno_del_tipo():
+    assert mapeo.aplicar(('char:11', 'T3_texto'), 'NA'.ljust(11)) is None
+    assert mapeo.aplicar(('char:11',), 'FICTUS33XXX') == 'FICTUS33XXX'
+    assert mapeo.aplicar(('char:11', 'T3_texto'), 'NA ') == 'NA '            # no llena el ancho: no es del tipo
+    assert mapeo.aplicar(('char:11', 'T3_texto'), 'NA\t'.ljust(11)) == 'NA\t'.ljust(11)   # intacto
+    with pytest.raises(KeyError):
+        mapeo.aplicar(('char',), 'X')                                        # el ancho es obligatorio
+
+
+def test_los_centinelas_son_exactos():
+    assert mapeo.aplicar(('T3_texto',), 'NA') is None
+    for distinto in ('N/A', 'na', 'NA '):
+        assert mapeo.aplicar(('T3_texto',), distinto) == distinto
+    assert mapeo.aplicar(('T3_numero',), Decimal('0.000001')) == Decimal('0.000001')
+
+
+def test_el_control_negativo_inyecta_otros_defectos_y_todos_fallan():
+    c = migracion.Comparacion('prueba', 'llave')
+    legado = {('u', 1): {'referencia': _REF.ljust(35), **_EN_VENTANA}}
+    tobe = {('u', 1): {'referencia': _REF}}
+    migracion._cruzar(c, legado, tobe, [('referencia', 'referencia', ('ciega1_T3',))])
+    resumen = c.resumen()
+    assert resumen['parches'] == {'ciega1_T3 → referencia': 1}
+    assert len(resumen['controles_negativos']) == 4 and all(x['falla'] for x in resumen['controles_negativos'])
+
+
+def test_lo_aplicado_debe_ser_igual_a_lo_medido_en_el_origen():
+    c = migracion.Comparacion('prueba', 'llave')
+    migracion._cruzar(c, {('u', 1): {'referencia': _REF.ljust(35), **_EN_VENTANA}}, {('u', 1): {'referencia': _REF}},
+                      [('referencia', 'referencia', ('ciega1_T3',))])
+    c.medidos = {'ciega1_T3 → referencia': 2}            # el origen dice 2: el parche aplicó 1
+    assert not c.resumen()['cuadra'] and c.resumen()['parches_sin_cuadrar']
+
+
+# ── la paridad no comparte código con la fuente de la verdad, pero debe dar lo mismo ─────────────────────────
+
+def _horas_de_dias(dias: list[date]):
+    for dia in dias:
+        for minuto in range(0, 24 * 60, 10):
+            yield datetime(dia.year, dia.month, dia.day) + timedelta(minutes=minuto)
+
+
+@pytest.mark.parametrize('zona_paridad, zona_generador', [
+    (paridad_zonas.CDMX, generador_zonas.CDMX), (paridad_zonas.NUEVA_YORK, generador_zonas.NUEVA_YORK)])
+def test_la_conversion_de_la_paridad_coincide_con_la_del_generador_en_los_cambios_de_horario(zona_paridad,
+                                                                                             zona_generador):
+    cambios = [date(2021, 3, 14), date(2021, 4, 4), date(2021, 10, 31), date(2021, 11, 7), date(2022, 3, 13),
+               date(2022, 4, 3), date(2022, 10, 30), date(2022, 11, 6), date(2023, 3, 12), date(2023, 11, 5)]
+    revisadas = repetidas = 0
+    for hora in _horas_de_dias(cambios):
+        revisadas += 1
+        assert paridad_zonas.a_utc(hora, zona_paridad) == generador_zonas.a_utc(hora, zona_generador), hora
+        if paridad_zonas.es_ambigua(hora, zona_paridad):
+            repetidas += 1
+            assert paridad_zonas.a_utc(hora, zona_paridad, 1) == \
+                hora.replace(tzinfo=zona_generador, fold=1).astimezone(timezone.utc), hora
+    assert revisadas == 1440 and repetidas >= 6        # al menos una hora repetida al año, de 10 en 10 minutos
 
 
 def test_parche_t5_convierte_la_hora_local_de_cada_zona():
@@ -147,14 +224,41 @@ def test_un_arbitro_que_no_pasa_su_auditoria_no_absuelve():
     assert r['por_categoria'][arbitraje.DEFECTO] == 1 and r['por_arbitro']['a']['auditoria_fallida'] == 1
 
 
-@pytest.mark.parametrize('envio, ultima, horas', [
-    (datetime(2023, 6, 1, 6, 39, 53, tzinfo=timezone.utc), datetime(2023, 6, 1, 12, 30, 42, tzinfo=timezone.utc), 1),
-    (datetime(2023, 12, 1, 6, 22, 41, tzinfo=timezone.utc), datetime(2023, 12, 1, 15, 8, 5, tzinfo=timezone.utc), 0),
-    (datetime(2022, 3, 20, 11, 55, 9, tzinfo=timezone.utc), datetime(2022, 3, 21, 12, 50, 6, tzinfo=timezone.utc), 1),
+# ── R08 / T5: la réplica y la corrección como hipótesis ──────────────────────────────────────────────────────
+
+@pytest.mark.parametrize('envio, ultima, legado', [
+    (datetime(2023, 12, 1, 0, 22, 41), datetime(2023, 12, 1, 10, 8, 5), '8.77'),    # 2da9c50b…
+    (datetime(2023, 6, 1, 0, 39, 53), datetime(2023, 6, 1, 8, 30, 42), '6.85'),     # 469818d6…
+    (datetime(2022, 3, 20, 5, 55, 9), datetime(2022, 3, 21, 8, 50, 6), '25.92'),    # 274cab37…
 ])
-def test_la_auditoria_de_t5_mide_la_hora_que_el_legado_supone_de_mas(envio, ultima, horas):
-    # casos reales: 469818d6… (junio 2023), 2da9c50b… (diciembre 2023), 274cab37… (marzo 2022)
-    assert motor._horas_de_desfase(envio, ultima) == horas
+def test_la_formula_del_legado_sobre_columnas_crudas_da_lo_que_el_legado_guardo(envio, ultima, legado):
+    assert motor.horas_fijas_del_legado(envio, ultima) == Decimal(legado)
+
+
+def _fila_r08(id_, envio, ultima, legado):
+    return id_, f'u{id_}', envio, Decimal(legado), ultima
+
+
+def test_la_auditoria_de_t5_prueba_los_dos_sentidos_y_desglosa_por_ventana():
+    desfase = {'u1': timedelta(hours=-5), 'u2': timedelta(hours=-4), 'u3': timedelta(hours=-4)}
+    filas = [_fila_r08(1, datetime(2023, 12, 1, 0, 22, 41), datetime(2023, 12, 1, 10, 8, 5), '8.77'),
+             _fila_r08(2, datetime(2023, 6, 1, 0, 39, 53), datetime(2023, 6, 1, 8, 30, 42), '6.85'),
+             _fila_r08(3, datetime(2022, 3, 20, 5, 55, 9), datetime(2022, 3, 21, 8, 50, 6), '25.92')]
+    r = motor.hipotesis_r08(filas, desfase, {1: (None, None, None), 2: (None, None, None), 3: (None, None, None)})
+    fija, instantes = r['hipotesis']
+    assert (fija['coinciden'], instantes['coinciden']) == (3, 1)
+    a = r['auditoria']
+    assert a['violaciones'] == 0 and a['diferencias'] == a['suma_de_ventanas'] == 2
+    assert a['conteos']['extra = 0 y el legado coincide'] == 1
+    assert set(a['ventanas']) == {'2023 (12-mar a 5-nov): Nueva York en horario de verano, México ya sin él',
+                                  'primavera 2022: Nueva York ya en horario de verano, México todavía no'}
+
+
+def test_la_auditoria_de_t5_detecta_una_diferencia_sin_desfase_extra():
+    """El sentido inverso: en diciembre de 2023 no hay desfase extra; si el legado difiere, es violación."""
+    filas = [_fila_r08(1, datetime(2023, 12, 1, 0, 22, 41), datetime(2023, 12, 1, 10, 8, 5), '9.77')]
+    r = motor.hipotesis_r08(filas, {'u1': timedelta(hours=-5)}, {1: (None, None, None)})
+    assert r['auditoria']['violaciones'] == 1
 
 
 def test_la_regla_de_hora_local_sin_zona_audita_el_desfase():
@@ -224,9 +328,86 @@ def test_el_piso_no_se_conforma_con_una_corrida_que_reproduce_el_orden(tmp_path)
     formato.escribir(tmp_path / 'p.jsonl', ['uetr', 'concepto', 'fecha_valor'], publicado)
     invertido = [publicado[1], publicado[0], publicado[2]]
     cursor = _CursorDelLegado([publicado, invertido, publicado])
+    cursor.description_columnas = ['uetr', 'concepto', 'fecha_valor']
     salida = {'archivo': 'p.jsonl', 'procedimiento': 'dbo.sp_reporte_ordenes', 'parametros': [], 'conjunto': 0,
               'llave_orden': ['fecha_valor']}
     piso = reporte.piso(cursor, salida, tmp_path)
     assert [m['pct_empatados_invertidos'] for m in piso['muestras']] == [0.0, 100.0, 0.0]
     assert piso['pct_empatados_invertidos'] == 100.0 and piso['inversiones_contrato'] == 0
     assert any('DBCC FREEPROCCACHE' in s for s in cursor.preparaciones)
+
+
+# ── control negativo del comparador del reporte: mutantes que DEBEN fallar (fixture chico, sin base) ──────────
+
+_COLUMNAS_REPORTE = ['folio', 'uetr', 'referencia_mt103', 'fecha_envio', 'fecha_valor', 'bic_corresponsal',
+                     'beneficiario', 'moneda', 'monto', 'gastos', 'estatus', 'concepto', 'monto_partida',
+                     'fecha_partida']
+
+
+def _renglon(n: int, fecha_valor: str, envio_local: str, partida_local: str, monto: str) -> tuple[list, list]:
+    uetr = f'3edcbeae-c21e-40f1-b309-430eca67e1{n:02d}'
+    comun = [f'OP-0000000{n:02d}', uetr, f'BFN2312010000{n:02d}']
+    legado = comun[:] + [envio_local, fecha_valor, 'FICTUS33XXX', 'Great Plains Seed Co.', 'USD', '1000.00', 'SHA',
+                         'CONCILIADA', 'ABONO', monto, partida_local]
+    tobe = comun[:] + [envio_local.replace(' ', 'T') + '-06:00', fecha_valor, 'FICTUS33XXX', 'Great Plains Seed Co.',
+                       'USD', '1000.00', 'SHA', 'CONCILIADA', 'ABONO', monto,
+                       partida_local.replace(' ', 'T') + '-05:00']
+    return legado, tobe
+
+
+class _LegadoVivoSinNada:
+    """Doble del legado vivo: no tiene ninguna partida posterior al corte."""
+
+    def cursor(self):
+        return self
+
+    def execute(self, *_):
+        pass
+
+    def fetchall(self):
+        return []
+
+    def fetchone(self):
+        return None
+
+
+def _reporte_chico(tmp_path):
+    from paridad import formato
+    pares = [_renglon(1, '2023-12-01', '2023-12-01 10:05:30', '2023-12-01 12:15:42', '988.50'),
+             _renglon(2, '2023-12-01', '2023-12-01 10:06:00', '2023-12-01 12:20:00', '1000.00'),
+             _renglon(3, '2023-12-04', '2023-12-04 09:00:00', '2023-12-04 11:00:00', '500.25'),
+             _renglon(4, '2023-12-04', '2023-12-04 09:30:00', '2023-12-04 11:30:00', '250.00')]
+    formato.escribir(tmp_path / 'publicado.jsonl', _COLUMNAS_REPORTE, [p[0] for p in pares])
+    formato.escribir(tmp_path / 'tobe.jsonl', _COLUMNAS_REPORTE, [p[1] for p in pares])
+    publicada = {'archivo': 'publicado.jsonl', 'sha256': '0' * 64}
+    corte = {'instante_utc': '2023-12-29T09:44:36+00:00', 'tablas': {'dbo.partida_solicitada': {'max_id': 100}}}
+    return publicada, corte, {'pct_empatados_invertidos': 10.0}
+
+
+def test_el_reporte_chico_sin_mutar_cumple(tmp_path):
+    publicada, corte, piso = _reporte_chico(tmp_path)
+    r = reporte.comparar(publicada, tmp_path, tmp_path / 'tobe.jsonl', piso, corte, _LegadoVivoSinNada(), {})
+    assert r['cumple'] and r['arbitraje']['por_categoria'][arbitraje.REGLA] == 8   # 4 renglones × 2 horas
+
+
+def test_cada_mutante_del_reporte_falla_como_debe(tmp_path):
+    publicada, corte, piso = _reporte_chico(tmp_path)
+    resultados = reporte.mutantes(publicada, tmp_path, tmp_path / 'tobe.jsonl', piso, corte, _LegadoVivoSinNada(), {},
+                                  tmp_path / 'mutantes')
+    assert len(resultados) == 6
+    fallan = {m['mutante']: m['falla_como_debe'] for m in resultados}
+    assert all(fallan.values()), fallan
+    hora = next(m for m in resultados if m['mutante'].startswith('una hora corrida'))
+    assert hora['defectos'] == 1               # «hora local sin zona» absorbe 8 celdas, pero no ésta
+
+
+def test_el_punto_ciego_cuenta_las_celdas_de_la_hora_repetida(tmp_path):
+    from paridad import formato
+    legado, tobe = _renglon(1, '2022-10-31', '2022-10-30 01:30:00', '2022-11-06 01:30:00', '1.00')
+    formato.escribir(tmp_path / 'publicado.jsonl', _COLUMNAS_REPORTE, [legado])
+    formato.escribir(tmp_path / 'tobe.jsonl', _COLUMNAS_REPORTE, [tobe])
+    r = reporte.comparar({'archivo': 'publicado.jsonl', 'sha256': ''}, tmp_path, tmp_path / 'tobe.jsonl',
+                         {'pct_empatados_invertidos': 1.0}, {'instante_utc': '2023-12-29T09:44:36+00:00',
+                                                             'tablas': {'dbo.partida_solicitada': {'max_id': 1}}},
+                         None, {})
+    assert r['punto_ciego']['celdas_en_hora_repetida'] == 2   # 01:30 del 30-oct (CDMX) y del 6-nov (NY)
