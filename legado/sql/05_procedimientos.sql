@@ -307,3 +307,64 @@ BEGIN
     ORDER BY p.bic_corresponsal;
 END
 GO
+-- Proceso de la mesa: refleja en cada operación el estado de su orden de pago.
+CREATE OR ALTER PROCEDURE dbo.sp_reflejar_estatus_operacion
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE o
+    SET estatus = CASE p.estatus WHEN 'CONCILIADA' THEN 'PAGADA'
+                                 WHEN 'DIFERENCIA' THEN 'PAGADA'
+                                 WHEN 'VENCIDA' THEN 'RECHAZADA'
+                                 ELSE 'EN_PROCESO' END
+    FROM dbo.orden_pago p
+    INNER JOIN dbo.operacion o ON o.id = p.operacion_id;
+END
+GO
+-- Reporte de antigüedad: órdenes enviadas hace más de @dias días sin confirmar, con filtro opcional por corresponsal.
+CREATE OR ALTER PROCEDURE dbo.sp_antiguedad_ordenes
+    @dias              int = 3,
+    @bic_corresponsal  char(11) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @sql nvarchar(max);
+    SET @sql = N'SELECT folio, uetr, bic_corresponsal, moneda, monto, fecha_envio FROM dbo.orden_pago '
+             + N'WHERE estatus = ''ENVIADA'' AND fecha_envio < DATEADD(day, -' + CAST(@dias AS nvarchar(10))
+             + N', GETDATE())';
+    IF @bic_corresponsal IS NOT NULL
+        SET @sql = @sql + N' AND bic_corresponsal = @bic';
+    SET @sql = @sql + N' ORDER BY fecha_envio, folio';
+    EXEC sp_executesql @sql, N'@bic char(11)', @bic = @bic_corresponsal;
+END
+GO
+-- Contingencia de la mesa: alta manual de una orden cuando la interfaz no corre. La pantalla abre el detalle con @id.
+CREATE OR ALTER PROCEDURE dbo.sp_alta_manual_orden
+    @operacion_id         int,
+    @uetr                 char(36),
+    @referencia_mt103     varchar(16),
+    @fecha_envio          datetime,
+    @fecha_valor          date,
+    @bic_corresponsal     char(11),
+    @beneficiario         nvarchar(120),
+    @cuenta_beneficiario  varchar(34),
+    @moneda               char(3),
+    @monto                decimal(18, 2),
+    @gastos               char(3),
+    @id                   int OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @n int, @folio varchar(20);
+
+    UPDATE dbo.folio SET @n = siguiente, siguiente = siguiente + 1, actualizado = GETDATE() WHERE serie = 'OP';
+    SET @folio = 'OP-' + RIGHT('000000000' + CAST(@n AS varchar(9)), 9);
+
+    INSERT INTO dbo.orden_pago (operacion_id, folio, uetr, referencia_mt103, fecha_registro, fecha_envio, fecha_valor,
+                                bic_corresponsal, bic_intermediario, beneficiario, cuenta_beneficiario, moneda, monto,
+                                gastos, estatus)
+    VALUES (@operacion_id, @folio, @uetr, @referencia_mt103, GETDATE(), @fecha_envio, @fecha_valor,
+            @bic_corresponsal, 'NA', @beneficiario, @cuenta_beneficiario, @moneda, @monto, @gastos, 'ENVIADA');
+    SET @id = @@IDENTITY;
+END
+GO
