@@ -3,9 +3,10 @@
 #
 #   DECANT_SA_PASSWORD='…' ./ciclo.sh
 #
-# Levanta el legado (docker compose), crea el esquema, genera y carga 3 años, arranca la pantalla, toma el
-# respaldo FECHADO, inyecta el delta del mismo día (legado vivo), restaura el respaldo en un contenedor LIMPIO,
-# lo radiografía y mide la detección contra el catálogo de trampas.
+# Levanta el legado (docker compose), crea el esquema, genera y carga 3 años (con sus archivos de interfaz),
+# arranca la pantalla, toma el respaldo FECHADO con lo que el legado publicaba, inyecta el delta del mismo día
+# (legado vivo), extrae ese delta también por la pantalla, restaura el respaldo en un contenedor LIMPIO, lo
+# radiografía, mide cada hallazgo fuera del catálogo y la detección contra el catálogo de trampas.
 set -euo pipefail
 : "${DECANT_SA_PASSWORD:?define DECANT_SA_PASSWORD (contraseña de sa del contenedor del legado)}"
 PY=${PYTHON:-python}
@@ -34,9 +35,15 @@ c.request('GET', '/salud'); raise SystemExit(c.getresponse().status != 200)" 2>/
   cat legado/datos/pantalla.log; return 1
 }
 
-radiografiar() {
+ultimo_manifiesto() {
   local manifiestos=(respaldos/respaldo_*.json)          # el glob sale ordenado: el último es el más reciente
-  "$PY" -m radiografia --manifiesto "${manifiestos[-1]}"
+  echo "${manifiestos[-1]}"
+}
+
+delta_por_pantalla() {
+  local fecha; fecha=$(basename "$(ultimo_manifiesto)" .json); fecha=${fecha#respaldo_}
+  "$PY" -m legado.extraer_pantalla --pantalla "http://127.0.0.1:$PUERTO_PANTALLA/" --fecha "$fecha" \
+    --salida "legado/datos/delta_por_pantalla_$fecha.jsonl"
 }
 
 detener_pantalla() {
@@ -50,7 +57,9 @@ paso 'generar y cargar'          "$PY" -m legado cargar
 paso 'pantalla'                  pantalla
 paso 'respaldar'                 "$PY" -m legado respaldar --pantalla "http://127.0.0.1:$PUERTO_PANTALLA/"
 paso 'legado vivo'               "$PY" -m legado.vivo
-paso 'restaurar y radiografiar'  radiografiar
+paso 'delta por la pantalla'     delta_por_pantalla
+paso 'restaurar y radiografiar'  "$PY" -m radiografia --manifiesto "$(ultimo_manifiesto)"
+paso 'veredictos medidos'        "$PY" -m radiografia.veredictos --manifiesto "$(ultimo_manifiesto)"
 paso 'medir contra el catálogo'  "$PY" -m radiografia.medicion --minimo 88
 paso 'daño de bcp -c'            "$PY" -m legado bcp
 echo

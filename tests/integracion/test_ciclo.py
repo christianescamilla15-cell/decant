@@ -10,13 +10,14 @@ from __future__ import annotations
 
 import json
 import os
-from collections import Counter
 from pathlib import Path
 
 import pytest
 
 from legado.generador.simulacion import _comision, _horas
 from legado.generador.zonas import NUEVA_YORK, local
+from radiografia.orden import comparar
+from universo.interfaces import leer_buzon
 
 pytestmark = pytest.mark.integracion
 
@@ -37,10 +38,31 @@ def _json(ruta: Path) -> dict:
     return json.loads(ruta.read_text(encoding='utf-8'))
 
 
-def test_el_respaldo_restaurado_cumple_el_criterio_de_salida():
+def test_el_respaldo_restaurado_cuadra_con_lo_que_el_legado_publicaba():
     criterio = _json(INFORME / 'radiografia.json')['criterio_salida']
-    assert criterio['aplica'] and criterio['cumple'], criterio
-    assert criterio['filas'] > 400_000
+    assert criterio['aplica'] and criterio['cumple']
+    cifras = {c['etiqueta']: c for c in criterio['cifras']}
+    assert cifras['Operaciones registradas']['interpretaciones'][0] == 'COUNT(*)'
+    # las órdenes son DOCUMENTOS: la radiografía tuvo que averiguar que la pantalla cuenta uetr distintos
+    ordenes = cifras['Órdenes de pago']
+    assert 'COUNT(*)' not in ordenes['interpretaciones'] and 'COUNT(DISTINCT uetr)' in ordenes['interpretaciones']
+    assert ordenes['filas'] > ordenes['valor']
+    assert all(t['cuadra'] for t in criterio['tablas']) and len(criterio['tablas']) == 8
+
+
+def test_el_piso_de_la_paridad_sale_del_restaurado_contra_lo_publicado_al_respaldar():
+    salidas = {s['nombre']: s for s in _json(INFORME / 'radiografia.json')['criterio_salida']['salidas']}
+    reporte = salidas['reporte_del_mes']
+    assert reporte['mismo_contenido'] and reporte['inversiones_contrato'] == 0
+    assert reporte['pares_empatados'] > 100_000
+
+
+def test_cada_hallazgo_fuera_del_catalogo_tiene_veredicto_medido():
+    medicion = _json(INFORME / 'medicion.json')
+    assert medicion['sin_veredicto'] == 0 and len(medicion['hallazgos_sin_trampa']) == 11
+    clases = {h['objeto']: h['clase'] for h in medicion['hallazgos_sin_trampa']}
+    assert clases['dbo.moneda.activa'] == 'defecto real'
+    assert clases['dbo.sp_registrar_orden'] == clases['dbo.sp_detalle_operacion'] == 'latente'
 
 
 def test_la_radiografia_detecta_al_menos_ocho_de_las_nueve_trampas():
@@ -48,17 +70,19 @@ def test_la_radiografia_detecta_al_menos_ocho_de_las_nueve_trampas():
     assert medicion['detectadas'] >= 8, [f['id'] for f in medicion['filas'] if f['estado'] != 'detectada']
 
 
-def test_control_negativo_el_reporte_mensual_del_legado_no_se_repite_a_si_mismo(conexion):
+def test_control_negativo_en_inversiones_contrato_en_cero_y_empates_libres(conexion):
     cursor = conexion.cursor()
     corridas = []
     for _ in range(5):
         cursor.execute("EXEC dbo.sp_reporte_ordenes @desde = '2023-12-01', @hasta = '2023-12-31'")
-        corridas.append([(f[0], f[11]) for f in cursor.fetchall()])
-    # mismo contenido (multiconjunto) …
-    assert all(Counter(c) == Counter(corridas[0]) for c in corridas[1:])
-    # … pero no el mismo orden: comparar por posición contra el propio legado ya da diferencias
-    distintas = [sum(1 for a, b in zip(corridas[0], c) if a != b) for c in corridas[1:]]
-    assert max(distintas) > 0, 'el control negativo salió en 0 %: hace falta más volumen (legado/VOLUMEN.md)'
+        corridas.append([(f[0], f[11], f[4]) for f in cursor.fetchall()])     # folio, concepto, fecha_valor
+    medidas = [comparar(corridas[0], c, [0, 1], [2]) for c in corridas[1:]]
+    assert all(m['mismo_contenido'] for m in medidas)
+    # el ORDER BY fecha_valor se cumple siempre: 0 inversiones entre pares con distinta fecha valor
+    assert all(m['inversiones_contrato'] == 0 for m in medidas)
+    # dentro de la misma fecha valor el orden es libre: el legado no se repite a sí mismo
+    assert max(m['inversiones_empatados'] for m in medidas) > 0, \
+        'el control negativo salió en 0 %: hace falta más volumen (legado/VOLUMEN.md)'
 
 
 def test_tipo_de_cambio_y_pesos_del_procedimiento_son_los_del_generador(conexion, datos):
@@ -142,3 +166,35 @@ def test_el_legado_vivo_siguio_escribiendo_despues_del_congelamiento():
             > registro['al_respaldo'][tabla]['filas']
     assert registro['al_congelamiento']['moneda']['filas'] == registro['al_respaldo']['moneda']['filas'] + 1
     assert registro['al_terminar']['operacion']['max_id'] > registro['al_congelamiento']['operacion']['max_id']
+
+
+def test_el_vivo_dejo_altas_hacia_atras_documentos_compartidos_y_folios_que_chocan():
+    choques = _json(sorted(DATOS.glob('vivo_*.json'))[-1])['choques']
+    atras = choques['altas_fechadas_hacia_atras']['filas']
+    assert atras and all(f['fecha_operacion'] < '2023-12-29' and f['canal'] == 'ARCHIVO' for f in atras)
+    assert len(choques['documentos_tambien_en_tobe']['filas']) == 4
+    folios = choques['folios_op_tras_congelamiento']
+    siguiente = folios['siguiente_al_congelamiento']
+    assert folios['folios'] and all(int(f.split('-')[1]) >= siguiente for f in folios['folios'])
+
+
+def test_las_liquidaciones_que_el_legado_descarto_estan_en_el_buzon(conexion):
+    cursor = conexion.cursor()
+    cursor.execute("SELECT uetr, referencia_mt103 FROM dbo.orden_pago WHERE estatus = 'VENCIDA'")
+    vencidas = {u: r for u, r in cursor.fetchall()}
+    confirmaciones = [c for ruta in sorted((DATOS / 'interfaces' / 'corresponsal').glob('*.fin'))
+                      for c in leer_buzon(ruta.read_text(encoding='utf-8'))]
+    tardias = [c for c in confirmaciones if c.uetr in vencidas]
+    assert len(tardias) > 1000
+    assert all(vencidas[c.uetr] == c.referencia for c in tardias)      # :21: coincide; :20: no es llave
+
+
+def test_el_delta_por_la_pantalla_pierde_renglones_y_la_columna_t6(conexion):
+    renglones = [json.loads(r) for r in (DATOS / 'delta_por_pantalla_2023-12-29.jsonl').read_text(
+        encoding='utf-8').splitlines()]
+    cursor = conexion.cursor()
+    cursor.execute("SELECT COUNT(*) FROM dbo.operacion WHERE fecha_operacion >= '2023-12-29' "
+                   "AND fecha_operacion < '2023-12-30'")
+    en_base = cursor.fetchone()[0]
+    assert len(renglones) == 200 < en_base                       # la lista corta en 200 (TOP sin ORDER BY)
+    assert not any('codigo_proposito' in r['encabezado'] for r in renglones)
