@@ -61,6 +61,18 @@ def medir(hallazgos: list[dict], trampas: list[dict]) -> dict:
     }
 
 
+def con_veredictos(m: dict, veredictos: list[dict]) -> dict:
+    """Pega a cada hallazgo fuera del catálogo su veredicto medido (radiografia/veredictos.py)."""
+    por_llave = {(v['categoria'], v['objeto']): v for v in veredictos}
+    for h in m['hallazgos_sin_trampa']:
+        v = por_llave.get((h['categoria'], h['objeto']))
+        h['clase'] = v['clase'] if v else 'sin veredicto'
+        h['veredicto'] = v['veredicto'] if v else ''
+        h['medicion'] = v['medicion'] if v else {}
+    m['sin_veredicto'] = sum(1 for h in m['hallazgos_sin_trampa'] if h['clase'] == 'sin veredicto')
+    return m
+
+
 def markdown(m: dict, base: str) -> str:
     r = [f'# Medición de la radiografía de `{base}` contra `legado/TRAMPAS.md`\n',
          'Los detectores corrieron sin leer el catálogo; esta tabla sólo cuenta qué señales esperadas aparecieron.\n',
@@ -71,12 +83,15 @@ def markdown(m: dict, base: str) -> str:
         r.append(f"| {f['id']} | {f['nombre']} | {f['estado']} | {'<br>'.join(f['senales']) or '—'} | "
                  f"{'<br>'.join(f['encontradas']) or '—'} |")
     r.append(f"\n## Hallazgos que no corresponden a ninguna trampa ({len(m['hallazgos_sin_trampa'])})\n")
-    r.append('Patrones que sí están en el código o en los datos pero que el catálogo no siembra como defecto: '
-             'hay que revisarlos uno por uno (algunos son ruido del patrón, otros son hallazgos reales).\n')
-    r.append('| Patrón | Objeto |')
-    r.append('|---|---|')
+    r.append('Cada uno lleva su veredicto MEDIDO sobre el respaldo restaurado (`radiografia/veredictos.py`; la '
+             'medición completa está en `veredictos.json`).\n')
+    r.append('| Patrón | Objeto | Clase | Veredicto |')
+    r.append('|---|---|---|---|')
     for h in m['hallazgos_sin_trampa']:
-        r.append(f"| {h['categoria']} | `{h['objeto']}` |")
+        veredicto = h.get('veredicto', '').replace('|', '\\|')
+        r.append(f"| {h['categoria']} | `{h['objeto']}` | {h.get('clase', 'sin veredicto')} | {veredicto} |")
+    if m.get('sin_veredicto'):
+        r.append(f"\n**{m['sin_veredicto']} hallazgos sin veredicto.**")
     return '\n'.join(r) + '\n'
 
 
@@ -90,6 +105,9 @@ def main(argv: list[str] | None = None) -> int:
     informe = json.loads(args.informe.read_text(encoding='utf-8'))
     resultado = medir(informe['hallazgos'], leer_catalogo(args.trampas.read_text(encoding='utf-8')))
     destino = args.informe.parent
+    veredictos = destino / 'veredictos.json'
+    if veredictos.exists():
+        resultado = con_veredictos(resultado, json.loads(veredictos.read_text(encoding='utf-8')))
     (destino / 'medicion.json').write_text(json.dumps(resultado, ensure_ascii=False, indent=1) + '\n',
                                            encoding='utf-8')
     (destino / 'medicion.md').write_text(markdown(resultado, informe['base']), encoding='utf-8')

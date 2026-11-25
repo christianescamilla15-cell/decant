@@ -5,7 +5,7 @@ import ast
 import re
 from pathlib import Path
 
-from radiografia.medicion import leer_catalogo, medir
+from radiografia.medicion import con_veredictos, leer_catalogo, markdown, medir
 from radiografia.sqlserver import IMAGEN
 
 RADIOGRAFIA = Path('radiografia')
@@ -50,3 +50,15 @@ def test_la_medicion_distingue_detectada_parcial_y_sin_patron():
     assert m['detectadas'] == 1 and m['pct_deteccion'] == 25.0
     # lo que no corresponde a ninguna trampa queda a la vista (los literales son inventario, no hallazgo)
     assert m['hallazgos_sin_trampa'] == [{'categoria': 'inner_join_hija', 'objeto': 'dbo.v'}]
+
+
+def test_cada_hallazgo_fuera_del_catalogo_lleva_su_veredicto_medido():
+    m = medir([{'categoria': 'top_sin_order_by', 'objeto': 'dbo.p'}, {'categoria': 'centinela', 'objeto': 'dbo.t.x'}],
+              [])
+    veredictos = [{'categoria': 'top_sin_order_by', 'objeto': 'dbo.p', 'clase': 'latente',
+                   'veredicto': 'Latente: 0 duplicados', 'medicion': {'duplicados': 0}}]
+    m = con_veredictos(m, veredictos)
+    assert [h['clase'] for h in m['hallazgos_sin_trampa']] == ['sin veredicto', 'latente']
+    assert m['sin_veredicto'] == 1
+    texto = markdown(m, 'X')
+    assert 'Latente: 0 duplicados' in texto and '1 hallazgos sin veredicto' in texto
