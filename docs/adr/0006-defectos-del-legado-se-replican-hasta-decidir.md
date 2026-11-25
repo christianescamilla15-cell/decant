@@ -18,9 +18,15 @@ MIDE en el informe de paridad (`python -m paridad`):
 | H1 moneda dada de baja | acepta la operación | ninguna regla la bloquea (veredicto de la radiografía) | ¿se rechaza? ¿desde qué fecha de baja (dato que no existe)? |
 | T2 reporte sin órdenes sin abono | un renglón por partida abonada | 6,536 órdenes sin partidas no salen (como en el legado) | ¿el reporte de órdenes incluye las que no tienen abono? |
 | T7 nombres dañados | conserva el nombre del legado | 21,189 nombres tienen su versión sana en el archivo de sucursales | ¿se corrigen con el archivo o se conservan? |
+| T5 horas de liquidación con hora fija | replica la hora fija (R08 al 100 %), calculada desde los instantes que guarda en UTC | con los instantes reales coincidiría en 71.28 %: 41,414 horas bajarían una hora, por ventana en el informe (6,819 de ellas en 2021 y 2022) | ¿se calculan con el desfase real de Nueva York? |
 
-Las excepciones ya decididas en el catálogo (T3, T4, T5, T8, T9 y la referencia con relleno de la ronda 1 a ciegas)
-tienen su propio ADR (0007, 0008).
+Las excepciones ya decididas en el catálogo (T3, T4, T8, T9 y la referencia con relleno de la ronda 1 a ciegas)
+tienen su propio ADR (0007, 0008). El ALMACENAMIENTO en UTC de T5 también está decidido (ADR 0008: el instante se
+guarda bien); lo que queda a negocio es el CÁLCULO de las horas, y mientras tanto se replica.
+
+**Historia (retro del 24-nov):** la primera versión de este ADR ponía a T5 entre «las ya decididas» y el TO-BE corregía
+las horas sin firma, mientras el ADR 0008 dejaba la pregunta abierta. Se corrigió aplicando esta misma regla: R08
+replica y la corrección se publica como hipótesis.
 
 ## Alternativas descartadas
 - **Corregir todo de una vez «porque es lo correcto»:** cifras distintas sin firma; la paridad ya no distinguiría un

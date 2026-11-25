@@ -8,23 +8,28 @@ namespace Decant.Domain.Tests;
 public class ConciliacionTests
 {
     /// <summary>
-    /// T5. El legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes. Fuera de las ventanas
-    /// de dos horas coinciden; dentro, el legado tiene una hora de más (discrepancia, ADR 0008).
+    /// T5 se REPLICA (ADR 0006): la hora fija del legado, calculada desde los instantes que guarda el TO-BE. Los tres
+    /// casos son documentos reales y el valor esperado es el que el legado GUARDÓ, uno por ventana: en diciembre de
+    /// 2023 Nueva York va 1 h adelante; en junio de 2023 y el 20-mar-2022 va 2 h (el legado tiene una hora de más,
+    /// y la réplica también).
     /// </summary>
     [Theory]
-    // 2da9c50b…: diciembre de 2023, Nueva York va 1 h adelante: coincide con el legado (8.77)
-    [InlineData(2023, 12, 1, 0, 22, 41, 2023, 12, 1, 10, 8, 5, "8.77")]
-    // 469818d6…: junio de 2023, Nueva York va 2 h adelante: el legado publicó 6.85
-    [InlineData(2023, 6, 1, 0, 39, 53, 2023, 6, 1, 8, 30, 42, "5.85")]
-    // 274cab37…: 20-mar-2022, Nueva York ya cambió y México no: el legado publicó 25.92
-    [InlineData(2022, 3, 20, 5, 55, 9, 2022, 3, 21, 8, 50, 6, "24.92")]
-    public void Las_horas_de_liquidacion_se_calculan_con_los_instantes(
+    [InlineData(2023, 12, 1, 0, 22, 41, 2023, 12, 1, 10, 8, 5, "8.77")]   // 2da9c50b…
+    [InlineData(2023, 6, 1, 0, 39, 53, 2023, 6, 1, 8, 30, 42, "6.85")]    // 469818d6…
+    [InlineData(2022, 3, 20, 5, 55, 9, 2022, 3, 21, 8, 50, 6, "25.92")]   // 274cab37…
+    public void Las_horas_de_liquidacion_replican_la_hora_fija_del_legado(
         int a, int m, int d, int h, int mi, int s, int a2, int m2, int d2, int h2, int mi2, int s2, string horas)
     {
         var envio = Datos.Mx(a, m, d, h, mi, s);
         var ultima = Datos.Ny(a2, m2, d2, h2, mi2, s2);
         Assert.Equal(decimal.Parse(horas), ReglasDeConciliacion.HorasDeLiquidacion(envio, ultima));
     }
+
+    /// <summary>La réplica cuenta fronteras de minuto como DATEDIFF: 10:00:59 → 10:01:00 es un minuto.</summary>
+    [Fact]
+    public void Las_horas_cuentan_fronteras_de_minuto_como_datediff() =>
+        Assert.Equal(0.02m, ReglasDeConciliacion.HorasDeLiquidacion(Datos.Mx(2023, 12, 1, 10, 0, 59),
+            Datos.Ny(2023, 12, 1, 11, 1, 0)));
 
     [Theory]
     [InlineData("1000.00", "1000.00", EstatusOrden.Conciliada)]

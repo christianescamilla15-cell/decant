@@ -11,14 +11,14 @@ from __future__ import annotations
 
 import random
 from collections import Counter, defaultdict
-from datetime import timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 from pathlib import Path
 
-from legado.generador.zonas import CDMX, NUEVA_YORK, a_utc
 from paridad import arbitraje
 from paridad.formato import texto
-from paridad.mapeo import aplicar, pisos_por_llegada
+from paridad.mapeo import aplicar, instante_no_antes_de, pisos_por_llegada
+from paridad.zonas import CDMX, a_utc, es_ambigua
 from universo.interfaces import leer_buzon
 
 # ── lo que se compara ─────────────────────────────────────────────────────────────────────────────────────────
@@ -28,7 +28,6 @@ T_OPERACION = 'SELECT id, folio, tipo_cambio, monto_mxn FROM decant.operacion'
 L_ORDEN = ('SELECT id, uetr, folio, estatus, horas_liquidacion, fecha_registro, fecha_envio FROM dbo.orden_pago')
 T_ORDEN = ('SELECT uetr, folio, estatus, horas_liquidacion, fecha_registro, fecha_envio, registros '
            'FROM decant.orden_pago')
-T_ULTIMA = 'SELECT uetr, MAX(fecha_hora) FROM decant.partida_corresponsal GROUP BY uetr'
 L_CLIENTE = ("SELECT p.uetr, l.renglon, l.concepto, l.moneda, l.monto, l.fecha_hora, l.referencia, p.id "
              "FROM dbo.partida_liquidada l JOIN dbo.orden_pago p ON p.id = l.orden_id WHERE p.estatus <> 'REEMPLAZADA'")
 T_CLIENTE = 'SELECT uetr, renglon, concepto, moneda, monto, fecha_hora, referencia FROM decant.partida_cliente'
@@ -45,6 +44,10 @@ L_COMISION = ("SELECT l.monto, o.monto_mxn FROM dbo.partida_liquidada l JOIN dbo
 L_BITACORA_JOB = ("SELECT p.uetr, b.estatus_nuevo, b.fecha FROM dbo.bitacora b JOIN dbo.orden_pago p ON p.id = b.llave "
                   "WHERE b.usuario = 'svc_agente'")
 T_MARCAS = 'SELECT regla, caso, instante, cumple, detalle FROM decant.marca'
+# R08 desde las columnas locales CRUDAS del legado (sin pasar por los instantes del TO-BE ni por los de la paridad)
+L_HORAS = ('SELECT p.id, p.uetr, p.fecha_envio, p.horas_liquidacion, '
+           '(SELECT MAX(s.fecha_hora) FROM dbo.partida_solicitada s WHERE s.orden_id = p.id) '
+           'FROM dbo.orden_pago p WHERE p.horas_liquidacion IS NOT NULL')
 
 PARTIDA_CLIENTE = (('concepto', ()), ('moneda', ('char',)), ('monto', ()), ('fecha_hora', ('T5_cdmx_llegada',)),
                    ('referencia', ()))
@@ -82,30 +85,10 @@ class Regla:
 
 # ── árbitros del motor ───────────────────────────────────────────────────────────────────────────────────────
 
-def _horas_de_desfase(envio_utc, ultima_utc) -> Decimal:
-    """Lo que el legado suma por suponer Nueva York siempre una hora adelante: (NY − CDMX) − 1 h."""
-    ny = ultima_utc.astimezone(NUEVA_YORK).utcoffset()
-    mx = envio_utc.astimezone(CDMX).utcoffset()
-    return Decimal(int((ny - mx - timedelta(hours=1)).total_seconds()) // 60) / Decimal(60)
-
-
-def _audita_t5(d: arbitraje.Diferencia) -> tuple[bool, str]:
-    extra = _horas_de_desfase(d.contexto['envio_utc'], d.contexto['ultima_utc'])
-    diferencia = Decimal(d.legado) - Decimal(d.tobe)
-    ok = extra != 0 and diferencia == extra
-    return ok, (f'legado − TO-BE = {diferencia} h; (NY − CDMX) − 1 h en esos instantes = {extra} h'
-                + ('; hora repetida de la Ciudad de México' if d.contexto.get('envio_ambiguo') else ''))
-
-
 def arbitros_del_motor(corte_utc) -> list[arbitraje.Arbitro]:
+    """R08 ya no tiene árbitro: el TO-BE replica la hora fija del legado (ADR 0006) y la corrección se mide como
+    hipótesis (`hipotesis_r08`). Lo único que puede absolverse aquí es un avance posterior al corte."""
     return [
-        arbitraje.Arbitro(
-            'T5-desfase-fijo', arbitraje.DISCREPANCIA, 'ADR 0008',
-            'el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes',
-            aplica=lambda d: d.regla == 'R08' and d.legado is not None and d.tobe is not None,
-            audita=_audita_t5,
-            pregunta='¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva '
-                     'la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?'),
         arbitraje.Arbitro(
             'avance', arbitraje.AVANCE, 'corte medido',
             'el valor del TO-BE sale de un evento del universo posterior al corte',
@@ -118,7 +101,7 @@ def arbitros_del_motor(corte_utc) -> list[arbitraje.Arbitro]:
 # ── medición ────────────────────────────────────────────────────────────────────────────────────────────────
 
 def _instante(valor, zona):
-    return a_utc(valor, zona).astimezone(timezone.utc)
+    return a_utc(valor, zona)
 
 
 def medir(cursor_legado, cursor_tobe, universo: Path, corte_utc) -> dict:
@@ -131,7 +114,8 @@ def medir(cursor_legado, cursor_tobe, universo: Path, corte_utc) -> dict:
         'R06': ('R06', 'partidas del corresponsal desde el buzón (llave UETR / :21:)', 'sp_registrar_liquidacion'),
         'R07': ('R07', 'estatus del documento (liquidación, D3, vencimiento con reloj inyectado, conciliación D2)',
                 'sp_registrar_liquidacion + sp_conciliar'),
-        'R08': ('R08', 'horas de liquidación con los instantes (T5)', 'sp_conciliar'),
+        'R08': ('R08', 'horas de liquidación: réplica de la hora fija del legado (T5, ADR 0006)',
+                'sp_conciliar línea 128'),
         'R09': ('R09', 're-registro: registros por documento y fecha del más reciente', 'sp_registrar_orden'),
         'R11': ('R11', 'consecutivos al final (siguiente folio FX y OP)', 'dbo.folio'),
         'R12': ('R12', 'liquidaciones descartadas por llegar vencidas (D3, visibles en el TO-BE)',
@@ -148,23 +132,18 @@ def medir(cursor_legado, cursor_tobe, universo: Path, corte_utc) -> dict:
     del tobe_op
 
     tobe_orden = {str(f[0]): f for f in _filas(cursor_tobe, T_ORDEN)}
-    ultima = {str(u): m for u, m in _filas(cursor_tobe, T_ULTIMA)}
     por_uetr: dict[str, list[tuple]] = defaultdict(list)
     filas_orden = _filas(cursor_legado, L_ORDEN)
     pisos = pisos_por_llegada([{'id': f[0], 'uetr': f[1], 'fecha_registro': f[5]} for f in filas_orden])
     for fila in filas_orden:
         por_uetr[fila[1].rstrip()].append(fila)
-    ambiguas = 0
     for uetr, filas in por_uetr.items():
         vigente = [f for f in filas if f[3] != 'REEMPLAZADA'][0]
         t = tobe_orden.get(uetr)
         r['R04'].caso(uetr, vigente[2], t and t[1])
         r['R07'].caso(uetr, vigente[3], t and t[2])
         if vigente[4] is not None:
-            envio_ambiguo = CDMX.utcoffset(vigente[6].replace(fold=0)) != CDMX.utcoffset(vigente[6].replace(fold=1))
-            ambiguas += envio_ambiguo
-            r['R08'].caso(uetr, vigente[4], t and t[3], {
-                'envio_utc': t[5] if t else None, 'ultima_utc': ultima.get(uetr), 'envio_ambiguo': envio_ambiguo})
+            r['R08'].caso(uetr, vigente[4], t and t[3])
         ultimo = max(filas, key=lambda f: f[0])
         r['R09'].caso(uetr, f'{len(filas)}|{texto(pisos[ultimo[0]][1])}',
                       t and f'{t[6]}|{texto(t[4])}')
@@ -200,8 +179,9 @@ def medir(cursor_legado, cursor_tobe, universo: Path, corte_utc) -> dict:
 
     arbitros = arbitros_del_motor(corte_utc)
     reglas = [x.resumen(arbitros) for x in r.values()]
-    return {'reglas': reglas, 'hipotesis': hipotesis(cursor_legado, cursor_tobe, por_uetr),
-            'notas': {'horas_con_envio_en_hora_repetida': ambiguas}}
+    r08 = hipotesis_r08(_filas(cursor_legado, L_HORAS), desfases_del_buzon(universo), pisos)
+    return {'reglas': reglas, 'hipotesis': r08['hipotesis'] + hipotesis(cursor_legado, cursor_tobe, por_uetr),
+            't5': r08['auditoria']}
 
 
 # ── hipótesis y controles ────────────────────────────────────────────────────────────────────────────────────
@@ -233,6 +213,110 @@ def hipotesis(cursor_legado, cursor_tobe, por_uetr) -> list[dict]:
                       'lectura': 'con una clase dominante, el % global de una regla inventada es alto: por eso se '
                                  'publica también por clase'})
     return resultado
+
+
+# ── R08 / T5: la réplica y la corrección como hipótesis, auditadas en los dos sentidos ──────────────────────────
+
+_ORIGEN = datetime(2000, 1, 1)
+_ORIGEN_UTC = datetime(2000, 1, 1, tzinfo=timezone.utc)
+
+
+def _horas(minutos: int) -> Decimal:
+    return (Decimal(minutos) / Decimal(60)).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+
+def horas_fijas_del_legado(envio_local: datetime, ultima_local_ny: datetime) -> Decimal:
+    """La fórmula de `sp_conciliar` (línea 128) sobre las columnas locales CRUDAS: DATEDIFF(minute, fecha_envio,
+    DATEADD(hour, -1, ultima)) / 60.0 a dos decimales. DATEDIFF cuenta fronteras de minuto: piso de cada lado."""
+    a = (envio_local - _ORIGEN) // timedelta(minutes=1)
+    b = (ultima_local_ny - timedelta(hours=1) - _ORIGEN) // timedelta(minutes=1)
+    return _horas(b - a)
+
+
+def horas_con_instantes(envio_utc: datetime, ultima_utc: datetime) -> Decimal:
+    """La corrección (hipótesis): la misma forma, con los instantes reales."""
+    a = (envio_utc - _ORIGEN_UTC) // timedelta(minutes=1)
+    b = (ultima_utc - _ORIGEN_UTC) // timedelta(minutes=1)
+    return _horas(b - a)
+
+
+def desfases_del_buzon(universo: Path) -> dict[str, timedelta]:
+    """UETR → desfase UTC de Nueva York que trae `:13D:` en su confirmación: fuente INDEPENDIENTE de cualquier base de
+    zonas (la de la paridad, la del generador o la del TO-BE)."""
+    desfases = {}
+    for archivo in sorted((universo / 'interfaces' / 'corresponsal').glob('*.fin')):
+        for c in leer_buzon(archivo.read_text(encoding='utf-8')):
+            desfases[c.uetr] = c.hora_local_ny - c.instante_utc.replace(tzinfo=None)
+    return desfases
+
+
+def ventana_t5(ultima_local_ny: datetime) -> str:
+    """En qué ventana cae una diferencia: las semanas en que los dos calendarios no coincidían (2021 y 2022) o 2023."""
+    anio, mes = ultima_local_ny.year, ultima_local_ny.month
+    if anio in (2021, 2022) and mes in (3, 4):
+        return f'primavera {anio}: Nueva York ya en horario de verano, México todavía no'
+    if anio in (2021, 2022) and mes in (10, 11):
+        return f'otoño {anio}: México ya fuera del horario de verano, Nueva York todavía no'
+    if anio == 2023 and 3 <= mes <= 11:
+        return '2023 (12-mar a 5-nov): Nueva York en horario de verano, México ya sin él'
+    return 'fuera de las ventanas conocidas'
+
+
+def hipotesis_r08(filas, desfases_ny: dict[str, timedelta], pisos: dict) -> dict:
+    """R08 como R05: cada hipótesis con su % sobre los mismos casos, y la auditoría de la corrección EN LOS DOS
+    SENTIDOS: «(desfase NY − desfase CDMX − 1 h) ≠ 0 ⇔ el legado difiere de la corrección», con la diferencia igual
+    a ese desfase extra. Nueva York por el `:13D:` del buzón; la Ciudad de México por la base de zonas de la paridad,
+    salvo la hora repetida, que se cuenta aparte (se resuelve por orden de llegada, otra fuente)."""
+    casos = coinciden_fija = coinciden_corr = 0
+    auditoria = Counter()
+    ventanas: Counter = Counter()
+    ejemplos = []
+    for id_, uetr, envio, horas_legado, ultima in filas:
+        casos += 1
+        fija = horas_fijas_del_legado(envio, ultima)
+        coinciden_fija += fija == horas_legado
+        desfase_ny = desfases_ny.get(uetr.rstrip())
+        if desfase_ny is None:
+            auditoria['sin :13D: en el buzón'] += 1
+            continue
+        ultima_utc = (ultima - desfase_ny).replace(tzinfo=timezone.utc)
+        ambigua = es_ambigua(envio, CDMX)
+        envio_utc = (instante_no_antes_de(envio, CDMX, pisos[id_][2]) if ambigua else a_utc(envio, CDMX))
+        desfase_mx = envio - envio_utc.replace(tzinfo=None)
+        corr = horas_con_instantes(envio_utc, ultima_utc)
+        coinciden_corr += corr == horas_legado
+        extra = Decimal(int((desfase_ny - desfase_mx - timedelta(hours=1)) / timedelta(minutes=1))) / Decimal(60)
+        diferencia = horas_legado - corr
+        if ambigua:
+            auditoria['hora repetida de la Ciudad de México (aparte; resuelta por orden de llegada)'] += 1
+            if diferencia:
+                auditoria['hora repetida: con diferencia'] += 1
+        elif extra != 0 and diferencia == extra:
+            auditoria['extra ≠ 0 y el legado difiere exactamente en el extra'] += 1
+        elif extra == 0 and diferencia == 0:
+            auditoria['extra = 0 y el legado coincide'] += 1
+        else:
+            auditoria['VIOLACIÓN: extra y diferencia no se corresponden'] += 1
+            if len(ejemplos) < 5:
+                ejemplos.append({'uetr': uetr.rstrip(), 'extra': str(extra), 'diferencia': str(diferencia)})
+        if diferencia:
+            ventanas[ventana_t5(ultima)] += 1
+    diferencias = casos - coinciden_corr
+    return {
+        'hipotesis': [
+            {'regla': 'R08 horas (T5)', 'hipotesis': 'hora fija del legado: su fórmula sobre sus columnas locales '
+             'crudas', 'elegida': True, 'casos': casos, 'coinciden': coinciden_fija,
+             'pct': round(100 * coinciden_fija / casos, 2) if casos else None},
+            {'regla': 'R08 horas (T5)', 'hipotesis': 'con los instantes reales (Nueva York por el :13D: del buzón)',
+             'elegida': False, 'casos': casos, 'coinciden': coinciden_corr,
+             'pct': round(100 * coinciden_corr / casos, 2) if casos else None},
+        ],
+        'auditoria': {'casos': casos, 'diferencias': diferencias, 'conteos': dict(auditoria),
+                      'violaciones': auditoria['VIOLACIÓN: extra y diferencia no se corresponden']
+                      + auditoria['sin :13D: en el buzón'],
+                      'ventanas': dict(sorted(ventanas.items())), 'suma_de_ventanas': sum(ventanas.values()),
+                      'ejemplos_de_violacion': ejemplos},
+    }
 
 
 # ── sólo marca ───────────────────────────────────────────────────────────────────────────────────────────────

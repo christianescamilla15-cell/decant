@@ -18,14 +18,17 @@ public static class ReglasDeConciliacion
         abonado == principal ? EstatusOrden.Conciliada : EstatusOrden.Diferencia;
 
     /// <summary>
-    /// R08 / T5. Horas entre el envío y la última partida del corresponsal, con los INSTANTES (UTC). El legado
-    /// suponía Nueva York siempre una hora adelante (<c>DATEADD(hour, -1, ultima)</c>); el TO-BE calcula bien y la
-    /// diferencia es una discrepancia del legado (ADR 0008). Se conserva la forma del legado: minutos cruzados entre
-    /// los dos sellos (<c>DATEDIFF(minute, …)</c>) entre 60, a dos decimales.
+    /// R08 / T5. Se REPLICA la hora fija del legado mientras negocio no decida (ADR 0006): <c>DATEDIFF(minute,
+    /// fecha_envio, DATEADD(hour, -1, ultima)) / 60.0</c> a dos decimales, con <c>fecha_envio</c> en la hora de pared
+    /// de la Ciudad de México y <c>ultima</c> en la de Nueva York. El TO-BE GUARDA los instantes en UTC (ADR 0008) y
+    /// de ellos recupera esas horas de pared: la réplica sólo afecta a esta regla. La corrección (con los instantes)
+    /// se publica como hipótesis en el informe de paridad.
     /// </summary>
     public static decimal HorasDeLiquidacion(DateTimeOffset envio, DateTimeOffset ultimaPartida)
     {
-        var minutos = (ultimaPartida.UtcTicks / TimeSpan.TicksPerMinute) - (envio.UtcTicks / TimeSpan.TicksPerMinute);
+        var envioLocal = Zonas.ALocal(envio, Zonas.CiudadDeMexico);
+        var ultimaMenosUnaHora = Zonas.ALocal(ultimaPartida, Zonas.NuevaYork).AddHours(-1);
+        var minutos = (ultimaMenosUnaHora.Ticks / TimeSpan.TicksPerMinute) - (envioLocal.Ticks / TimeSpan.TicksPerMinute);
         return Math.Round(minutos / 60m, 2, MidpointRounding.AwayFromZero);
     }
 }
