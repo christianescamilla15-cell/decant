@@ -6,7 +6,7 @@ from collections import Counter
 from pathlib import Path
 
 ORDEN_CATEGORIAS = ('top_sin_order_by', 'inner_join_hija', 'reloj_en_regla', 'if_exists_sin_else',
-                    'if_exists_guarda', 'desfase_horario_fijo', 'centinela', 'mojibake', 're_registro',
+                    'if_exists_guarda', 'desfase_horario_fijo', 'round_trunca', 'centinela', 'mojibake', 're_registro',
                     'llave_candidata_con_duplicados', 'columna_sin_lectura', 'tabla_sin_lectura', 'literal_magico')
 TITULOS = {
     'top_sin_order_by': 'TOP sin ORDER BY',
@@ -15,6 +15,7 @@ TITULOS = {
     'if_exists_sin_else': 'IF EXISTS sin ELSE que escribe datos (camino silencioso)',
     'if_exists_guarda': 'IF EXISTS sin ELSE con cuerpo de guarda o DDL (informativo)',
     'desfase_horario_fijo': 'Conversión de zona con desfase fijo',
+    'round_trunca': 'ROUND con tercer argumento: trunca en vez de redondear',
     'centinela': 'Centinelas en vez de NULL (por distribución de valores)',
     'mojibake': 'Texto con mojibake (UTF-8 leído como latin-1)',
     're_registro': 'Re-registro: el mismo documento con otra llave interna',
@@ -53,11 +54,37 @@ def markdown(informe: dict) -> str:
     c = informe['criterio_salida']
     r.append('\n## Criterio de salida\n')
     if c['aplica']:
-        estado = 'CUMPLE' if c['cumple'] else '**NO CUMPLE: el respaldo no trae lo que publica la pantalla**'
-        r.append(f"`COUNT(*)` de `{c['tabla']}` en el respaldo = **{c['filas']:,}** · la pantalla del legado "
-                 f"publicaba **{c['pantalla']:,}** al tomarlo → {estado}.\n")
+        estado = 'CUMPLE' if c['cumple'] else '**NO CUMPLE: el respaldo no es lo que el legado publicaba**'
+        r.append(f'**{estado}.** El restaurado se compara contra lo que el legado decía de sí mismo al tomar el '
+                 f'respaldo (el manifiesto), no contra sí mismo.\n')
+        r.append('### Cifras de la pantalla: qué cuenta cada una\n')
+        r.append('| Cifra | Valor | Tabla | COUNT(*) | Interpretaciones que dan la cifra | Lectura |')
+        r.append('|---|---:|---|---:|---|---|')
+        for x in c['cifras']:
+            r.append(f"| {x['etiqueta']} | {x['valor']:,} | `{x['tabla']}` | {x['filas']:,} | "
+                     f"{', '.join(f'`{i}`' for i in x['interpretaciones']) or '—'} | {_md(x['lectura'])} |")
+        r.append('\n### Cuadre de cada tabla y contador contra el manifiesto\n')
+        r.append('| Objeto | Manifiesto | Restaurado | Cuadra |')
+        r.append('|---|---|---|---|')
+        for x in c['tablas']:
+            r.append(f"| `{x['objeto']}` | {_md(x['manifiesto'])} | {_md(x['restaurado'])} | "
+                     f"{'sí' if x['cuadra'] else '**NO**'} |")
+        r.append('\n### Salidas publicadas: re-corrida sobre el restaurado contra la captura del respaldo\n')
+        r.append('El orden se mide por inversiones con llave natural. Los pares con distinta llave de orden son '
+                 'contrato (0 inversiones). Los pares empatados son libres, y su desorden es el piso de la paridad.\n')
+        r.append('| Salida | Renglones (comunes) | Mismo contenido | Pares contrato | Inversiones contrato '
+                 '| Pares empatados | Empatados invertidos | % posiciones distintas |')
+        r.append('|---|---:|---|---:|---:|---:|---:|---:|')
+        for x in c['salidas']:
+            contenido = 'sí' if x['mismo_contenido'] else (
+                '**NO**' if x['llave_orden'] else 'no: sin ORDER BY, otra instancia devuelve otras filas')
+            r.append(f"| {x['nombre']} (`{x['procedimiento']}`) | {x['renglones']:,} ({x['renglones_comunes']:,}) | "
+                     f"{contenido} | {x['pares_contrato']:,} | "
+                     f"{x['inversiones_contrato']:,} | {x['pares_empatados']:,} | {x['inversiones_empatados']:,} "
+                     f"({x['pct_empatados_invertidos']} %) | {x['pct_posiciones_distintas']} |")
+        r.append('')
     else:
-        r.append('No aplica: no hay manifiesto con la cifra de una pantalla (base de muestra).\n')
+        r.append('No aplica: no hay manifiesto con lo que publicaba el legado (base de muestra).\n')
     corte = informe['corte']
     r.append('## Corte medido en la fuente\n')
     if corte.get('tabla_principal'):

@@ -19,7 +19,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from radiografia import datos, informe, inventario, patrones, sqlserver
+from radiografia import cuadre, datos, informe, inventario, patrones, sqlserver
 
 
 def _sha256(ruta: Path) -> str:
@@ -30,7 +30,8 @@ def _sha256(ruta: Path) -> str:
     return h.hexdigest()
 
 
-def radiografiar(archivos: list[dict], base: str, manifiesto: dict | None, conservar: bool = False) -> dict:
+def radiografiar(archivos: list[dict], base: str, manifiesto: dict | None, conservar: bool = False,
+                 carpeta: Path | None = None) -> dict:
     tiempos: dict[str, float] = {}
     t0 = time.perf_counter()
     servidor = sqlserver.arrancar_limpio()
@@ -90,16 +91,23 @@ def radiografiar(archivos: list[dict], base: str, manifiesto: dict | None, conse
                                    if x['temporal'] == 'HISTORY_TABLE')
             hallazgos += datos.llaves_duplicadas(cursor, columnas, columnas_por_tabla, historicas)
             tiempos['patrones_datos'] = round(time.perf_counter() - t, 1)
+
+            criterio = {'aplica': False}
+            if manifiesto:
+                t = time.perf_counter()
+                cifras = [cuadre.interpretar_cifra(cursor, c['tabla'], c['valor'], columnas_por_tabla[c['tabla']])
+                          | {'etiqueta': c['etiqueta']} for c in manifiesto['pantalla']['cifras']]
+                tablas_cuadre = cuadre.cuadre_tablas(cursor, manifiesto, filas, corte)
+                recorridas = cuadre.salidas(cursor, manifiesto, carpeta, _sha256)
+                criterio = {'aplica': True, 'cifras': cifras, 'tablas': tablas_cuadre, 'salidas': recorridas,
+                            'cumple': all(x['cumple'] for x in cifras) and all(x['cuadra'] for x in tablas_cuadre)
+                            and all(x['cumple'] for x in recorridas)}
+                tiempos['criterio_salida'] = round(time.perf_counter() - t, 1)
     finally:
         if not conservar:
             servidor.cerrar()
 
     principal = (manifiesto or {}).get('tabla_principal')
-    criterio = {'aplica': False}
-    if manifiesto and principal:
-        n = filas.get(principal.lower())
-        cifra = manifiesto['pantalla']['total_operaciones']
-        criterio = {'aplica': True, 'tabla': principal, 'filas': n, 'pantalla': cifra, 'cumple': n == cifra}
     corte_principal = next((x for x in corte if principal and x['tabla'] == principal.lower()), None)
     return {
         'base': base,
@@ -149,15 +157,24 @@ def main(argv: list[str] | None = None) -> int:
         manifiesto, base = None, args.base
         archivos = [{'base': args.base, 'ruta': args.bak}]
     t0 = time.perf_counter()
-    resultado = radiografiar(archivos, base, manifiesto, args.conservar)
+    carpeta = args.manifiesto.parent if args.manifiesto else None
+    resultado = radiografiar(archivos, base, manifiesto, args.conservar, carpeta)
     resultado['tiempos']['total'] = round(time.perf_counter() - t0, 1)
     ruta_json, ruta_md = informe.escribir(resultado, args.salida)
     c = resultado['criterio_salida']
     print(f'radiografía de {base}: {len(resultado["hallazgos"])} hallazgos · {ruta_md}')
     print('  ' + ' · '.join(f'{k} {v}' for k, v in sorted(resultado['resumen'].items())))
     if c['aplica']:
-        print(f"  criterio de salida: COUNT({c['tabla']}) = {c['filas']:,} · pantalla = {c['pantalla']:,} → "
-              f"{'CUMPLE' if c['cumple'] else 'NO CUMPLE'}")
+        for cifra in c['cifras']:
+            print(f"  «{cifra['etiqueta']}» = {cifra['valor']:,} → {', '.join(cifra['interpretaciones']) or '¿?'} "
+                  f"de {cifra['tabla']} ({cifra['lectura']})")
+        malas = [x['objeto'] for x in c['tablas'] if not x['cuadra']]
+        print(f"  cuadre contra el manifiesto: {len(c['tablas']) - len(malas)} de {len(c['tablas'])}"
+              + (f" · NO cuadran: {', '.join(malas)}" if malas else ''))
+        for s in c['salidas']:
+            print(f"  salida {s['nombre']}: mismo contenido {s['mismo_contenido']} · inversiones contrato "
+                  f"{s['inversiones_contrato']} · empatados invertidos {s['pct_empatados_invertidos']} %")
+        print(f"  criterio de salida: {'CUMPLE' if c['cumple'] else 'NO CUMPLE'}")
         return 0 if c['cumple'] else 1
     return 0
 
