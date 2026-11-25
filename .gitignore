@@ -9,6 +9,7 @@ __pycache__/
 .coverage.*
 coverage.xml
 reporte.xml
+reporte-*.xml
 # Reportes de los escaneos del CI (se suben como artefactos)
 *.sarif
 semgrep.json

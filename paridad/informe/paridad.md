@@ -1,6 +1,6 @@
 # Paridad del TO-BE contra el legado
 
-Generado 2026-11-24T22:58:03-06:00 con `python -m paridad`. Corte medido de la fuente: **2023-12-29T03:44:36** (Ciudad de México) = 2023-12-29T09:44:36+00:00; mayor sello de la bitácora o fecha_operacion (hora de la Ciudad de México), convertido a UTC; por identidad, MAX(id) de cada tabla.
+Generado 2026-11-24T23:30:05-06:00 con `python -m paridad`. Corte medido de la fuente: **2023-12-29T03:44:36** (Ciudad de México) = 2023-12-29T09:44:36+00:00; mayor sello de la bitácora o fecha_operacion (hora de la Ciudad de México), convertido a UTC; por identidad, MAX(id) de cada tabla.
 
 | Ejercicio | Cumple |
 |---|---|
@@ -90,14 +90,16 @@ Lados según el BINDING de la pantalla (T4): «Liquidado por el corresponsal» =
 
 ## 3. Paridad de reporte (TO-BE en sombra contra lo que el legado publicó)
 
-Publicado: `salida_reporte_del_mes_2023-12-29.jsonl` (7,492 renglones, sha256 `dc03a5d23611ad8e…`). TO-BE: 7,673 renglones. Comunes 7,492; sólo en el TO-BE 181; sólo en el legado 0; comunes con alguna celda distinta 7,492.
+Publicado: `salida_reporte_del_mes_2023-12-29.jsonl` (7,492 renglones, sha256 `b72045c846d0d590…`). TO-BE: 7,673 renglones. Comunes 7,492; sólo en el TO-BE 181; sólo en el legado 0; comunes con alguna celda distinta 7,492.
 
 | Orden (inversiones, por llave natural) | Pares de contrato | Inversiones de contrato | Pares empatados | % empatados invertidos |
 |---|---:|---:|---:|---:|
-| piso: el legado re-corrido contra lo que publicó (esta corrida) | 26,515,033 | 0 | 1,546,253 | 7.08 |
-| TO-BE contra lo publicado | 26,515,033 | 0 | 1,546,253 | 47.24 |
+| piso: el legado re-corrido contra lo que publicó (esta corrida) | 26,515,033 | 0 | 1,546,253 | 45.18 |
+| TO-BE contra lo publicado | 26,515,033 | 0 | 1,546,253 | 47.46 |
 
-**Veredicto del orden:** contrato en 0; los empates no son contrato: el propio legado invierte 7.08 % de sus pares empatados en esta corrida y el TO-BE 47.24 %.
+Piso (control negativo) con el plan variado en el contenedor limpio: tal cual: 21.44 % de empatados invertidos, 0 de contrato; estadísticas nuevas y caché de planes vacía: 18.91 % de empatados invertidos, 0 de contrato; MAXDOP 4 (los núcleos del runner de GitHub): 45.18 % de empatados invertidos, 0 de contrato.
+
+**Veredicto del orden:** contrato en 0; los empates no son contrato: el propio legado invierte hasta 45.18 % de sus pares empatados en esta corrida (con el plan variado) y el TO-BE 47.46 %.
 
 | Categoría | Diferencias |
 |---|---:|
@@ -136,14 +138,14 @@ Medido tal cual, sin ajustar nada: la paridad sólo puede ver el efecto de una t
 
 | Paso | Segundos |
 |---|---:|
-| restaurar el respaldo en un contenedor limpio | 17.8 |
-| extraer universo y oráculo | 41.7 |
-| cargar decant_migracion y comparar su esquema | 38.3 |
-| cargar decant_motor y comparar su esquema | 40.3 |
-| cargar decant_marca_vencimiento y comparar su esquema | 50.2 |
-| cargar decant_marca_conciliacion y comparar su esquema | 50.2 |
-| cargar decant_sombra y comparar su esquema | 41.4 |
-| verificar la migración (byte a byte y cuadres) | 81.2 |
-| medir el motor | 34.2 |
-| paridad de reporte | 9.7 |
-| gemelos | 2.4 |
+| restaurar el respaldo en un contenedor limpio | 11.2 |
+| extraer universo y oráculo | 37.6 |
+| cargar decant_migracion y comparar su esquema | 37.5 |
+| cargar decant_motor y comparar su esquema | 38.2 |
+| cargar decant_marca_vencimiento y comparar su esquema | 39.0 |
+| cargar decant_marca_conciliacion y comparar su esquema | 42.1 |
+| cargar decant_sombra y comparar su esquema | 41.2 |
+| verificar la migración (byte a byte y cuadres) | 71.7 |
+| medir el motor | 32.0 |
+| paridad de reporte | 10.7 |
+| gemelos | 2.3 |

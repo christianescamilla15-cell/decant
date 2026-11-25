@@ -1,5 +1,5 @@
 {
- "generado": "2026-11-24T22:58:03-06:00",
+ "generado": "2026-11-24T23:30:05-06:00",
  "corte": {
   "tablas": {
    "dbo.moneda": {
@@ -1439,7 +1439,7 @@
  "reporte": {
   "publicado": {
    "archivo": "salida_reporte_del_mes_2023-12-29.jsonl",
-   "sha256": "dc03a5d23611ad8ed0d072f1f2aa300290179eea22434cea8dcd148496f8eec7",
+   "sha256": "b72045c846d0d5903078b2ac6b4413f6d2eb799db49caddeee611dce6b71a84a",
    "renglones": 7492
   },
   "tobe": {
@@ -1458,11 +1458,12 @@
     "pares_contrato": 26515033,
     "inversiones_contrato": 0,
     "pares_empatados": 1546253,
-    "inversiones_empatados": 730436,
-    "pct_empatados_invertidos": 47.24,
+    "inversiones_empatados": 733794,
+    "pct_empatados_invertidos": 47.46,
     "pct_posiciones_distintas": 99.7
    },
    "piso_misma_corrida": {
+    "variante": "MAXDOP 4 (los núcleos del runner de GitHub)",
     "renglones": 7492,
     "renglones_otra_toma": 7492,
     "renglones_comunes": 7492,
@@ -1470,13 +1471,36 @@
     "pares_contrato": 26515033,
     "inversiones_contrato": 0,
     "pares_empatados": 1546253,
-    "inversiones_empatados": 109399,
-    "pct_empatados_invertidos": 7.08,
-    "pct_posiciones_distintas": 17.6
+    "inversiones_empatados": 698537,
+    "pct_empatados_invertidos": 45.18,
+    "pct_posiciones_distintas": 99.6,
+    "muestras": [
+     {
+      "variante": "tal cual",
+      "inversiones_contrato": 0,
+      "inversiones_empatados": 331503,
+      "pct_empatados_invertidos": 21.44,
+      "mismo_contenido": true
+     },
+     {
+      "variante": "estadísticas nuevas y caché de planes vacía",
+      "inversiones_contrato": 0,
+      "inversiones_empatados": 292451,
+      "pct_empatados_invertidos": 18.91,
+      "mismo_contenido": true
+     },
+     {
+      "variante": "MAXDOP 4 (los núcleos del runner de GitHub)",
+      "inversiones_contrato": 0,
+      "inversiones_empatados": 698537,
+      "pct_empatados_invertidos": 45.18,
+      "mismo_contenido": true
+     }
+    ]
    },
    "contrato_en_cero": true,
    "empates_libres": true,
-   "veredicto": "contrato en 0; los empates no son contrato: el propio legado invierte 7.08 % de sus pares empatados en esta corrida y el TO-BE 47.24 %"
+   "veredicto": "contrato en 0; los empates no son contrato: el propio legado invierte hasta 45.18 % de sus pares empatados en esta corrida (con el plan variado) y el TO-BE 47.46 %"
   },
   "arbitraje": {
    "diferencias": 15165,
@@ -1631,17 +1655,17 @@
   "cumple": true
  },
  "tiempos": {
-  "restaurar el respaldo en un contenedor limpio": 17.8,
-  "extraer universo y oráculo": 41.7,
-  "cargar decant_migracion y comparar su esquema": 38.3,
-  "cargar decant_motor y comparar su esquema": 40.3,
-  "cargar decant_marca_vencimiento y comparar su esquema": 50.2,
-  "cargar decant_marca_conciliacion y comparar su esquema": 50.2,
-  "cargar decant_sombra y comparar su esquema": 41.4,
-  "verificar la migración (byte a byte y cuadres)": 81.2,
-  "medir el motor": 34.2,
-  "paridad de reporte": 9.7,
-  "gemelos": 2.4
+  "restaurar el respaldo en un contenedor limpio": 11.2,
+  "extraer universo y oráculo": 37.6,
+  "cargar decant_migracion y comparar su esquema": 37.5,
+  "cargar decant_motor y comparar su esquema": 38.2,
+  "cargar decant_marca_vencimiento y comparar su esquema": 39.0,
+  "cargar decant_marca_conciliacion y comparar su esquema": 42.1,
+  "cargar decant_sombra y comparar su esquema": 41.2,
+  "verificar la migración (byte a byte y cuadres)": 71.7,
+  "medir el motor": 32.0,
+  "paridad de reporte": 10.7,
+  "gemelos": 2.3
  },
  "trampas_a_ciegas": [
   {
