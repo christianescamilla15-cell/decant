@@ -471,3 +471,15 @@ def test_reusar_cargas_exige_la_llave_del_mismo_codigo(tmp_path):
         tobe.verificar_reuso(tmp_path, 'a' * 64)
     tobe.verificar_reuso(tmp_path, 'b' * 64)
 
+
+
+def test_cada_tabla_de_las_migraciones_tiene_origen_o_declaracion():
+    """Sin esperar al job de paridad: una tabla nueva del TO-BE debe mapearse desde el legado o declararse en NUEVAS
+    (el esquema tras cada carga la rechazaría a los diez minutos)."""
+    from paridad.mapeo import NUEVAS, T, destinos
+    carpeta = Path(__file__).resolve().parent.parent / 'src/Decant.Infrastructure/Persistencia/Migraciones'
+    tablas = {t for archivo in carpeta.glob('*.cs') if not archivo.name.endswith(('.Designer.cs', 'Snapshot.cs'))
+              for t in re.findall(r'CreateTable\(\s*name: "(\w+)"', archivo.read_text(encoding='utf-8'))}
+    assert {'orden_pago', 'resultado_archivo'} <= tablas
+    con_origen = {c.rsplit('.', 1)[0] for c in destinos()} | {c.rsplit('.', 1)[0] for c in NUEVAS}
+    assert sorted(t for t in tablas if T + t not in con_origen) == []

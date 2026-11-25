@@ -233,6 +233,7 @@ NUEVAS = {
     T + 'liquidacion_descartada.*': 'D3 visible: la confirmación que el legado tiraba en silencio',
     T + 'marca.*': 'evidencia del modo «sólo marca»',
     T + 'corrida.*': 'qué carga o replay dejó el estado, con qué reglas y banderas',
+    T + 'resultado_archivo.*': 'lo que dejó cada archivo del lote en cada corrida (mensajes, rechazos, repetidos)',
     T + '__historial_migraciones.*': 'historial de migraciones de EF Core',
 }
 

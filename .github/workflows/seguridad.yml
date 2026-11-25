@@ -46,13 +46,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0        # toda la historia: un secreto borrado sigue en Git
-      # Imagen oficial con versión fija (la misma que .pre-commit-config.yaml). Se corre con el usuario del
+      # Imagen oficial con versión y digest fijos (la versión es la de .pre-commit-config.yaml). Con el usuario del
       # runner para que git no rechace el árbol montado por «dubious ownership».
       - name: gitleaks sobre toda la historia
         shell: bash             # bash con pipefail: el código de salida de gitleaks sobrevive al tee
         run: >-
           docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/repo"
-          ghcr.io/gitleaks/gitleaks:v8.21.2 git /repo --redact --verbose --exit-code 1
+          ghcr.io/gitleaks/gitleaks:v8.21.2@sha256:0e99e8821643ea5b235718642b93bb32486af9c8162c8b8731f7cbdc951a7f46
+          git /repo --redact --verbose --exit-code 1
           2>&1 | tee gitleaks.log
       # La acción oficial termina en verde aunque no haya escaneado un solo commit: se exige verlo en el log.
       - name: probar que escaneó commits

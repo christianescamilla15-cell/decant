@@ -185,7 +185,7 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
 
 ## Pruebas
 
-- `pytest`: 163 pruebas sin base. Cubren:
+- `pytest`: 164 pruebas sin base. Cubren:
   - el determinismo del generador (huella fija) y la existencia de cada trampa en los datos;
   - el universo: partición por columna, llaves reales del buzón, liquidaciones descartadas y nombres sanos en el
     archivo de sucursales;
@@ -195,7 +195,8 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - la paridad: universo y oráculo atados a la partición, cada parche exacto con su control negativo, la conversión
     de horas contra la del generador, esquema con su control de T6, arbitraje, R08 como hipótesis, los mutantes del
     reporte, cuadre por lado y el binding de la pantalla;
-  - que `--reusar-cargas` sólo reutilice cargas hechas por el mismo código y el mismo respaldo (llave sha256).
+  - que `--reusar-cargas` sólo reutilice cargas hechas por el mismo código y el mismo respaldo (llave sha256), y que
+    cada tabla de las migraciones tenga origen en el legado o declaración (sin esperar al job de paridad).
 - `pytest -m integracion`: 16 pruebas contra SQL Server real. Comprueban:
   - que el generador calcula lo mismo que los procedimientos del legado;
   - el criterio de salida contra el manifiesto;
@@ -208,7 +209,7 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - lo que pierde el delta por la pantalla;
   - los espacios finales contados en el motor y la medición separada por catálogo.
 
-- `dotnet test Decant.slnx`: 181 pruebas del TO-BE.
+- `dotnet test Decant.slnx`: 183 pruebas del TO-BE.
   - `Decant.Domain.Tests` (85): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
     ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón: una fila por cada
     variante de formato que existe entre sus 150,124 mensajes), bordes e invariantes. Mutación del dominio con
@@ -218,8 +219,9 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - `Decant.Application.Tests` (23): el replay, la carga histórica y el reproceso con dobles escritos a mano, y las
     invariantes del lote (dos veces no duplica, permutado da lo mismo, un archivo dañado no detiene a los demás, un
     rechazo de negocio no es error técnico ni se reintenta).
-  - `Decant.Infrastructure.Tests` (23) y `Decant.Api.Tests` (33): EF Core, COPY y la API completa contra PostgreSQL
-    real con Testcontainers: bordes de fecha (día local de 23 y 25 horas, rangos inclusivos), cargas simultáneas
+  - `Decant.Infrastructure.Tests` (25) y `Decant.Api.Tests` (33): EF Core, COPY y la API completa contra PostgreSQL
+    real con Testcontainers: bordes de fecha (día local de 23 y 25 horas, rangos inclusivos), el estatus como texto
+    de ida y vuelta, cargas simultáneas
     contra los índices únicos, la migración nueva sobre una base con datos (y su reversa), el contrato de errores
     `problem+json` (sin autenticación en el alcance: [ADR 0012](docs/adr/0012-api-sin-autenticacion-en-el-alcance-de-la-demo.md))
     y que cada propiedad de la configuración se lea de su clave.
