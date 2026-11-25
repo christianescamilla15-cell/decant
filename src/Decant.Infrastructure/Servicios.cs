@@ -16,9 +16,13 @@ public static class Servicios
     public static IServiceCollection AgregarDecant(this IServiceCollection servicios, string cadenaDeConexion,
         string? carpetaUniverso = null, string? carpetaOraculo = null)
     {
-        servicios.AddDbContext<DecantDbContext>(o => o.UseNpgsql(cadenaDeConexion,
+        // Una fábrica (para quien lee en paralelo: un contexto por llamada) y el contexto por alcance que usan los
+        // casos de uso secuenciales; los dos con las mismas opciones.
+        servicios.AddDbContextFactory<DecantDbContext>(o => o.UseNpgsql(cadenaDeConexion,
             n => n.MigrationsHistoryTable("__historial_migraciones", DecantDbContext.Esquema)));
+        servicios.AddScoped(s => s.GetRequiredService<IDbContextFactory<DecantDbContext>>().CreateDbContext());
         servicios.AddScoped<IConsultasTobe, ConsultasEf>();
+        servicios.AddSingleton<IConsultasEnLote, ConsultasEnLoteEf>();
         servicios.AddScoped<IAlmacenTobe, AlmacenPostgres>();
         servicios.AddSingleton<IClock, SystemClock>();
         servicios.AddScoped<IMediador, Mediador>();
