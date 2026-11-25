@@ -198,3 +198,19 @@ def test_el_delta_por_la_pantalla_pierde_renglones_y_la_columna_t6(conexion):
     en_base = cursor.fetchone()[0]
     assert len(renglones) == 200 < en_base                       # la lista corta en 200 (TOP sin ORDER BY)
     assert not any('codigo_proposito' in r['encabezado'] for r in renglones)
+
+
+def test_los_espacios_finales_se_cuentan_en_el_motor_y_la_radiografia_los_ve_con_su_ventana(conexion):
+    from legado.generador.cargar import con_relleno_en_el_motor
+    assert con_relleno_en_el_motor(conexion.cursor(), 'partida_solicitada', 'referencia') == 48_013
+    espacios = [h for h in _json(INFORME / 'radiografia.json')['hallazgos'] if h['categoria'] == 'espacios_finales']
+    assert [h['objeto'] for h in espacios] == ['dbo.partida_solicitada.referencia']
+    ventana = espacios[0]['ventana']
+    assert ventana['desde'].startswith('2022-07') and ventana['hasta'].startswith('2023-01')
+
+
+def test_la_medicion_separa_el_catalogo_propio_del_ciego_ya_conocido():
+    catalogos = {c['archivo']: c for c in _json(INFORME / 'medicion.json')['catalogos']}
+    assert catalogos['legado/TRAMPAS.md']['detectadas'] >= 8 and catalogos['legado/TRAMPAS.md']['nota'] is None
+    ciego = catalogos['legado/TRAMPAS_CIEGAS.md']
+    assert ciego['detectadas'] == 3 and 'NO cuenta como control' in ciego['nota']

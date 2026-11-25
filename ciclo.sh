@@ -60,7 +60,8 @@ paso 'legado vivo'               "$PY" -m legado.vivo
 paso 'delta por la pantalla'     delta_por_pantalla
 paso 'restaurar y radiografiar'  "$PY" -m radiografia --manifiesto "$(ultimo_manifiesto)"
 paso 'veredictos medidos'        "$PY" -m radiografia.veredictos --manifiesto "$(ultimo_manifiesto)"
-paso 'medir contra el catálogo'  "$PY" -m radiografia.medicion --minimo 88
+paso 'medir contra los catálogos' "$PY" -m radiografia.medicion --minimo 88 --trampas legado/TRAMPAS.md \
+  --trampas legado/TRAMPAS_CIEGAS.md --conocido legado/TRAMPAS_CIEGAS.md
 paso 'daño de bcp -c'            "$PY" -m legado bcp
 echo
 echo 'Tiempos:'

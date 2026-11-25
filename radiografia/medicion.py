@@ -3,7 +3,8 @@
 Es el ÚNICO módulo de la radiografía que lee el catálogo, y lo hace DESPUÉS: los detectores ya corrieron y su
 informe está escrito. Aquí sólo se cuenta qué señales esperadas aparecen entre los hallazgos y cuáles no.
 
-    python -m radiografia.medicion --informe radiografia/informe/radiografia.json --trampas legado/TRAMPAS.md
+    python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAMPAS_CIEGAS.md \
+        --conocido legado/TRAMPAS_CIEGAS.md
 """
 from __future__ import annotations
 
@@ -73,16 +74,44 @@ def con_veredictos(m: dict, veredictos: list[dict]) -> dict:
     return m
 
 
-def markdown(m: dict, base: str) -> str:
-    r = [f'# Medición de la radiografía de `{base}` contra `legado/TRAMPAS.md`\n',
-         'Los detectores corrieron sin leer el catálogo; esta tabla sólo cuenta qué señales esperadas aparecieron.\n',
-         f"**Detección: {m['detectadas']} de {m['trampas']} trampas ({m['pct_deteccion']} %)**"
-         + (f" · {m['parciales']} parcial(es)" if m['parciales'] else '') + '.\n',
-         '| Id | Trampa | Estado | Señales esperadas | Encontradas |', '|---|---|---|---|---|']
-    for f in m['filas']:
+def medir_catalogos(hallazgos: list[dict], catalogos: list[dict]) -> dict:
+    """Mide contra uno o varios catálogos POR SEPARADO. «Fuera del catálogo» es lo que no explica ninguno.
+
+    catalogos: [{'archivo', 'trampas', 'nota'}]; el primero es el principal (sus cifras quedan arriba).
+    """
+    resultados = [{**medir(hallazgos, c['trampas']), 'archivo': c['archivo'], 'nota': c.get('nota')}
+                  for c in catalogos]
+    senales = {s for c in catalogos for t in c['trampas'] for s in t['senales']}
+    fuera = sorted({(h['categoria'], h['objeto']) for h in hallazgos
+                    if h['categoria'] not in INFORMATIVAS and (h['categoria'], h['objeto'].lower()) not in senales})
+    for r in resultados:
+        r.pop('hallazgos_sin_trampa', None)
+    principal = {k: v for k, v in resultados[0].items() if k not in ('archivo', 'nota')}
+    return {**principal, 'catalogos': resultados,
+            'hallazgos_sin_trampa': [{'categoria': c, 'objeto': o} for c, o in fuera]}
+
+
+def _tabla_catalogo(c: dict) -> list[str]:
+    r = [f"## `{c['archivo']}`\n"]
+    if c.get('nota'):
+        r.append(f"> {c['nota']}\n")
+    r.append(f"**Detección: {c['detectadas']} de {c['trampas']} trampas ({c['pct_deteccion']} %)**"
+             + (f" · {c['parciales']} parcial(es)" if c['parciales'] else '') + '.\n')
+    r += ['| Id | Trampa | Estado | Señales esperadas | Encontradas |', '|---|---|---|---|---|']
+    for f in c['filas']:
         r.append(f"| {f['id']} | {f['nombre']} | {f['estado']} | {'<br>'.join(f['senales']) or '—'} | "
                  f"{'<br>'.join(f['encontradas']) or '—'} |")
-    r.append(f"\n## Hallazgos que no corresponden a ninguna trampa ({len(m['hallazgos_sin_trampa'])})\n")
+    return r + ['']
+
+
+def markdown(m: dict, base: str) -> str:
+    catalogos = m.get('catalogos') or [{**m, 'archivo': 'legado/TRAMPAS.md', 'nota': None}]
+    r = [f'# Medición de la radiografía de `{base}`\n',
+         'Los detectores corrieron sin leer los catálogos; estas tablas sólo cuentan qué señales esperadas '
+         'aparecieron. Cada catálogo se mide por separado.\n']
+    for c in catalogos:
+        r += _tabla_catalogo(c)
+    r.append(f"## Hallazgos que no corresponden a ninguna trampa ({len(m['hallazgos_sin_trampa'])})\n")
     r.append('Cada uno lleva su veredicto MEDIDO sobre el respaldo restaurado (`radiografia/veredictos.py`; la '
              'medición completa está en `veredictos.json`).\n')
     r.append('| Patrón | Objeto | Clase | Veredicto |')
@@ -95,15 +124,27 @@ def markdown(m: dict, base: str) -> str:
     return '\n'.join(r) + '\n'
 
 
+NOTA_CONOCIDO = ('Catálogo CONOCIDO: el autor de los detectores ya lo leyó, y los detectores de esta versión se '
+                 'escribieron después de verlo. Detectar estas trampas ahora NO cuenta como control; el control real '
+                 'de esta versión es una siembra a ciegas nueva.')
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog='python -m radiografia.medicion', description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--informe', type=Path, default=Path('radiografia/informe/radiografia.json'))
-    parser.add_argument('--trampas', type=Path, default=Path('legado/TRAMPAS.md'))
-    parser.add_argument('--minimo', type=float, default=0.0, help='falla si el %% de detección queda debajo')
+    parser.add_argument('--trampas', type=Path, action='append',
+                        help='catálogo (repetible; el primero es el principal). Por omisión, legado/TRAMPAS.md')
+    parser.add_argument('--conocido', type=Path, action='append', default=[],
+                        help='catálogo que ya no cuenta como control (se dice en el informe)')
+    parser.add_argument('--minimo', type=float, default=0.0,
+                        help='falla si el %% de detección del catálogo principal queda debajo')
     args = parser.parse_args(argv)
+    archivos = args.trampas or [Path('legado/TRAMPAS.md')]
     informe = json.loads(args.informe.read_text(encoding='utf-8'))
-    resultado = medir(informe['hallazgos'], leer_catalogo(args.trampas.read_text(encoding='utf-8')))
+    catalogos = [{'archivo': str(a), 'trampas': leer_catalogo(a.read_text(encoding='utf-8')),
+                  'nota': NOTA_CONOCIDO if a in args.conocido else None} for a in archivos]
+    resultado = medir_catalogos(informe['hallazgos'], catalogos)
     destino = args.informe.parent
     veredictos = destino / 'veredictos.json'
     if veredictos.exists():
@@ -111,10 +152,12 @@ def main(argv: list[str] | None = None) -> int:
     (destino / 'medicion.json').write_text(json.dumps(resultado, ensure_ascii=False, indent=1) + '\n',
                                            encoding='utf-8')
     (destino / 'medicion.md').write_text(markdown(resultado, informe['base']), encoding='utf-8')
-    print(f"detección: {resultado['detectadas']} de {resultado['trampas']} trampas ({resultado['pct_deteccion']} %) · "
-          f"{len(resultado['hallazgos_sin_trampa'])} hallazgos fuera del catálogo · {destino / 'medicion.md'}")
-    for f in resultado['filas']:
-        print(f"  {f['id']:3s} {f['estado']:16s} {f['nombre']}")
+    for c in resultado['catalogos']:
+        print(f"{c['archivo']}: {c['detectadas']} de {c['trampas']} trampas ({c['pct_deteccion']} %)"
+              + (' · conocido, no cuenta como control' if c['nota'] else ''))
+        for f in c['filas']:
+            print(f"  {f['id']:3s} {f['estado']:16s} {f['nombre']}")
+    print(f"{len(resultado['hallazgos_sin_trampa'])} hallazgos fuera de los catálogos · {destino / 'medicion.md'}")
     return 0 if resultado['pct_deteccion'] >= args.minimo else 1
 
 
