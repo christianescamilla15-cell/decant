@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="coverlet.collector" PrivateAssets="all" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <ProjectReference Include="..\..\src\Decant.Api\Decant.Api.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <!-- El estado de prueba se arma con los mismos constructores en los dos proyectos de integración. -->
+    <Compile Include="..\Decant.Infrastructure.Tests\Escenario.cs" Link="Escenario.cs" />
+    <Compile Include="..\Decant.Infrastructure.Tests\BaseDePrueba.cs" Link="BaseDePrueba.cs" />
+  </ItemGroup>
+</Project>

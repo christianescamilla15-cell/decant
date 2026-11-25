@@ -103,9 +103,14 @@ def arrancar_limpio(memoria_mb: int = 4096) -> Servidor:
                 '-p', '127.0.0.1::1433', IMAGEN)
     finally:
         os.unlink(entorno.name)
-    puerto = int(_docker('port', nombre, '1433/tcp').splitlines()[0].rsplit(':', 1)[1])
-    servidor = Servidor(nombre, puerto, contrasena, propio=True)
-    _esperar(servidor)
+    try:
+        puerto = int(_docker('port', nombre, '1433/tcp').splitlines()[0].rsplit(':', 1)[1])
+        servidor = Servidor(nombre, puerto, contrasena, propio=True)
+        _esperar(servidor)
+    except BaseException:
+        # si nunca quedó listo, nadie más lo puede cerrar: se quita aquí
+        subprocess.run(['docker', 'rm', '-f', nombre], capture_output=True, check=False)
+        raise
     return servidor
 
 

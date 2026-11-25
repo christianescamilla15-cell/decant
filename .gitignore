@@ -9,6 +9,7 @@ __pycache__/
 .coverage.*
 coverage.xml
 reporte.xml
+reporte-*.xml
 # Reportes de los escaneos del CI (se suben como artefactos)
 *.sarif
 semgrep.json
@@ -19,6 +20,7 @@ sbom.spdx.json
 # ── Datos generados (se reproducen con la semilla; no se versionan) ───────
 legado/datos/
 respaldos/
+paridad/datos/
 muestras/
 *.bak
 
@@ -31,3 +33,11 @@ muestras/
 .idea/
 *.swp
 .DS_Store
+
+# ── .NET ──────────────────────────────────────────────────────────────────
+bin/
+obj/
+TestResults/
+resultados/
+*.trx
+StrykerOutput/

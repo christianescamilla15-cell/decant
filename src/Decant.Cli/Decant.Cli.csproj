@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lotes: carga histórica, replay del universo, reporte y configuración impresa. Misma composición que la API. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Decant.Cli</RootNamespace>
+    <AssemblyName>decant</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\Decant.Infrastructure\Decant.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- La configuración por ambiente vive en un solo lugar: la de la API. -->
+    <Content Include="..\Decant.Api\appsettings*.json" CopyToOutputDirectory="PreserveNewest" LinkBase="." />
+  </ItemGroup>
+</Project>

@@ -2,3 +2,5 @@
 # Versiones fijas con == (Trivy no inventaría rangos).
 pymssql==2.4.6     # driver de SQL Server con FreeTDS incluido (sin ODBC del sistema)
 tzdata==2026.6     # base de zonas horarias FIJA: el generador no depende de la del sistema operativo
+psycopg==3.3.9          # paridad: lee el TO-BE en PostgreSQL (siempre junto con psycopg-binary, misma versión)
+psycopg-binary==3.3.9
