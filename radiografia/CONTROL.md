@@ -1,8 +1,37 @@
-# Control: la radiografía sobre una base pública de Microsoft
+# Control: la radiografía sobre bases públicas de Microsoft
 
 Una radiografía que sólo se prueba sobre el legado que uno mismo sembró puede «detectar» lo que su autor ya sabía.
-El control la corre, sin cambiar nada, sobre una base que no escribimos y que se tiene por limpia:
-**WideWorldImporters**, el respaldo oficial de los ejemplos de SQL Server.
+El control la corre, sin cambiar nada, sobre bases que no escribimos y que se tienen por limpias.
+
+Hay dos controles con papeles distintos:
+
+1. **WideWorldImporters es de ENTRENAMIENTO.** Los arreglos de la v1 de los detectores se hicieron mirando sus
+   falsos positivos, así que su resultado ya no prueba que los detectores generalicen.
+2. **AdventureWorks es el control APARTADO.** Se corrió UNA sola vez, después de congelar los detectores, y se
+   publica tal cual salió. La validación del detector de D1 (`round_trunca`, agregado después de la v1) sólo cuenta
+   contra él.
+
+## Detectores congelados: `detectores-v2`
+
+Los detectores son tres archivos. Se congelaron en el tag `detectores-v2` con estos sha256, y la prueba
+`test_los_detectores_estan_congelados_en_detectores_v2` falla si cualquiera cambia:
+
+```
+8e29395ee20f056a02e1858abb3812dd0a05747a6d0c531ada5881e34e86ff6b  radiografia/tsql.py
+70f4415556b3386b31264bbe8a28eededb35c548b351b9f0157fddf0d8788b3e  radiografia/patrones.py
+ab60df538a88a6423e1cb734abc7c5e33d620425e580f33d18573b01fc29a5a9  radiografia/datos.py
+```
+
+Cambiar un detector después de esto exige un tag nuevo (`detectores-v3`), su sha256 aquí y un control apartado
+NUEVO: el de AdventureWorks ya no serviría para validarlo.
+
+## Control apartado: AdventureWorks
+
+Pendiente de su única corrida.
+
+---
+
+# Control de entrenamiento: WideWorldImporters
 
 - **Fuente:** `WideWorldImporters-Full.bak` del release `wide-world-importers-v1.0` del repositorio
   `microsoft/sql-server-samples` en GitHub. sha256
@@ -18,9 +47,12 @@ El control la corre, sin cambiar nada, sobre una base que no escribimos y que se
   (y su `.json`).
 - **Qué se analizó:** 48 tablas con 4,713,833 filas y 47 módulos (42 procedimientos, 3 vistas y 2 funciones).
   No tiene triggers. No se restauró su msdb, así que no hay jobs que inventariar.
-- **Tiempo:** 48 s (arranque del contenedor 6 s, restauración 8 s, patrones sobre datos 30 s).
+- **Tiempo:** 48–65 s (arranque del contenedor 6 s, restauración 8 s, patrones sobre datos 30 s).
 
-## Resultado (versión final de los detectores)
+## Resultado (detectores congelados `detectores-v2`)
+
+La última corrida, ya con el detector `round_trunca`, da lo mismo que la anterior: 0 ROUND que truncan en
+WideWorldImporters.
 
 Un falso positivo, aquí, es un hallazgo que al leer el código o los datos NO resulta ser un defecto.
 
@@ -32,6 +64,7 @@ Un falso positivo, aquí, es un hallazgo que al leer el código o los datos NO r
 | IF EXISTS sin ELSE que escribe datos | 0 | 0 | 0 | — |
 | IF EXISTS sin ELSE de guarda o DDL (informativo) | 65 | 0 | — | 64 `IF NOT EXISTS … CREATE/EXEC` de configuración idempotente y 1 `IF EXISTS … THROW`. |
 | Desfase horario fijo | 0 | 0 | 0 | — |
+| ROUND que trunca (nuevo en v2) | 0 | 0 | 0 | No cuenta como validación: WideWorldImporters es de entrenamiento. |
 | Centinelas | 7 | 0 | 7 | Ceros legítimos: saldo pendiente 0 (pagado), 0 artículos refrigerados; y «0 de impuesto» en los pagos, un 0 en vez de NULL decidido por el diseño. |
 | **Mojibake** | **5** | **5** | **0** | **Daño REAL en la muestra: «Chávez» guardado como «ChÃ¡vez» en `Application.People` (FullName, SearchName), `Sales.Customers` (dos direcciones) y 213 facturas (`Sales.Invoices.DeliveryInstructions`). No hay ni una «Chávez» bien escrita.** |
 | Re-registro | 0 | 0 | 0 | — |

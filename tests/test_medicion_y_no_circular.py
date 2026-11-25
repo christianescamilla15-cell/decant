@@ -62,3 +62,15 @@ def test_cada_hallazgo_fuera_del_catalogo_lleva_su_veredicto_medido():
     assert m['sin_veredicto'] == 1
     texto = markdown(m, 'X')
     assert 'Latente: 0 duplicados' in texto and '1 hallazgos sin veredicto' in texto
+
+
+def test_los_detectores_estan_congelados_en_detectores_v2():
+    """Tras congelar (tag `detectores-v2`), el control apartado y la siembra a ciegas sólo valen si los detectores no
+    cambian. Sus sha256 viven en radiografia/CONTROL.md: cambiar un detector exige un tag nuevo y un control nuevo."""
+    import hashlib
+    congelados = re.findall(r'^([0-9a-f]{64})  (radiografia/\w+\.py)$', Path('radiografia/CONTROL.md').read_text(
+        encoding='utf-8'), re.MULTILINE)
+    assert {ruta for _, ruta in congelados} == {'radiografia/tsql.py', 'radiografia/patrones.py',
+                                               'radiografia/datos.py'}
+    for esperado, ruta in congelados:
+        assert hashlib.sha256(Path(ruta).read_bytes()).hexdigest() == esperado, f'{ruta} cambió tras el congelamiento'
