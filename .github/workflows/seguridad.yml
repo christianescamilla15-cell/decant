@@ -68,13 +68,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lenguaje: [python]      # + javascript-typescript si hay front
+        lenguaje: [python, csharp]   # el TO-BE es .NET 10; + javascript-typescript si hay front
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           languages: ${{ matrix.lenguaje }}
           queries: security-and-quality
+          # sin compilar: C# se analiza desde el código (CodeQL lo soporta) y Python nunca se compila
+          build-mode: none
       - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
 
   semgrep:
