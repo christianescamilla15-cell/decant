@@ -1,13 +1,13 @@
 # Radiografía de `BFN_DIVISAS`
 
-Generada 2026-11-25T02:07:33+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
+Generada 2026-11-25T02:45:39+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
 
 ## Restauración
 
 | Base restaurada | Archivo | sha256 contra el manifiesto | Verificación | Segundos |
 |---|---|---|---|---:|
-| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.4 |
-| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.6 |
+| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.1 |
+| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.5 |
 
 ## Criterio de salida
 
@@ -39,7 +39,7 @@ El orden se mide por inversiones con llave natural. Los pares con distinta llave
 
 | Salida | Renglones (comunes) | Mismo contenido | Pares contrato | Inversiones contrato | Pares empatados | Empatados invertidos | % posiciones distintas |
 |---|---:|---|---:|---:|---:|---:|---:|
-| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 338,760 (21.91 %) | 60.2 |
+| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 100,627 (6.51 %) | 11.2 |
 | lista_del_dia_anterior (`dbo.sp_lista_operaciones`) | 200 (183) | no: sin ORDER BY, otra instancia devuelve otras filas | 0 | 0 | 16,653 | 372 (2.23 %) | 69.0 |
 
 ## Corte medido en la fuente
@@ -59,7 +59,7 @@ Tabla principal `dbo.operacion`: MAX(id) = **412125** (IDENT_CURRENT 412125).
 
 ## Inventario
 
-7 tablas · 2,506,073 filas · 10 módulos · 1 triggers · 1 pasos de job.
+7 tablas · 2,506,073 filas · 12 módulos · 1 triggers · 1 pasos de job.
 
 | Tabla | Filas |
 |---|---:|
@@ -71,7 +71,7 @@ Tabla principal `dbo.operacion`: MAX(id) = **412125** (IDENT_CURRENT 412125).
 | `dbo.moneda` | 11 |
 | `dbo.folio` | 2 |
 
-Módulos: 1 job, 7 procedimiento, 1 trigger, 1 vista.
+Módulos: 1 job, 9 procedimiento, 1 trigger, 1 vista.
 
 Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
@@ -96,7 +96,7 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | Llave candidata con duplicados (no parece re-registro) | 1 |
 | Columnas que ningún módulo lee | 4 |
 | Tablas que ningún módulo lee | 1 |
-| Literales mágicos (números y códigos en duro) | 30 |
+| Literales mágicos (números y códigos en duro) | 35 |
 
 ### TOP sin ORDER BY (5)
 
@@ -181,7 +181,7 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 |---|---:|---|---|
 | `dbo.bitacora` |  | ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación) |  |
 
-### Literales mágicos (números y códigos en duro) (30)
+### Literales mágicos (números y códigos en duro) (35)
 
 | Objeto | Literales distintos | Ejemplos |
 |---|---:|---|
@@ -189,10 +189,12 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | `dbo.sp_conciliar` | 7 | `5000`, `'LIQUIDADA'`, `60.0`, `'PRINCIPAL'`, `'VENCIDA'`, `'ENVIADA'`, `-3` |
 | `dbo.sp_registrar_operacion` | 6 | `'FX'`, `'V'`, `1.0035`, `0.9965`, `9`, `2` |
 | `dbo.sp_registrar_liquidacion` | 3 | `'ENVIADA'`, `2`, `'LIQUIDADA'` |
+| `dbo.sp_reporte_posicion` | 3 | `'C'`, `'V'`, `2` |
+| `dbo.sp_ordenes_por_vencer` | 2 | `-2`, `'ENVIADA'` |
 | `dbo.sp_detalle_operacion` | 1 | `'REEMPLAZADA'` |
 | `dbo.vw_reporte_ordenes` | 1 | `'REEMPLAZADA'` |
 
 ## Tiempos
 
-arranque_contenedor: 10.9 s · restauracion: 4.3 s · inventario: 1.2 s · patrones_codigo: 0.0 s · patrones_datos: 27.2 s · criterio_salida: 4.2 s · total: 48.1 s
+arranque_contenedor: 6.3 s · restauracion: 4.1 s · inventario: 1.1 s · patrones_codigo: 0.0 s · patrones_datos: 17.5 s · criterio_salida: 1.5 s · total: 31.2 s
 
