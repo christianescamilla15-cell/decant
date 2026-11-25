@@ -102,8 +102,8 @@ código y los datos en una restauración aparte, de sólo lectura, sin volver a 
 - **División entera:** no tipa columnas de vistas, tablas derivadas, temporales ni variables de tabla, ni el
   resultado de funciones del usuario o tipos de alias. `AVG(<entero>)` sin una división (que en PostgreSQL da
   `numeric` y en SQL Server trunca) no se reporta: el arreglo pedido era la `/`.
-- Siguen los límites de la v3: las columnas calculadas cuentan como dato en `espacios_finales`, e IF EXISTS no
-  distingue una variable de tabla de una tabla.
+- Siguen los límites anteriores: las columnas calculadas cuentan como dato en `espacios_finales` (v3), e IF EXISTS
+  no distingue una variable de tabla de una tabla (v2).
 
 ## Historial: corrida de `detectores-v3` sobre los controles públicos
 
