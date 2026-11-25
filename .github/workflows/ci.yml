@@ -127,6 +127,8 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: '10.0.x'
+          cache: true             # caché de NuGet con llave del hash de los packages.lock.json
+          cache-dependency-path: '**/packages.lock.json'
       # Candados de NuGet en modo bloqueado: lo que compila el CI es exactamente lo versionado.
       - run: dotnet restore Decant.slnx --locked-mode
       # Las advertencias son errores (Directory.Build.props).
@@ -163,6 +165,8 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: '10.0.x'
+          cache: true             # caché de NuGet con llave del hash de los packages.lock.json
+          cache-dependency-path: '**/packages.lock.json'
       - run: dotnet restore Decant.slnx --locked-mode
       - run: dotnet build Decant.slnx -c Release --no-restore
       # Cada proyecto levanta su PostgreSQL (imagen fija por digest) con Testcontainers.
@@ -197,6 +201,8 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           dotnet-version: '10.0.x'
+          cache: true             # caché de NuGet con llave del hash de los packages.lock.json
+          cache-dependency-path: '**/packages.lock.json'
       - run: pip install -r requirements.txt -r requirements-dev.txt
       - run: dotnet restore Decant.slnx --locked-mode
       - run: dotnet build Decant.slnx -c Release --no-restore
@@ -212,17 +218,28 @@ jobs:
       # la paridad lo usa para auditar el avance de producción.
       - name: ciclo completo del legado
         run: ./ciclo.sh
+      # Imagen fija por digest y con tope de memoria; la espera es explícita (puerto y una consulta), no un retraso.
       - name: PostgreSQL del TO-BE (imagen fija por digest)
         run: |
-          docker run -d --name decant-pg -e POSTGRES_USER=decant -e POSTGRES_PASSWORD="$DECANT_PG_PASSWORD" \
-            -p "127.0.0.1:$DECANT_PG_PUERTO:5432" \
+          docker run -d --name decant-pg --memory 1g -e POSTGRES_USER=decant \
+            -e POSTGRES_PASSWORD="$DECANT_PG_PASSWORD" -p "127.0.0.1:$DECANT_PG_PUERTO:5432" \
             postgres:16-alpine@sha256:f2f98726820d0342055351c6e9d36e705f5bfffb3dd53ff556325114b08afb6d
-          for _ in $(seq 1 30); do docker exec decant-pg pg_isready -U decant -q && exit 0; sleep 1; done
+          for _ in $(seq 1 60); do
+            if docker exec decant-pg pg_isready -h 127.0.0.1 -U decant -q &&
+               docker exec decant-pg psql -h 127.0.0.1 -U decant -tAc 'SELECT 1' | grep -qx 1; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs decant-pg
           exit 1
       - name: los dos ejercicios, la paridad de reporte y los gemelos (un comando)
         run: |
           manifiestos=(respaldos/respaldo_*.json)
-          python -m paridad --manifiesto "${manifiestos[-1]}"
+          # /usr/bin/time -v deja la memoria pico (RSS) del proceso más grande que lanzó la paridad
+          medir=()
+          if [ -x /usr/bin/time ]; then medir=(/usr/bin/time -v -o memoria-paridad.txt); fi
+          "${medir[@]}" python -m paridad --manifiesto "${manifiestos[-1]}"
       - name: pruebas sobre el informe de paridad (T4 por el binding de la pantalla, entre otras)
         run: pytest -q -m paridad --junitxml=reporte-paridad.xml
       - run: python3 herramientas/verificar_reportes.py pytest reporte-paridad.xml
@@ -235,6 +252,22 @@ jobs:
             paridad/datos/*/corte.json
             paridad/datos/*/*/manifiesto.json
             reporte-paridad.xml
+      # Memoria pico de cada contenedor (cgroup v2: memory.peak) contra su tope, y la del proceso de la paridad.
+      - name: memoria pico
+        if: always()
+        run: |
+          for c in $(docker ps -q --filter name=decant); do
+            id=$(docker inspect -f '{{.Id}}' "$c"); nombre=$(docker inspect -f '{{.Name}}' "$c")
+            tope=$(docker inspect -f '{{.HostConfig.Memory}}' "$c")
+            pico=/sys/fs/cgroup/system.slice/docker-$id.scope/memory.peak
+            if [ -r "$pico" ]; then
+              echo "$nombre: pico $(( $(cat "$pico") / 1048576 )) MiB · tope $(( tope / 1048576 )) MiB"
+            else
+              echo "$nombre: memory.peak no disponible · tope $(( tope / 1048576 )) MiB"
+            fi
+          done
+          grep -E 'Maximum resident set size|Elapsed' memoria-paridad.txt || true
+          free -m
       - name: apagar el legado, PostgreSQL y cualquier restauración que haya quedado
         if: always()
         run: |

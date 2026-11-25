@@ -68,16 +68,44 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lenguaje: [python, csharp]   # el TO-BE es .NET 10; + javascript-typescript si hay front
+        lenguaje: [python]   # C# va en su propio job, compilado; + javascript-typescript si hay front
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           languages: ${{ matrix.lenguaje }}
           queries: security-and-quality
-          # sin compilar: C# se analiza desde el código (CodeQL lo soporta) y Python nunca se compila
-          build-mode: none
+          build-mode: none     # Python nunca se compila
       - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+
+  # C# COMPILADO (build-mode manual): sin compilar, CodeQL adivina tipos y dependencias y pierde flujos que pasan
+  # por los paquetes; compilando ve el mismo programa que corre. Job propio para medir su estabilidad antes de
+  # decidir si entra al ruleset.
+  codeql-csharp:
+    name: SAST (CodeQL C#, compilado)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: csharp
+          queries: security-and-quality
+          build-mode: manual
+      - run: dotnet restore Decant.slnx --locked-mode
+      # sin compilación compartida: el rastreador de CodeQL debe ver cada invocación del compilador
+      - run: dotnet build Decant.slnx -c Release --no-restore --no-incremental -p:UseSharedCompilation=false
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:csharp
 
   semgrep:
     name: SAST (Semgrep, bloqueante)

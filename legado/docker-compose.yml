@@ -15,6 +15,8 @@ services:
       # de vencimiento (GETDATE() - 3 días) sobre datos de 2023 y vencería todo lo pendiente. Ver docs/adr/0001.
       MSSQL_AGENT_ENABLED: "false"
       MSSQL_MEMORY_LIMIT_MB: "3072"
+    # Tope del contenedor por encima del de SQL Server (3 GB): el CI tiene 16 GB para todo el job de paridad.
+    mem_limit: 4g
     ports:
       - "127.0.0.1:${DECANT_PUERTO:-14330}:1433"
     healthcheck:

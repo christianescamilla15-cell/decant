@@ -185,7 +185,7 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
 
 ## Pruebas
 
-- `pytest`: 161 pruebas sin base. Cubren:
+- `pytest`: 163 pruebas sin base. Cubren:
   - el determinismo del generador (huella fija) y la existencia de cada trampa en los datos;
   - el universo: partición por columna, llaves reales del buzón, liquidaciones descartadas y nombres sanos en el
     archivo de sucursales;
@@ -194,7 +194,8 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - la no circularidad (ningún detector lee el catálogo) y el congelamiento de los detectores;
   - la paridad: universo y oráculo atados a la partición, cada parche exacto con su control negativo, la conversión
     de horas contra la del generador, esquema con su control de T6, arbitraje, R08 como hipótesis, los mutantes del
-    reporte, cuadre por lado y el binding de la pantalla.
+    reporte, cuadre por lado y el binding de la pantalla;
+  - que `--reusar-cargas` sólo reutilice cargas hechas por el mismo código y el mismo respaldo (llave sha256).
 - `pytest -m integracion`: 16 pruebas contra SQL Server real. Comprueban:
   - que el generador calcula lo mismo que los procedimientos del legado;
   - el criterio de salida contra el manifiesto;
@@ -207,16 +208,24 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - lo que pierde el delta por la pantalla;
   - los espacios finales contados en el motor y la medición separada por catálogo.
 
-- `dotnet test Decant.slnx`: 121 pruebas del TO-BE.
-  - `Decant.Domain.Tests` (76): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
-    ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón), bordes e invariantes.
-    Mutación del dominio con Stryker.NET: **83.78 %** (155 de 185 mutantes; los que sobreviven son textos de
-    mensajes de error y mutantes equivalentes, como `Sum` contra `Max` sobre el único principal).
-  - `Decant.Application.Tests` (16): el replay, la carga histórica y el reproceso con dobles escritos a mano.
-  - `Decant.Infrastructure.Tests` (12) y `Decant.Api.Tests` (10): EF Core, COPY y la API completa contra PostgreSQL
-    real con Testcontainers.
-  - `Decant.Architecture.Tests` (7): capas, el replay sin acceso al oráculo y nadie usa `DateTime.Now` salvo
-    `SystemClock` (recorriendo el IL).
+- `dotnet test Decant.slnx`: 181 pruebas del TO-BE.
+  - `Decant.Domain.Tests` (85): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
+    ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón: una fila por cada
+    variante de formato que existe entre sus 150,124 mensajes), bordes e invariantes. Mutación del dominio con
+    Stryker.NET como compuerta (`.github/workflows/mutacion.yml`, ruptura en 80: en cada PR sólo lo cambiado, cada
+    noche completo): **91.62 %** (153 de 164) con los textos de error excluidos por método (`stryker-config.json`);
+    sin esa exclusión, 83.87 %. Sobreviven mutantes equivalentes, como `Sum` contra `Max` sobre el único principal.
+  - `Decant.Application.Tests` (23): el replay, la carga histórica y el reproceso con dobles escritos a mano, y las
+    invariantes del lote (dos veces no duplica, permutado da lo mismo, un archivo dañado no detiene a los demás, un
+    rechazo de negocio no es error técnico ni se reintenta).
+  - `Decant.Infrastructure.Tests` (23) y `Decant.Api.Tests` (33): EF Core, COPY y la API completa contra PostgreSQL
+    real con Testcontainers: bordes de fecha (día local de 23 y 25 horas, rangos inclusivos), cargas simultáneas
+    contra los índices únicos, la migración nueva sobre una base con datos (y su reversa), el contrato de errores
+    `problem+json` (sin autenticación en el alcance: [ADR 0012](docs/adr/0012-api-sin-autenticacion-en-el-alcance-de-la-demo.md))
+    y que cada propiedad de la configuración se lea de su clave.
+  - `Decant.Architecture.Tests` (17): capas, el replay sin acceso al oráculo, nadie usa `DateTime.Now` salvo
+    `SystemClock` (recorriendo el IL), ningún tipo de EF fuera de la infraestructura, lecturas sin rastreo, ni
+    defaults de reloj en la base ni conversiones de zona fuera de `Zonas`, y la fecha valor como `date`.
 - `pytest -m paridad`: 8 pruebas sobre el informe de paridad, entre ellas la de T4 por el binding de la pantalla.
 
 ## Seguridad

@@ -1,0 +1,22 @@
+{
+  "stryker-config": {
+    "project": "Decant.Domain.csproj",
+    "configuration": "Release",
+    "thresholds": {
+      "high": 90,
+      "low": 80,
+      "break": 80
+    },
+    "reporters": [
+      "progress",
+      "json",
+      "html",
+      "markdown"
+    ],
+    "ignore-methods": [
+      "Error.ctor",
+      "*Exception.ctor"
+    ],
+    "concurrency": 4
+  }
+}
