@@ -36,7 +36,7 @@ def test_huella_fijada_del_periodo_corto(datos_chicos):
     assert datos_chicos.huella() == HUELLA_CHICO
 
 
-HUELLA_CHICO = 'defe2830211c49ed5f9cde3ea6622a793c7f8e422f11a2d4e1bddb678351f72f'
+HUELLA_CHICO = '330a48fa9330d9ea5dc37450702201082ea4832ac53f72b07bc67b27602ffc5f'
 
 
 # ── volumen (medido en legado/VOLUMEN.md) ───────────────────────────────────────────────────────────────────
@@ -245,3 +245,25 @@ def test_el_delta_trae_operaciones_catalogo_y_escrituras_despues_del_congelamien
     assert acciones[('posterior_congelamiento', 'operacion')] > 0
     instantes = [p['instante_utc'] for p in datos.pasos]
     assert instantes == sorted(instantes)
+
+
+# ── preparación de S3 en el legado vivo ─────────────────────────────────────────────────────────────────────
+
+def test_un_archivo_de_sucursal_tardio_da_altas_fechadas_hacia_atras_despues_del_respaldo(datos):
+    tardias = [p for p in datos.pasos if p['accion'] == 'operacion' and p['args']['canal'] == 'ARCHIVO']
+    assert tardias
+    corte = datos.config.fecha_respaldo.isoformat()
+    for p in tardias:
+        assert p['fase'] == 'delta' and p['hora_local'].startswith(corte)      # llegan después de la foto…
+        assert p['args']['fecha_operacion'] < corte                             # …con fecha de negocio anterior
+
+
+def test_hay_documentos_del_legado_tras_el_congelamiento_que_tambien_capturara_el_tobe(datos):
+    tras = [p['args']['uetr'] for p in datos.pasos if p['fase'] == 'posterior_congelamiento' and p['accion'] == 'orden']
+    assert tras and datos.choques['tobe_tambien_captura'] == tras
+
+
+def test_el_corresponsal_nunca_abona_un_monto_negativo(datos):
+    # regresión: al leer el buzón en su formato real salieron 4 abonos negativos (gastos mayores que el principal)
+    assert all(d.abono > 0 for d in datos.documentos)
+    assert all(f[5] > 0 for f in datos.tablas['partida_solicitada'])

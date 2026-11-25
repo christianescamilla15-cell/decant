@@ -15,11 +15,13 @@ import hashlib
 import math
 import random
 import uuid
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal
 
 from . import catalogos as cat
+from . import interfaces
 from .zonas import CDMX, NUEVA_YORK, UTC, a_utc, local
 
 D2 = Decimal('0.01')
@@ -78,7 +80,8 @@ class Config:
 
 class Operacion:
     __slots__ = ('seq', 'insercion', 'fecha_local', 'sucursal', 'canal', 'cliente', 'clabe', 'tipo', 'moneda',
-                 'monto', 'tc', 'tc_ref', 'monto_mxn', 'estatus', 'id', 'folio', 'orden_archivo')
+                 'monto', 'tc', 'tc_ref', 'monto_mxn', 'estatus', 'id', 'folio', 'orden_archivo', 'cliente_original',
+                 'reenvio', 'ref_sucursal')
 
 
 class Documento:
@@ -96,6 +99,8 @@ class Datos:
     pasos: list[dict]
     operaciones: list[Operacion] = field(repr=False)
     documentos: list[Documento] = field(repr=False)
+    interfaces: dict[str, str] = field(repr=False, default_factory=dict)
+    choques: dict[str, list] = field(default_factory=dict)
 
     def conteos(self) -> dict[str, int]:
         return {t: len(filas) for t, filas in self.tablas.items()}
@@ -113,6 +118,10 @@ class Datos:
         for paso in self.pasos:
             h.update(repr(sorted(paso.items())).encode('utf-8'))
         resultado['delta'] = h.hexdigest()
+        h = hashlib.sha256()
+        for ruta in sorted(self.interfaces):
+            h.update(ruta.encode('utf-8') + b'\0' + self.interfaces[ruta].encode('utf-8'))
+        resultado['interfaces'] = h.hexdigest()
         return resultado
 
     def huella(self) -> str:
@@ -236,6 +245,9 @@ def _operaciones(cfg: Config, rng: random.Random, tasas) -> list[Operacion]:
             nombre, clabe = clientes[_elegir(rng, acumulado_cliente)]
             if canal != 'EN_LINEA':
                 nombre = nombre.upper()
+            op.cliente_original = nombre
+            op.reenvio = None
+            op.ref_sucursal = None
             if canal == 'ARCHIVO' and date(2021, 3, 1) <= dia <= date(2022, 6, 30):
                 # la interfaz de sucursales leyó como latin-1 archivos que venían en UTF-8
                 nombre = nombre.encode('utf-8').decode('latin-1')
@@ -372,6 +384,9 @@ def _documentos(cfg: Config, rng: random.Random, ops: list[Operacion], dias: int
         if op.moneda == 'JPY':
             # el corresponsal abona yenes enteros (ISO 4217: el yen no tiene decimales)
             principal = principal.to_integral_value(rounding=ROUND_DOWN)
+        # el corresponsal nunca cobra más de la mitad de lo que abona (órdenes de pocos dólares)
+        tope = (principal / 2).to_integral_value(rounding=ROUND_DOWN) if op.moneda == 'JPY' else q2(principal / 2)
+        comision = min(comision, tope)
         abono = principal - comision
         if rng.random() < 0.012:
             descuento = Decimal(round(rng.uniform(1, 25) / valor_usd)) if op.moneda == 'JPY' else q2(
@@ -443,6 +458,7 @@ def generar(cfg: Config | None = None) -> Datos:
     dias = (cfg.fecha_respaldo - cfg.inicio).days + 1
     tasas = _tasas(cfg, rng)
     ops = _operaciones(cfg, rng, tasas)
+    _reenvio_tardio(cfg, ops)
     docs = _documentos(cfg, rng, ops, dias)
 
     # eventos: (instante, prioridad, desempate, tipo, carga)
@@ -570,7 +586,27 @@ def generar(cfg: Config | None = None) -> Datos:
                       ('OP', folios['OP'], local(ultimo_folio['OP']))]
     tablas = {t: [tuple(f) for f in filas[t]] for t in TABLAS}
     pasos = _con_catalogo(cfg, pasos)
-    return Datos(cfg, tablas, pasos, ops, docs)
+    archivos = {**interfaces.buzon_corresponsal(docs, cfg.fin), **interfaces.archivo_sucursales(ops, cfg.fin)}
+    # Choque de S3: documentos que el legado registra DESPUÉS del congelamiento y que el TO-BE también capturará.
+    choques = {'tobe_tambien_captura': [p['args']['uetr'] for p in pasos
+                                        if p['fase'] == 'posterior_congelamiento' and p['accion'] == 'orden']}
+    return Datos(cfg, tablas, pasos, ops, docs, archivos, choques)
+
+
+def _reenvio_tardio(cfg: Config, ops: list[Operacion]) -> None:
+    """La sucursal con más operaciones de AYER no pudo mandar su archivo a las 22:00 y lo reenvía HOY a las 09:40,
+    después del respaldo: altas nuevas (ids mayores al corte) con fecha de negocio ANTERIOR al corte."""
+    ayer = cfg.fecha_respaldo - timedelta(days=1)
+    del_dia = [op for op in ops if op.canal == 'ARCHIVO' and op.fecha_local.date() == ayer]
+    if not del_dia:
+        return
+    conteo = Counter(op.sucursal for op in del_dia)
+    sucursal = min(conteo, key=lambda s: (-conteo[s], s))
+    llegada = a_utc(datetime.combine(cfg.fecha_respaldo, time(9, 40)))
+    for op in del_dia:
+        if op.sucursal == sucursal:
+            op.insercion = llegada
+            op.reenvio = llegada
 
 
 def _paso(tipo: str, carga, fase: str, instante: datetime) -> list[dict]:

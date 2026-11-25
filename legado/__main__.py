@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -56,11 +57,20 @@ def cargar(operaciones_por_dia: int | None, semilla: int | None) -> None:
     (DATOS / f'delta_{cfg.fecha_respaldo.isoformat()}.json').write_text(
         json.dumps({'fecha_negocio': cfg.fecha_respaldo.isoformat(), 'respaldo_utc': cfg.respaldo.isoformat(),
                     'congelamiento_utc': cfg.congelamiento.isoformat(), 'fin_utc': cfg.fin.isoformat(),
-                    'pasos': datos.pasos}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+                    'choques': datos.choques, 'pasos': datos.pasos}, ensure_ascii=False, indent=1) + '\n',
+        encoding='utf-8')
+    interfaces = DATOS / 'interfaces'
+    if interfaces.exists():
+        shutil.rmtree(interfaces)
+    for relativa, contenido in datos.interfaces.items():
+        ruta = interfaces / relativa
+        ruta.parent.mkdir(parents=True, exist_ok=True)
+        ruta.write_text(contenido, encoding='utf-8')
     print(f'generado en {t1 - t0:.1f} s · cargado y verificado en {t2 - t1:.1f} s · huella {datos.huella()[:16]}')
     for tabla, n in conteos.items():
         print(f'  {tabla:20s} {n:>10,}')
     print(f'  delta del mismo día: {len(datos.pasos)} llamadas → {DATOS.name}/delta_{cfg.fecha_respaldo}.json')
+    print(f'  archivos de interfaz: {len(datos.interfaces):,} → {DATOS.name}/interfaces/')
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -90,10 +100,12 @@ def main(argv: list[str] | None = None) -> int:
     elif args.orden == 'respaldar':
         from legado.respaldo import respaldar
         m = respaldar(args.pantalla, args.salida)
-        print(f"respaldo del {m['fecha_negocio']} · la pantalla publica {m['pantalla']['total_operaciones']:,} "
-              f"operaciones · {m['ruta']}")
+        cifras = ' · '.join(f"{c['etiqueta']} {c['valor']:,}" for c in m['pantalla']['cifras'])
+        print(f"respaldo del {m['fecha_negocio']} · la pantalla publica: {cifras} · {m['ruta']}")
         for a in m['archivos']:
             print(f"  {a['nombre']}  {a['bytes']:,} bytes  sha256 {a['sha256'][:16]}…")
+        for s in m['salidas']:
+            print(f"  salida publicada {s['archivo']}: {s['filas']:,} renglones")
     elif args.orden == 'bcp':
         from legado.bcp import medir
         resultado = medir()
