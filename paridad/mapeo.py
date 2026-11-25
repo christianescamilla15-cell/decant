@@ -4,52 +4,60 @@ Cada columna del legado tiene exactamente un destino en el TO-BE o un motivo esc
 del TO-BE tiene un origen o está declarada como nueva. Lo usan la comparación de ESQUEMA (que caza la columna que
 ningún reporte imprime, T6) y la comparación byte a byte (que aplica los parches y los cuenta).
 
-Un parche convierte el valor del legado en el que el TO-BE debe tener; si cambia el valor, se cuenta. Un valor que no
-coincide DESPUÉS de los parches es un defecto de la migración, no una normalización más.
+Un parche es una transformación EXACTA con el predicado de su hallazgo, no una normalización amplia: sólo cambia los
+valores que cumplen el predicado y deja todo lo demás como está, para que un defecto distinto en la misma columna
+siga contando como diferencia. Cada parche declara su conteo esperado, que se mide en el ORIGEN en la misma corrida
+(`paridad/migracion.py`), y tiene su control negativo. Las reglas para agregar uno están en `docs/parches.md`.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import date, datetime
 from decimal import Decimal
 
-from legado.generador.zonas import CDMX, NUEVA_YORK, UTC, a_utc
+from paridad.zonas import CDMX, NUEVA_YORK, a_utc
 
 
 @dataclass(frozen=True)
 class Parche:
     nombre: str
     decision: str          # ADR o regla que lo respalda
-    descripcion: str
+    descripcion: str       # el predicado, dicho en palabras
 
+
+# Ronda 1 a ciegas, T3 (legado/TRAMPAS_CIEGAS.md y la ventana que midió la radiografía): una versión de la interfaz
+# guardó la referencia con el relleno de su búfer de ancho fijo.
+VENTANA_CIEGA1_T3 = (date(2022, 7, 4), date(2023, 1, 27))
+ANCHO_CIEGA1_T3 = 35
 
 PARCHES = {
-    'char': Parche('char', 'tipo del legado', 'char(n) se compara sin el relleno del tipo (no es dato)'),
-    'T3_texto': Parche('T3_texto', 'ADR 0007', 'centinela «NA» → NULL'),
-    'T3_numero': Parche('T3_numero', 'ADR 0007', 'centinela 0 → NULL'),
+    'char': Parche('char', 'tipo del legado', 'char(n): sólo si el valor mide exactamente n y lo que sobra al final '
+                                              'son espacios; se quita ese relleno'),
+    'T3_texto': Parche('T3_texto', 'ADR 0007', 'centinela: el texto exacto «NA» → NULL'),
+    'T3_numero': Parche('T3_numero', 'ADR 0007', 'centinela: el número exacto 0 → NULL'),
     'T5_cdmx': Parche('T5_cdmx', 'ADR 0008', 'hora local de la Ciudad de México → instante UTC (hora repetida: '
                                              'primera ocurrencia)'),
     'T5_ny': Parche('T5_ny', 'ADR 0008', 'hora local de Nueva York → instante UTC'),
     'T5_cdmx_llegada': Parche('T5_cdmx_llegada', 'ADR 0008', 'como T5_cdmx, pero en la hora repetida decide el ORDEN '
                                                              'DE LLEGADA de las altas de órdenes (su identidad)'),
-    'ciega1_T3': Parche('ciega1_T3', 'ADR 0007', 'referencia del corresponsal sin el relleno de ancho fijo de la '
-                                                 'interfaz (ronda 1 a ciegas, T3)'),
-    'uuid': Parche('uuid', 'tipo del TO-BE', 'char(36) → uuid (mismo texto en minúsculas)'),
+    'ciega1_T3': Parche('ciega1_T3', 'ADR 0007', 'referencia del corresponsal con fecha entre el 4-jul-2022 y el '
+                                                 '27-ene-2023 (Nueva York), de exactamente 35 caracteres, cuyo final '
+                                                 'son sólo espacios después de un último carácter que no es blanco: '
+                                                 'se quita ese relleno'),
 }
 
 
-def _instante(valor: datetime | None, zona) -> datetime | None:
-    if valor is None:
-        return None
-    return a_utc(valor, zona).astimezone(timezone.utc)
+def _nombre(parche: str) -> tuple[str, int | None]:
+    """'char:11' → ('char', 11)."""
+    nombre, _, ancho = parche.partition(':')
+    return nombre, int(ancho) if ancho else None
 
 
 def instante_no_antes_de(hora_local: datetime | None, zona, piso: datetime | None) -> datetime | None:
     """Hora local → instante; en la hora repetida, la primera ocurrencia que no quede antes de `piso`."""
     if hora_local is None:
         return None
-    primera = a_utc(hora_local.replace(fold=0), zona).astimezone(timezone.utc)
-    segunda = hora_local.replace(tzinfo=zona, fold=1).astimezone(UTC)
+    primera, segunda = a_utc(hora_local, zona, 0), a_utc(hora_local, zona, 1)
     if primera == segunda or piso is None or primera >= piso:
         return primera
     return segunda
@@ -69,27 +77,43 @@ def pisos_por_llegada(filas: list[dict]) -> dict:
     return pisos
 
 
-def aplicar(nombres: tuple[str, ...], valor, piso: datetime | None = None):
-    """Aplica los parches en orden; devuelve el valor esperado en el TO-BE. `piso` sólo lo usa T5_cdmx_llegada."""
-    for nombre in nombres:
+def relleno_fijo(valor: str, ancho: int) -> bool:
+    """¿El valor mide exactamente `ancho` y termina en espacios después de un carácter que no es blanco?"""
+    base = valor.rstrip(' ')
+    return len(valor) == ancho and base != valor and (base == '' or not base[-1].isspace())
+
+
+def en_ventana_ciega1_t3(fecha_hora: datetime | None) -> bool:
+    return fecha_hora is not None and VENTANA_CIEGA1_T3[0] <= fecha_hora.date() <= VENTANA_CIEGA1_T3[1]
+
+
+def aplicar(nombres: tuple[str, ...], valor, piso: datetime | None = None, fila: dict | None = None):
+    """Aplica los parches en orden y devuelve el valor esperado en el TO-BE. `piso` lo usa T5_cdmx_llegada; `fila`
+    (el renglón del legado), ciega1_T3 para su ventana de fechas. Lo que no cumple el predicado no se toca."""
+    for parche in nombres:
         if valor is None:
             return None
-        if nombre in ('char', 'ciega1_T3'):
-            valor = valor.rstrip(' ')
+        nombre, ancho = _nombre(parche)
+        if nombre == 'char':
+            if ancho is None:
+                raise KeyError(f'{parche}: char necesita su ancho (char:n)')
+            valor = valor.rstrip(' ') if relleno_fijo(valor, ancho) else valor
+        elif nombre == 'ciega1_T3':
+            fecha = (fila or {}).get('fecha_hora')
+            if en_ventana_ciega1_t3(fecha) and relleno_fijo(valor, ANCHO_CIEGA1_T3):
+                valor = valor.rstrip(' ')
         elif nombre == 'T3_texto':
-            valor = None if valor.rstrip(' ') == 'NA' else valor
+            valor = None if valor == 'NA' else valor
         elif nombre == 'T3_numero':
             valor = None if Decimal(valor) == 0 else valor
         elif nombre == 'T5_cdmx':
-            valor = _instante(valor, CDMX)
+            valor = a_utc(valor, CDMX)
         elif nombre == 'T5_ny':
-            valor = _instante(valor, NUEVA_YORK)
+            valor = a_utc(valor, NUEVA_YORK)
         elif nombre == 'T5_cdmx_llegada':
             valor = instante_no_antes_de(valor, CDMX, piso)
-        elif nombre == 'uuid':
-            valor = valor.rstrip(' ').lower()
         else:
-            raise KeyError(nombre)
+            raise KeyError(parche)
     return valor
 
 
@@ -113,14 +137,14 @@ class Tabla:
 T = 'decant.'
 MAPEO: dict[str, Tabla] = {
     'dbo.moneda': Tabla(T + 'moneda', {
-        'codigo': Columna(T + 'moneda.codigo', ('char',)),
-        'numerico': Columna(T + 'moneda.numerico', ('char',)),
+        'codigo': Columna(T + 'moneda.codigo', ('char:3',)),
+        'numerico': Columna(T + 'moneda.numerico', ('char:3',)),
         'nombre': Columna(T + 'moneda.nombre'),
         'decimales': Columna(T + 'moneda.decimales'),
         'activa': Columna(T + 'moneda.activa'),
     }, llave_natural=('codigo',)),
     'dbo.folio': Tabla(T + 'consecutivo', {
-        'serie': Columna(T + 'consecutivo.serie', ('char',)),
+        'serie': Columna(T + 'consecutivo.serie'),
         'siguiente': Columna(T + 'consecutivo.siguiente'),
         'actualizado': Columna(None, motivo='inventario: sello GETDATE() del último consumo que nadie lee (veredicto '
                                             'de la radiografía); el corte se mide con MAX(id)'),
@@ -129,12 +153,12 @@ MAPEO: dict[str, Tabla] = {
         'id': Columna(T + 'operacion.id', tipo_destino='bigint'),
         'folio': Columna(T + 'operacion.folio'),
         'fecha_operacion': Columna(T + 'operacion.fecha_operacion', ('T5_cdmx',)),
-        'sucursal': Columna(T + 'operacion.sucursal', ('char',)),
+        'sucursal': Columna(T + 'operacion.sucursal', ('char:4',)),
         'canal': Columna(T + 'operacion.canal'),
         'cliente': Columna(T + 'operacion.cliente'),
         'cuenta_clabe': Columna(T + 'operacion.cuenta_clabe', ('T3_texto',)),
-        'tipo': Columna(T + 'operacion.tipo', ('char',)),
-        'moneda': Columna(T + 'operacion.moneda', ('char',)),
+        'tipo': Columna(T + 'operacion.tipo', ('char:1',)),
+        'moneda': Columna(T + 'operacion.moneda', ('char:3',)),
         'monto_divisa': Columna(T + 'operacion.monto_divisa'),
         'tipo_cambio': Columna(T + 'operacion.tipo_cambio'),
         'tipo_cambio_referencia': Columna(T + 'operacion.tipo_cambio_referencia', ('T3_numero',)),
@@ -145,19 +169,19 @@ MAPEO: dict[str, Tabla] = {
         'id': Columna(T + 'registro_orden.id_legado', tipo_destino='bigint'),
         'operacion_id': Columna(T + 'orden_pago.operacion_id', tipo_destino='bigint'),
         'folio': Columna(T + 'orden_pago.folio'),
-        'uetr': Columna(T + 'orden_pago.uetr', ('uuid',), tipo_destino='uuid'),
+        'uetr': Columna(T + 'orden_pago.uetr', tipo_destino='uuid'),
         'referencia_mt103': Columna(T + 'orden_pago.referencia_mt103'),
         'fecha_registro': Columna(T + 'registro_orden.fecha_registro', ('T5_cdmx_llegada',)),
         'fecha_envio': Columna(T + 'orden_pago.fecha_envio', ('T5_cdmx_llegada',)),
         'fecha_valor': Columna(T + 'orden_pago.fecha_valor'),
-        'bic_corresponsal': Columna(T + 'orden_pago.bic_corresponsal', ('char',)),
-        'bic_intermediario': Columna(T + 'orden_pago.bic_intermediario', ('char', 'T3_texto')),
+        'bic_corresponsal': Columna(T + 'orden_pago.bic_corresponsal', ('char:11',)),
+        'bic_intermediario': Columna(T + 'orden_pago.bic_intermediario', ('char:11', 'T3_texto')),
         'beneficiario': Columna(T + 'orden_pago.beneficiario'),
         'cuenta_beneficiario': Columna(T + 'orden_pago.cuenta_beneficiario'),
-        'moneda': Columna(T + 'orden_pago.moneda', ('char',)),
+        'moneda': Columna(T + 'orden_pago.moneda', ('char:3',)),
         'monto': Columna(T + 'orden_pago.monto'),
-        'gastos': Columna(T + 'orden_pago.gastos', ('char',)),
-        'codigo_proposito': Columna(T + 'orden_pago.codigo_proposito', ('char',)),
+        'gastos': Columna(T + 'orden_pago.gastos', ('char:3',)),
+        'codigo_proposito': Columna(T + 'orden_pago.codigo_proposito', ('char:4',)),
         'estatus': Columna(T + 'orden_pago.estatus'),
         'horas_liquidacion': Columna(T + 'orden_pago.horas_liquidacion'),
     }, llave_natural=('uetr',), notas=(
@@ -169,7 +193,7 @@ MAPEO: dict[str, Tabla] = {
         'orden_id': Columna(T + 'partida_corresponsal.uetr', tipo_destino='uuid'),
         'renglon': Columna(T + 'partida_corresponsal.renglon'),
         'concepto': Columna(T + 'partida_corresponsal.concepto'),
-        'moneda': Columna(T + 'partida_corresponsal.moneda', ('char',)),
+        'moneda': Columna(T + 'partida_corresponsal.moneda', ('char:3',)),
         'monto': Columna(T + 'partida_corresponsal.monto'),
         'fecha_hora': Columna(T + 'partida_corresponsal.fecha_hora', ('T5_ny',)),
         'referencia': Columna(T + 'partida_corresponsal.referencia', ('ciega1_T3',)),
@@ -179,7 +203,7 @@ MAPEO: dict[str, Tabla] = {
         'orden_id': Columna(T + 'partida_cliente.uetr', tipo_destino='uuid'),
         'renglon': Columna(T + 'partida_cliente.renglon'),
         'concepto': Columna(T + 'partida_cliente.concepto'),
-        'moneda': Columna(T + 'partida_cliente.moneda', ('char',)),
+        'moneda': Columna(T + 'partida_cliente.moneda', ('char:3',)),
         'monto': Columna(T + 'partida_cliente.monto'),
         'fecha_hora': Columna(T + 'partida_cliente.fecha_hora', ('T5_cdmx_llegada',)),
         'referencia': Columna(T + 'partida_cliente.referencia'),
@@ -225,6 +249,6 @@ def validar() -> list[str]:
             if c.destino is None and not (c.motivo or mapeo.motivo):
                 errores.append(f'{tabla}.{columna}: no se migra y no dice por qué')
             for p in c.parches:
-                if p not in PARCHES:
+                if _nombre(p)[0] not in PARCHES:
                     errores.append(f'{tabla}.{columna}: parche desconocido {p}')
     return errores

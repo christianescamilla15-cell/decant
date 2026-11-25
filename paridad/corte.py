@@ -11,9 +11,7 @@ anterior no puede serlo.
 """
 from __future__ import annotations
 
-from datetime import timezone
-
-from legado.generador.zonas import a_utc
+from paridad.zonas import CDMX, a_utc
 
 # Consultas fijas (sin armar SQL con texto): una por tabla.
 CONTEOS = {
@@ -43,7 +41,7 @@ def medir(cursor) -> dict:
         'ultima_escritura_bitacora_local': bitacora.isoformat(),
         'ultima_operacion_local': operacion.isoformat(),
         'instante_local': ultima_local.isoformat(),
-        'instante_utc': a_utc(ultima_local).astimezone(timezone.utc).isoformat(),
+        'instante_utc': a_utc(ultima_local, CDMX).isoformat(),
         'regla': 'mayor sello de la bitácora o fecha_operacion (hora de la Ciudad de México), convertido a UTC; '
                  'por identidad, MAX(id) de cada tabla',
     }

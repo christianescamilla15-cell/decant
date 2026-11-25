@@ -27,26 +27,28 @@ API = RAIZ / 'src' / 'Decant.Api' / 'bin' / 'Release' / 'net10.0' / 'Decant.Api.
 # campo de la pantalla → (ruta en el JSON, normalización documentada)
 CAMPOS = {
     'id': ('operacion.id', None), 'folio': ('operacion.folio', None),
-    'fecha_operacion': ('operacion.fechaOperacion', 'hora_local'), 'sucursal': ('operacion.sucursal', 'char'),
+    'fecha_operacion': ('operacion.fechaOperacion', 'hora_local'), 'sucursal': ('operacion.sucursal', ('char:4',)),
     'canal': ('operacion.canal', None), 'cliente': ('operacion.cliente', None),
-    'cuenta_clabe': ('operacion.cuentaClabe', 'T3_texto'), 'tipo': ('operacion.tipo', 'char'),
-    'moneda': ('operacion.moneda', 'char'), 'nombre_moneda': ('operacion.nombreMoneda', None),
+    'cuenta_clabe': ('operacion.cuentaClabe', ('T3_texto',)), 'tipo': ('operacion.tipo', ('char:1',)),
+    'moneda': ('operacion.moneda', ('char:3',)), 'nombre_moneda': ('operacion.nombreMoneda', None),
     'decimales': ('operacion.decimales', None), 'monto_divisa': ('operacion.montoDivisa', None),
     'tipo_cambio': ('operacion.tipoCambio', None),
-    'tipo_cambio_referencia': ('operacion.tipoCambioReferencia', 'T3_numero'),
+    'tipo_cambio_referencia': ('operacion.tipoCambioReferencia', ('T3_numero',)),
     'monto_mxn': ('operacion.montoMxn', None), 'estatus': ('operacion.estatus', None),
-    'folio_orden': ('orden.folio', None), 'uetr': ('orden.uetr', 'char'),
+    'folio_orden': ('orden.folio', None), 'uetr': ('orden.uetr', None),
     'referencia_mt103': ('orden.referenciaMt103', None), 'fecha_registro': ('orden.fechaRegistro', 'hora_local'),
     'fecha_envio': ('orden.fechaEnvio', 'hora_local'), 'fecha_valor': ('orden.fechaValor', None),
-    'bic_corresponsal': ('orden.bicCorresponsal', 'char'), 'bic_intermediario': ('orden.bicIntermediario', 'T3_texto'),
+    'bic_corresponsal': ('orden.bicCorresponsal', ('char:11',)),
+    'bic_intermediario': ('orden.bicIntermediario', ('char:11', 'T3_texto')),
     'beneficiario': ('orden.beneficiario', None), 'cuenta_beneficiario': ('orden.cuentaBeneficiario', None),
-    'monto_orden': ('orden.monto', None), 'gastos': ('orden.gastos', 'char'), 'estatus_orden': ('orden.estatus', None),
+    'monto_orden': ('orden.monto', None), 'gastos': ('orden.gastos', ('char:3',)),
+    'estatus_orden': ('orden.estatus', None),
     'horas_liquidacion': ('orden.horasLiquidacion', None),
 }
 NO_EXPUESTOS = {'orden_id': 'llave interna del legado (cambia con cada re-registro); el TO-BE expone la UETR'}
-PARTIDA = {'#': ('renglon', None), 'Concepto': ('concepto', None), 'Moneda': ('moneda', 'char'),
+PARTIDA = {'#': ('renglon', None), 'Concepto': ('concepto', None), 'Moneda': ('moneda', ('char:3',)),
            'Monto': ('monto', None), 'Fecha y hora': ('fechaHora', 'hora_local'),
-           'Referencia': ('referencia', 'ciega1_T3')}
+           'Referencia': ('referencia', ('ciega1_T3',))}
 
 # Casos estratificados (estatus × forma): los elige el legado restaurado, siempre los mismos para la misma semilla.
 CASOS = {
@@ -95,15 +97,11 @@ def _valor_json(documento: dict, ruta: str):
     return valor
 
 
-def _normalizar(legado: str, tobe, regla: str | None) -> tuple[str | None, str | None]:
-    """Texto esperado (del legado con su parche) y texto del TO-BE, comparables."""
+def _normalizar(legado: str, tobe, regla, fila: dict | None = None) -> tuple[str | None, str | None]:
+    """Texto esperado (el de la pantalla con sus parches EXACTOS de `paridad/mapeo.py`) y texto del TO-BE."""
     esperado: str | None = legado
-    if regla in ('char', 'ciega1_T3'):
-        esperado = legado.rstrip(' ')
-    elif regla == 'T3_texto':
-        esperado = aplicar(('T3_texto',), legado)
-    elif regla == 'T3_numero':
-        esperado = aplicar(('T3_numero',), legado)
+    if isinstance(regla, tuple):
+        esperado = aplicar(regla, legado, fila=fila)
     if tobe is None:
         return esperado, None
     if regla == 'hora_local':
@@ -141,7 +139,8 @@ def comparar_caso(pantalla: int, api: int, operacion_id: int) -> dict:
         iguales = len(renglones_pantalla) == len(renglones_tobe)
         for fila_p, fila_t in zip(renglones_pantalla, renglones_tobe):
             for titulo, (clave, regla) in PARTIDA.items():
-                esperado, obtenido = _normalizar(fila_p[titulo], fila_t.get(clave), regla)
+                contexto = {'fecha_hora': datetime.fromisoformat(fila_p['Fecha y hora'])}
+                esperado, obtenido = _normalizar(fila_p[titulo], fila_t.get(clave), regla, contexto)
                 campos += 1
                 if esperado != obtenido:
                     iguales = False
