@@ -39,7 +39,7 @@ el repositorio.
 - **Control negativo en inversiones** ([medido](legado/VOLUMEN.md)). Con 400 operaciones por día, el reporte
   mensual del legado invierte 26–28 % de sus pares empatados entre dos corridas, con 0 inversiones de contrato.
   Con 250 por día salía en 0. El piso real, el respaldo restaurado contra lo que el legado PUBLICÓ al tomarlo, es
-  de 18–25 % de empatados invertidos (tres corridas) y 0 de contrato. La lista con `TOP` sin `ORDER BY` ni siquiera devuelve las
+  de 0 inversiones de contrato siempre; los empatados invertidos VARÍAN mucho entre corridas (observado de 2.6 % a 25 %), por eso cada comparación se juzga contra el piso de la MISMA corrida, nunca contra una constante. La lista con `TOP` sin `ORDER BY` ni siquiera devuelve las
   mismas filas en otra instancia (17 de 200 distintas).
 - **Control a ciegas, ronda 1** ([CONTROL_CIEGO.md](radiografia/CONTROL_CIEGO.md)). Otra sesión sembró 3 trampas
   sin que el autor de los detectores las conociera, y `detectores-v2` detectó **0 de 3**. Los detectores acertaban
