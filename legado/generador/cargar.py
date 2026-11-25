@@ -51,7 +51,27 @@ def cargar(datos: Datos, conexion: pymssql.Connection) -> dict[str, int]:
             ids = list(range(1, len(columnas) + 1))
         if cuerpo:
             conexion.bulk_copy(f'dbo.{tabla}', cuerpo, column_ids=ids, batch_size=20000, tablock=True)
+            if columnas[0] == 'id':
+                _restaurar_espacios_finales(conexion, tabla, columnas, filas)
     return verificar(datos, conexion)
+
+
+def _restaurar_espacios_finales(conexion: pymssql.Connection, tabla: str, columnas: tuple, filas: list) -> None:
+    """El BCP de FreeTDS recorta los espacios finales de los varchar; una inserción normal los conserva
+    (ANSI_PADDING ON). Se devuelven con un UPDATE por lotes y se comprueba cuántos quedaron."""
+    cursor = conexion.cursor()
+    for posicion, columna in enumerate(columnas):
+        relleno = [(int(f[0]), len(f[posicion]) - len(f[posicion].rstrip(' '))) for f in filas
+                   if isinstance(f[posicion], str) and f[posicion].endswith(' ')]
+        if not relleno:
+            continue
+        for inicio in range(0, len(relleno), 1000):
+            valores = ', '.join(f'({i}, {n})' for i, n in relleno[inicio:inicio + 1000])
+            cursor.execute(f'UPDATE t SET [{columna}] = t.[{columna}] + SPACE(x.n) FROM dbo.[{tabla}] t '
+                           f'JOIN (VALUES {valores}) x (id, n) ON x.id = t.id')
+        cursor.execute(f'SELECT COUNT_BIG(*) FROM dbo.[{tabla}] WHERE DATALENGTH([{columna}]) > LEN([{columna}])')
+        if cursor.fetchone()[0] != len(relleno):
+            raise SystemExit(f'{tabla}.{columna}: no quedaron los {len(relleno)} valores con espacios finales')
 
 
 def verificar(datos: Datos, conexion: pymssql.Connection, muestra: int = 40) -> dict[str, int]:

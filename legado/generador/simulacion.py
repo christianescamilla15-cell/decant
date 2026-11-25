@@ -562,12 +562,16 @@ def generar(cfg: Config | None = None) -> Datos:
             d = carga
             orden = d.filas[-1][0]
             hora_ny = local(d.t_liquidacion, NUEVA_YORK)
+            referencia = d.ref_corresponsal
+            if date(2022, 7, 4) <= hora_ny.date() <= date(2023, 1, 27):
+                # versión de la interfaz SWIFT que copiaba el campo desde su búfer de ancho fijo, sin recortarlo
+                referencia = referencia.ljust(35)
             filas['partida_solicitada'].append((sig['partida_solicitada'], orden, 1, 'ABONO', d.moneda, d.abono,
-                                                hora_ny, d.ref_corresponsal))
+                                                hora_ny, referencia))
             sig['partida_solicitada'] += 1
             if d.comision > 0:
                 filas['partida_solicitada'].append((sig['partida_solicitada'], orden, 2, 'COMISION_CORRESPONSAL',
-                                                    d.moneda, d.comision, hora_ny, d.ref_corresponsal))
+                                                    d.moneda, d.comision, hora_ny, referencia))
                 sig['partida_solicitada'] += 1
             cambiar(d, 'LIQUIDADA', 'svc_swift', instante)
         else:
