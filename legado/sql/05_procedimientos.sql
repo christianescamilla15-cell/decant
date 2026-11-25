@@ -256,3 +256,54 @@ BEGIN
     ORDER BY fecha_envio, folio;
 END
 GO
+-- Tesorería: liquidaciones del corresponsal desde una fecha, las más recientes primero.
+CREATE OR ALTER PROCEDURE dbo.sp_liquidaciones_recientes
+    @desde datetime
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT folio, uetr, bic_corresponsal, moneda, monto, fecha_hora, referencia
+    FROM dbo.vw_liquidaciones_recientes
+    WHERE fecha_hora >= @desde;
+END
+GO
+-- Constancia para el cliente: la operación con su orden de pago.
+CREATE OR ALTER PROCEDURE dbo.sp_constancia_operacion
+    @operacion_id int
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @folio varchar(20), @cliente nvarchar(120), @moneda char(3), @monto_divisa decimal(18, 2),
+            @monto_mxn decimal(18, 2), @folio_orden varchar(20), @uetr char(36), @estatus_orden varchar(12),
+            @fecha_envio datetime;
+
+    SELECT @folio = o.folio, @cliente = o.cliente, @moneda = o.moneda, @monto_divisa = o.monto_divisa,
+           @monto_mxn = o.monto_mxn, @folio_orden = p.folio, @uetr = p.uetr, @estatus_orden = p.estatus,
+           @fecha_envio = p.fecha_envio
+    FROM dbo.operacion o
+    LEFT JOIN dbo.orden_pago p ON p.operacion_id = o.id
+    WHERE o.id = @operacion_id;
+
+    SELECT @folio AS folio, @cliente AS cliente, @moneda AS moneda, @monto_divisa AS monto_divisa,
+           @monto_mxn AS monto_mxn, @folio_orden AS folio_orden, @uetr AS uetr, @estatus_orden AS estatus_orden,
+           @fecha_envio AS fecha_envio;
+END
+GO
+-- Tablero por corresponsal: órdenes, porcentaje conciliado y tiempo promedio de la operación al envío.
+CREATE OR ALTER PROCEDURE dbo.sp_tablero_corresponsales
+    @desde date,
+    @hasta date
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT p.bic_corresponsal,
+           COUNT(*) AS ordenes,
+           SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*) AS pct_conciliadas,
+           AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60 AS horas_promedio_envio
+    FROM dbo.orden_pago p
+    INNER JOIN dbo.operacion o ON o.id = p.operacion_id
+    WHERE p.estatus <> 'REEMPLAZADA' AND p.fecha_envio >= @desde AND p.fecha_envio < DATEADD(day, 1, @hasta)
+    GROUP BY p.bic_corresponsal
+    ORDER BY p.bic_corresponsal;
+END
+GO

@@ -10,3 +10,12 @@ FROM dbo.orden_pago o
 INNER JOIN dbo.partida_solicitada p ON p.orden_id = o.id
 WHERE o.estatus <> 'REEMPLAZADA';
 GO
+-- Liquidaciones del corresponsal, las más recientes primero (base de la consulta de tesorería).
+CREATE OR ALTER VIEW dbo.vw_liquidaciones_recientes
+AS
+SELECT TOP 100 PERCENT p.folio, p.uetr, p.bic_corresponsal, p.moneda, s.monto, s.fecha_hora, s.referencia
+FROM dbo.partida_solicitada s
+INNER JOIN dbo.orden_pago p ON p.id = s.orden_id
+WHERE s.concepto = 'ABONO'
+ORDER BY s.fecha_hora DESC;
+GO
