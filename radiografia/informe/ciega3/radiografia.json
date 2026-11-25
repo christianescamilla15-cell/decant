@@ -1,0 +1,1539 @@
+{
+ "base": "BFN_DIVISAS",
+ "generado_utc": "2026-11-25T04:31:51+00:00",
+ "respaldo": {
+  "base": "BFN_DIVISAS",
+  "fecha_negocio": "2023-12-29",
+  "tomado_utc": "2026-11-25T04:31:01+00:00",
+  "tabla_principal": "dbo.operacion",
+  "pantalla": {
+   "url": "http://127.0.0.1:18082/",
+   "leido_antes_utc": "2026-11-25T04:31:00+00:00",
+   "leido_despues_utc": "2026-11-25T04:31:02+00:00",
+   "cifras": [
+    {
+     "etiqueta": "Operaciones registradas",
+     "atributo": "data-total-operaciones",
+     "tabla": "dbo.operacion",
+     "valor": 412125
+    },
+    {
+     "etiqueta": "Órdenes de pago",
+     "atributo": "data-total-ordenes",
+     "tabla": "dbo.orden_pago",
+     "valor": 150719
+    }
+   ]
+  },
+  "tablas": {
+   "dbo.bitacora": {
+    "filas": 685276,
+    "max_id": 685276
+   },
+   "dbo.folio": {
+    "filas": 2,
+    "max_id": null
+   },
+   "dbo.moneda": {
+    "filas": 11,
+    "max_id": null
+   },
+   "dbo.operacion": {
+    "filas": 412125,
+    "max_id": 412125
+   },
+   "dbo.orden_pago": {
+    "filas": 270616,
+    "max_id": 270616
+   },
+   "dbo.partida_liquidada": {
+    "filas": 893174,
+    "max_id": 893174
+   },
+   "dbo.partida_solicitada": {
+    "filas": 244869,
+    "max_id": 244869
+   }
+  },
+  "contadores": {
+   "dbo.folio": {
+    "llave": "serie",
+    "valor": "siguiente",
+    "filas": {
+     "FX": 412126,
+     "OP": 150720
+    }
+   }
+  },
+  "salidas": [
+   {
+    "nombre": "reporte_del_mes",
+    "procedimiento": "dbo.sp_reporte_ordenes",
+    "parametros": [
+     "2023-12-01",
+     "2023-12-29"
+    ],
+    "conjunto": 0,
+    "llave_natural": [
+     "folio",
+     "concepto"
+    ],
+    "llave_orden": [
+     "fecha_valor"
+    ],
+    "archivo": "salida_reporte_del_mes_2023-12-29.jsonl",
+    "filas": 7492,
+    "sha256": "2c2b94558ffbc1d3f1a56d5970bc9413739dbdab552035cd2500e6d36e2adf1a"
+   },
+   {
+    "nombre": "lista_del_dia_anterior",
+    "procedimiento": "dbo.sp_lista_operaciones",
+    "parametros": [
+     "2023-12-28",
+     200
+    ],
+    "conjunto": 1,
+    "llave_natural": [
+     "folio"
+    ],
+    "llave_orden": [],
+    "archivo": "salida_lista_del_dia_anterior_2023-12-29.jsonl",
+    "filas": 200,
+    "sha256": "54e3c33467cfaaa535f384d81bf2d85029bc856300808f74a22b6e606e91fadd"
+   }
+  ]
+ },
+ "restauracion": [
+  {
+   "base": "BFN_DIVISAS",
+   "restaurada_como": "BFN_DIVISAS",
+   "archivo": "bfn_divisas_2023-12-29.bak",
+   "sha256": "1b4c860ac8815dd686348ff1002dbffc04a757cb51b59b2a04977c753bd22e6f",
+   "sha256_ok": true,
+   "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
+   "segundos": 2.2
+  },
+  {
+   "base": "msdb",
+   "restaurada_como": "legado_msdb",
+   "archivo": "msdb_2023-12-29.bak",
+   "sha256": "727431b6fc3ff665936c618c885bd7daea3b256252bd77099f80d3abc431ff12",
+   "sha256_ok": true,
+   "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
+   "segundos": 0.6
+  }
+ ],
+ "msdb": "legado_msdb",
+ "criterio_salida": {
+  "aplica": true,
+  "cifras": [
+   {
+    "tabla": "dbo.operacion",
+    "valor": 412125,
+    "filas": 412125,
+    "interpretaciones": [
+     "COUNT(*)",
+     "COUNT(DISTINCT id)",
+     "COUNT(DISTINCT folio)"
+    ],
+    "lectura": "la pantalla cuenta filas",
+    "cumple": true,
+    "etiqueta": "Operaciones registradas"
+   },
+   {
+    "tabla": "dbo.orden_pago",
+    "valor": 150719,
+    "filas": 270616,
+    "interpretaciones": [
+     "COUNT(DISTINCT operacion_id)",
+     "COUNT(DISTINCT folio)",
+     "COUNT(DISTINCT uetr)",
+     "COUNT(DISTINCT referencia_mt103)"
+    ],
+    "lectura": "la pantalla NO cuenta filas (270,616): cuenta valores distintos; 119,897 filas repiten la llave",
+    "cumple": true,
+    "etiqueta": "Órdenes de pago"
+   }
+  ],
+  "tablas": [
+   {
+    "objeto": "dbo.bitacora",
+    "manifiesto": {
+     "filas": 685276,
+     "max_id": 685276
+    },
+    "restaurado": {
+     "filas": 685276,
+     "max_id": 685276
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.folio",
+    "manifiesto": {
+     "filas": 2,
+     "max_id": null
+    },
+    "restaurado": {
+     "filas": 2,
+     "max_id": null
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.moneda",
+    "manifiesto": {
+     "filas": 11,
+     "max_id": null
+    },
+    "restaurado": {
+     "filas": 11,
+     "max_id": null
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.operacion",
+    "manifiesto": {
+     "filas": 412125,
+     "max_id": 412125
+    },
+    "restaurado": {
+     "filas": 412125,
+     "max_id": 412125
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.orden_pago",
+    "manifiesto": {
+     "filas": 270616,
+     "max_id": 270616
+    },
+    "restaurado": {
+     "filas": 270616,
+     "max_id": 270616
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.partida_liquidada",
+    "manifiesto": {
+     "filas": 893174,
+     "max_id": 893174
+    },
+    "restaurado": {
+     "filas": 893174,
+     "max_id": 893174
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.partida_solicitada",
+    "manifiesto": {
+     "filas": 244869,
+     "max_id": 244869
+    },
+    "restaurado": {
+     "filas": 244869,
+     "max_id": 244869
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.folio.siguiente",
+    "manifiesto": {
+     "FX": 412126,
+     "OP": 150720
+    },
+    "restaurado": {
+     "FX": 412126,
+     "OP": 150720
+    },
+    "cuadra": true
+   }
+  ],
+  "salidas": [
+   {
+    "nombre": "reporte_del_mes",
+    "procedimiento": "dbo.sp_reporte_ordenes",
+    "parametros": [
+     "2023-12-01",
+     "2023-12-29"
+    ],
+    "llave_natural": [
+     "folio",
+     "concepto"
+    ],
+    "llave_orden": [
+     "fecha_valor"
+    ],
+    "renglones": 7492,
+    "renglones_otra_toma": 7492,
+    "renglones_comunes": 7492,
+    "mismo_contenido": true,
+    "pares_contrato": 26515033,
+    "inversiones_contrato": 0,
+    "pares_empatados": 1546253,
+    "inversiones_empatados": 291248,
+    "pct_empatados_invertidos": 18.84,
+    "pct_posiciones_distintas": 46.3,
+    "reproducible": true,
+    "cumple": true
+   },
+   {
+    "nombre": "lista_del_dia_anterior",
+    "procedimiento": "dbo.sp_lista_operaciones",
+    "parametros": [
+     "2023-12-28",
+     200
+    ],
+    "llave_natural": [
+     "folio"
+    ],
+    "llave_orden": [],
+    "renglones": 200,
+    "renglones_otra_toma": 200,
+    "renglones_comunes": 183,
+    "mismo_contenido": false,
+    "pares_contrato": 0,
+    "inversiones_contrato": 0,
+    "pares_empatados": 16653,
+    "inversiones_empatados": 372,
+    "pct_empatados_invertidos": 2.23,
+    "pct_posiciones_distintas": 69.0,
+    "reproducible": false,
+    "cumple": true
+   }
+  ],
+  "cumple": true
+ },
+ "corte": {
+  "tabla_principal": "dbo.operacion",
+  "principal": {
+   "tabla": "dbo.operacion",
+   "identidad": {
+    "columna": "id",
+    "max": 412125,
+    "ident_current": 412125
+   },
+   "fechas": {
+    "fecha_operacion": {
+     "min": "2021-01-01 00:09:00",
+     "max": "2023-12-29 03:34:00"
+    }
+   }
+  },
+  "tablas": [
+   {
+    "tabla": "dbo.bitacora",
+    "identidad": {
+     "columna": "id",
+     "max": 685276,
+     "ident_current": 685276
+    },
+    "fechas": {
+     "fecha": {
+      "min": "2021-01-01 00:24:11",
+      "max": "2023-12-29 03:44:36"
+     }
+    }
+   },
+   {
+    "tabla": "dbo.folio",
+    "identidad": null,
+    "fechas": {
+     "actualizado": {
+      "min": "2023-12-29 03:34:00",
+      "max": "2023-12-29 03:44:36"
+     }
+    }
+   },
+   {
+    "tabla": "dbo.moneda",
+    "identidad": null,
+    "fechas": {}
+   },
+   {
+    "tabla": "dbo.operacion",
+    "identidad": {
+     "columna": "id",
+     "max": 412125,
+     "ident_current": 412125
+    },
+    "fechas": {
+     "fecha_operacion": {
+      "min": "2021-01-01 00:09:00",
+      "max": "2023-12-29 03:34:00"
+     }
+    }
+   },
+   {
+    "tabla": "dbo.orden_pago",
+    "identidad": {
+     "columna": "id",
+     "max": 270616,
+     "ident_current": 270616
+    },
+    "fechas": {
+     "fecha_registro": {
+      "min": "2021-01-01 00:24:11",
+      "max": "2023-12-29 03:44:36"
+     },
+     "fecha_envio": {
+      "min": "2021-01-01 00:25:31",
+      "max": "2023-12-29 03:45:38"
+     },
+     "fecha_valor": {
+      "min": "2021-01-01",
+      "max": "2023-12-29"
+     }
+    }
+   },
+   {
+    "tabla": "dbo.partida_liquidada",
+    "identidad": {
+     "columna": "id",
+     "max": 893174,
+     "ident_current": 893174
+    },
+    "fechas": {
+     "fecha_hora": {
+      "min": "2021-01-01 00:24:11",
+      "max": "2023-12-29 03:44:36"
+     }
+    }
+   },
+   {
+    "tabla": "dbo.partida_solicitada",
+    "identidad": {
+     "columna": "id",
+     "max": 244869,
+     "ident_current": 244869
+    },
+    "fechas": {
+     "fecha_hora": {
+      "min": "2021-01-01 08:11:34",
+      "max": "2023-12-28 17:58:52"
+     }
+    }
+   }
+  ]
+ },
+ "inventario": {
+  "tablas": [
+   {
+    "esquema": "dbo",
+    "tabla": "bitacora",
+    "filas": 685276,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "folio",
+    "filas": 2,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "moneda",
+    "filas": 11,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "operacion",
+    "filas": 412125,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "orden_pago",
+    "filas": 270616,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "partida_liquidada",
+    "filas": 893174,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "partida_solicitada",
+    "filas": 244869,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   }
+  ],
+  "columnas": 64,
+  "llaves_foraneas": [
+   {
+    "nombre": "fk_operacion_moneda",
+    "hija": "dbo.operacion",
+    "padre": "dbo.moneda"
+   },
+   {
+    "nombre": "fk_orden_moneda",
+    "hija": "dbo.orden_pago",
+    "padre": "dbo.moneda"
+   },
+   {
+    "nombre": "fk_orden_operacion",
+    "hija": "dbo.orden_pago",
+    "padre": "dbo.operacion"
+   },
+   {
+    "nombre": "fk_liquidada_orden",
+    "hija": "dbo.partida_liquidada",
+    "padre": "dbo.orden_pago"
+   },
+   {
+    "nombre": "fk_solicitada_orden",
+    "hija": "dbo.partida_solicitada",
+    "padre": "dbo.orden_pago"
+   }
+  ],
+  "modulos": [
+   {
+    "nombre": "dbo.sp_alta_manual_orden",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 29
+   },
+   {
+    "nombre": "dbo.sp_antiguedad_ordenes",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 16
+   },
+   {
+    "nombre": "dbo.sp_conciliar",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 22
+   },
+   {
+    "nombre": "dbo.sp_constancia_operacion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 21
+   },
+   {
+    "nombre": "dbo.sp_detalle_operacion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 26
+   },
+   {
+    "nombre": "dbo.sp_liquidaciones_recientes",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 10
+   },
+   {
+    "nombre": "dbo.sp_lista_operaciones",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 19
+   },
+   {
+    "nombre": "dbo.sp_ordenes_por_vencer",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 15
+   },
+   {
+    "nombre": "dbo.sp_reflejar_estatus_operacion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 13
+   },
+   {
+    "nombre": "dbo.sp_registrar_liquidacion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 26
+   },
+   {
+    "nombre": "dbo.sp_registrar_operacion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 32
+   },
+   {
+    "nombre": "dbo.sp_registrar_orden",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 55
+   },
+   {
+    "nombre": "dbo.sp_reporte_ordenes",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 13
+   },
+   {
+    "nombre": "dbo.sp_reporte_posicion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 39
+   },
+   {
+    "nombre": "dbo.sp_tablero_corresponsales",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 17
+   },
+   {
+    "nombre": "dbo.tr_orden_pago_bitacora",
+    "tipo": "TRIGGER",
+    "lineas": 11
+   },
+   {
+    "nombre": "dbo.vw_liquidaciones_recientes",
+    "tipo": "VISTA",
+    "lineas": 8
+   },
+   {
+    "nombre": "dbo.vw_reporte_ordenes",
+    "tipo": "VISTA",
+    "lineas": 9
+   },
+   {
+    "nombre": "job: BFN - conciliacion nocturna / conciliar",
+    "tipo": "JOB",
+    "lineas": 1
+   }
+  ],
+  "triggers": [
+   {
+    "trigger": "dbo.tr_orden_pago_bitacora",
+    "tabla": "dbo.orden_pago",
+    "deshabilitado": false
+   }
+  ],
+  "jobs": [
+   {
+    "job": "BFN - conciliacion nocturna",
+    "habilitado": true,
+    "paso": 1,
+    "nombre_paso": "conciliar",
+    "subsistema": "TSQL",
+    "base": "BFN_DIVISAS",
+    "comando": "EXEC dbo.sp_conciliar;",
+    "horario": "todas las noches 23:30",
+    "frecuencia": 4,
+    "intervalo": 1,
+    "hora": "23:30",
+    "horario_habilitado": true
+   }
+  ]
+ },
+ "hallazgos": [
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_alta_manual_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 20,
+   "detalle": "código en duro 'OP' (1 vez/veces)",
+   "fragmento": "UPDATE dbo.folio SET @n = siguiente, siguiente = siguiente + 1, actualizado = GETDATE() WHERE serie = 'OP';",
+   "clase": "código",
+   "valor": "'OP'",
+   "lineas": [
+    20
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_alta_manual_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "número en duro 9 (1 vez/veces)",
+   "fragmento": "SET @folio = 'OP-' + RIGHT('000000000' + CAST(@n AS varchar(9)), 9);",
+   "clase": "número",
+   "valor": "9",
+   "lineas": [
+    21
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero",
+   "fragmento": "SELECT TOP (5000) id INTO #lote FROM dbo.orden_pago WHERE estatus = 'LIQUIDADA';",
+   "asigna_variable": false
+  },
+  {
+   "categoria": "reloj_en_regla",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "GETDATE() decide un resultado: reprocesar otro día da otra respuesta",
+   "fragmento": "WHERE estatus = 'ENVIADA' AND fecha_envio < DATEADD(day, -3, GETDATE());"
+  },
+  {
+   "categoria": "desfase_horario_fijo",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "DATEADD(hour, -1, …): convierte zonas con un desfase fijo; con horario de verano el desfase cambia según la fecha",
+   "fragmento": "SET horas_liquidacion = DATEDIFF(minute, o.fecha_envio, DATEADD(hour, -1, l.ultima)) / 60.0,"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "número en duro 5000 (1 vez/veces)",
+   "fragmento": "SELECT TOP (5000) id INTO #lote FROM dbo.orden_pago WHERE estatus = 'LIQUIDADA';",
+   "clase": "número",
+   "valor": "5000",
+   "lineas": [
+    7
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "código en duro 'LIQUIDADA' (1 vez/veces)",
+   "fragmento": "SELECT TOP (5000) id INTO #lote FROM dbo.orden_pago WHERE estatus = 'LIQUIDADA';",
+   "clase": "código",
+   "valor": "'LIQUIDADA'",
+   "lineas": [
+    7
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "número en duro 60.0 (1 vez/veces)",
+   "fragmento": "SET horas_liquidacion = DATEDIFF(minute, o.fecha_envio, DATEADD(hour, -1, l.ultima)) / 60.0,",
+   "clase": "número",
+   "valor": "60.0",
+   "lineas": [
+    10
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 17,
+   "detalle": "código en duro 'PRINCIPAL' (1 vez/veces)",
+   "fragmento": "FROM dbo.partida_liquidada WHERE concepto = 'PRINCIPAL') p ON p.orden_id = o.id;",
+   "clase": "código",
+   "valor": "'PRINCIPAL'",
+   "lineas": [
+    17
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 20,
+   "detalle": "código en duro 'VENCIDA' (1 vez/veces)",
+   "fragmento": "SET estatus = 'VENCIDA'",
+   "clase": "código",
+   "valor": "'VENCIDA'",
+   "lineas": [
+    20
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "código en duro 'ENVIADA' (1 vez/veces)",
+   "fragmento": "WHERE estatus = 'ENVIADA' AND fecha_envio < DATEADD(day, -3, GETDATE());",
+   "clase": "código",
+   "valor": "'ENVIADA'",
+   "lineas": [
+    21
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_conciliar",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "número en duro -3 (1 vez/veces)",
+   "fragmento": "WHERE estatus = 'ENVIADA' AND fecha_envio < DATEADD(day, -3, GETDATE());",
+   "clase": "número",
+   "valor": "-3",
+   "lineas": [
+    21
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_constancia_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "asigna @folio_orden, @uetr, @estatus_orden, @fecha_envio sin TOP ni agregado desde un conjunto que puede traer varias filas: dbo.orden_pago (p) entra por un LEFT JOIN que iguala operacion_id, sin cubrir ninguna llave única suya (id). La variable se queda con la última fila que entregue el plan",
+   "fragmento": "SELECT @folio = o.folio, @cliente = o.cliente, @moneda = o.moneda, @monto_divisa = o.monto_divisa,",
+   "asigna_variable": true,
+   "forma": "asignacion_multifila",
+   "tablas_sin_fijar": [
+    "dbo.orden_pago"
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_detalle_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 8,
+   "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario)",
+   "fragmento": "SELECT TOP 1 @orden = id FROM dbo.orden_pago WHERE operacion_id = @operacion_id AND estatus <> 'REEMPLAZADA';",
+   "asigna_variable": true
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_detalle_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 8,
+   "detalle": "código en duro 'REEMPLAZADA' (1 vez/veces)",
+   "fragmento": "SELECT TOP 1 @orden = id FROM dbo.orden_pago WHERE operacion_id = @operacion_id AND estatus <> 'REEMPLAZADA';",
+   "clase": "código",
+   "valor": "'REEMPLAZADA'",
+   "lineas": [
+    8
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_lista_operaciones",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 15,
+   "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero",
+   "fragmento": "SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,",
+   "asigna_variable": false
+  },
+  {
+   "categoria": "reloj_en_regla",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "el reloj del servidor entra por la variable @limite (viene de @hoy) y decide un resultado: reprocesar otro día da otra respuesta",
+   "fragmento": "CASE WHEN fecha_envio < DATEADD(day, -1, @limite) THEN 'VENCE HOY' ELSE 'VENCE MANANA' END AS aviso",
+   "forma": "por_variable"
+  },
+  {
+   "categoria": "reloj_en_regla",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "el reloj del servidor entra por la variable @limite (viene de @hoy) y decide un resultado: reprocesar otro día da otra respuesta",
+   "fragmento": "WHERE estatus = 'ENVIADA' AND fecha_envio < @limite",
+   "forma": "por_variable"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 8,
+   "detalle": "número en duro -2 (1 vez/veces)",
+   "fragmento": "SET @limite = DATEADD(day, -2, @hoy);",
+   "clase": "número",
+   "valor": "-2",
+   "lineas": [
+    8
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "código en duro 'ENVIADA' (1 vez/veces)",
+   "fragmento": "WHERE estatus = 'ENVIADA' AND fecha_envio < @limite",
+   "clase": "código",
+   "valor": "'ENVIADA'",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reflejar_estatus_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "código en duro 'CONCILIADA' (1 vez/veces)",
+   "fragmento": "SET estatus = CASE p.estatus WHEN 'CONCILIADA' THEN 'PAGADA'",
+   "clase": "código",
+   "valor": "'CONCILIADA'",
+   "lineas": [
+    7
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reflejar_estatus_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 8,
+   "detalle": "código en duro 'DIFERENCIA' (1 vez/veces)",
+   "fragmento": "WHEN 'DIFERENCIA' THEN 'PAGADA'",
+   "clase": "código",
+   "valor": "'DIFERENCIA'",
+   "lineas": [
+    8
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reflejar_estatus_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 9,
+   "detalle": "código en duro 'VENCIDA' (1 vez/veces)",
+   "fragmento": "WHEN 'VENCIDA' THEN 'RECHAZADA'",
+   "clase": "código",
+   "valor": "'VENCIDA'",
+   "lineas": [
+    9
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_registrar_liquidacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 15,
+   "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario)",
+   "fragmento": "SELECT TOP 1 @id = id, @moneda = moneda FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';",
+   "asigna_variable": true
+  },
+  {
+   "categoria": "if_exists_sin_else",
+   "objeto": "dbo.sp_registrar_liquidacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "IF EXISTS sin ELSE que escribe datos: cuando la condición no se cumple no pasa nada y nadie se entera (camino silencioso)",
+   "fragmento": "IF EXISTS (SELECT 1 FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA')",
+   "cuerpo": "DML"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_liquidacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "código en duro 'ENVIADA' (2 vez/veces)",
+   "fragmento": "IF EXISTS (SELECT 1 FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA')",
+   "clase": "código",
+   "valor": "'ENVIADA'",
+   "lineas": [
+    13,
+    15
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_liquidacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 22,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "VALUES (@id, 2, 'COMISION_CORRESPONSAL', @moneda, @comision, @fecha_hora, @referencia);",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    22
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_liquidacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 24,
+   "detalle": "código en duro 'LIQUIDADA' (1 vez/veces)",
+   "fragmento": "UPDATE dbo.orden_pago SET estatus = 'LIQUIDADA' WHERE id = @id;",
+   "clase": "código",
+   "valor": "'LIQUIDADA'",
+   "lineas": [
+    24
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 19,
+   "detalle": "código en duro 'FX' (1 vez/veces)",
+   "fragmento": "UPDATE dbo.folio SET @n = siguiente, siguiente = siguiente + 1, actualizado = GETDATE() WHERE serie = 'FX';",
+   "clase": "código",
+   "valor": "'FX'",
+   "lineas": [
+    19
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 22,
+   "detalle": "código en duro 'V' (1 vez/veces)",
+   "fragmento": "SET @tipo_cambio = CASE @tipo WHEN 'V' THEN @tipo_cambio_referencia * 1.0035",
+   "clase": "código",
+   "valor": "'V'",
+   "lineas": [
+    22
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 22,
+   "detalle": "número en duro 1.0035 (1 vez/veces)",
+   "fragmento": "SET @tipo_cambio = CASE @tipo WHEN 'V' THEN @tipo_cambio_referencia * 1.0035",
+   "clase": "número",
+   "valor": "1.0035",
+   "lineas": [
+    22
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 23,
+   "detalle": "número en duro 0.9965 (1 vez/veces)",
+   "fragmento": "ELSE @tipo_cambio_referencia * 0.9965 END;",
+   "clase": "número",
+   "valor": "0.9965",
+   "lineas": [
+    23
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "número en duro 9 (1 vez/veces)",
+   "fragmento": "VALUES ('FX-' + RIGHT('000000000' + CAST(@n AS varchar(9)), 9), @fecha_operacion, @sucursal, @canal, @cliente,",
+   "clase": "número",
+   "valor": "9",
+   "lineas": [
+    27
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 29,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "ISNULL(@tipo_cambio_referencia, 0), ROUND(@monto_divisa * @tipo_cambio, 2), 'CONCERTADA');",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    29
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 23,
+   "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario)",
+   "fragmento": "SELECT TOP 1 @anterior = id, @folio = folio FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';",
+   "asigna_variable": true
+  },
+  {
+   "categoria": "round_trunca",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 43,
+   "detalle": "ROUND(…, …, 1) trunca en vez de redondear: con montos, un centavo de diferencia contra cualquier cálculo que redondee",
+   "fragmento": "SET @comision = ROUND(@monto_mxn * 0.0025, 2, 1);"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 23,
+   "detalle": "código en duro 'ENVIADA' (1 vez/veces)",
+   "fragmento": "SELECT TOP 1 @anterior = id, @folio = folio FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';",
+   "clase": "código",
+   "valor": "'ENVIADA'",
+   "lineas": [
+    23
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "código en duro 'OP' (1 vez/veces)",
+   "fragmento": "UPDATE dbo.folio SET @n = siguiente, siguiente = siguiente + 1, actualizado = GETDATE() WHERE serie = 'OP';",
+   "clase": "código",
+   "valor": "'OP'",
+   "lineas": [
+    27
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 28,
+   "detalle": "número en duro 9 (1 vez/veces)",
+   "fragmento": "SET @folio = 'OP-' + RIGHT('000000000' + CAST(@n AS varchar(9)), 9);",
+   "clase": "número",
+   "valor": "9",
+   "lineas": [
+    28
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 40,
+   "detalle": "código en duro 'REEMPLAZADA' (1 vez/veces)",
+   "fragmento": "UPDATE dbo.orden_pago SET estatus = 'REEMPLAZADA' WHERE id = @anterior;",
+   "clase": "código",
+   "valor": "'REEMPLAZADA'",
+   "lineas": [
+    40
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 43,
+   "detalle": "número en duro 0.0025 (1 vez/veces)",
+   "fragmento": "SET @comision = ROUND(@monto_mxn * 0.0025, 2, 1);",
+   "clase": "número",
+   "valor": "0.0025",
+   "lineas": [
+    43
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 43,
+   "detalle": "número en duro 2 (3 vez/veces)",
+   "fragmento": "SET @comision = ROUND(@monto_mxn * 0.0025, 2, 1);",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    43,
+    49,
+    50
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 44,
+   "detalle": "número en duro 150 (2 vez/veces)",
+   "fragmento": "IF @comision < 150",
+   "clase": "número",
+   "valor": "150",
+   "lineas": [
+    44,
+    45
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 50,
+   "detalle": "número en duro 3 (1 vez/veces)",
+   "fragmento": "(@id, 3, 'IVA', 'MXN', ROUND(@comision * 0.16, 2), @fecha_registro, @folio);",
+   "clase": "número",
+   "valor": "3",
+   "lineas": [
+    50
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 50,
+   "detalle": "número en duro 0.16 (1 vez/veces)",
+   "fragmento": "(@id, 3, 'IVA', 'MXN', ROUND(@comision * 0.16, 2), @fecha_registro, @folio);",
+   "clase": "número",
+   "valor": "0.16",
+   "lineas": [
+    50
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 52,
+   "detalle": "código en duro 'OUR' (1 vez/veces)",
+   "fragmento": "IF @gastos = 'OUR'",
+   "clase": "código",
+   "valor": "'OUR'",
+   "lineas": [
+    52
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 54,
+   "detalle": "número en duro 4 (1 vez/veces)",
+   "fragmento": "VALUES (@id, 4, 'GASTOS_OUR', 'USD', 25.00, @fecha_registro, @folio);",
+   "clase": "número",
+   "valor": "4",
+   "lineas": [
+    54
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 54,
+   "detalle": "número en duro 25.00 (1 vez/veces)",
+   "fragmento": "VALUES (@id, 4, 'GASTOS_OUR', 'USD', 25.00, @fecha_registro, @folio);",
+   "clase": "número",
+   "valor": "25.00",
+   "lineas": [
+    54
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 24,
+   "detalle": "asigna @tc_cierre sin TOP ni agregado desde un conjunto que puede traer varias filas: dbo.operacion: el filtro iguala moneda (llaves únicas: id). La variable se queda con la última fila que entregue el plan",
+   "fragmento": "SELECT @tc_cierre = tipo_cambio",
+   "asigna_variable": true,
+   "forma": "asignacion_multifila",
+   "tablas_sin_fijar": [
+    "dbo.operacion"
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 12,
+   "detalle": "código en duro 'C' (1 vez/veces)",
+   "fragmento": "SELECT moneda, SUM(CASE WHEN tipo = 'C' THEN monto_divisa ELSE 0 END),",
+   "clase": "código",
+   "valor": "'C'",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "código en duro 'V' (1 vez/veces)",
+   "fragmento": "SUM(CASE WHEN tipo = 'V' THEN monto_divisa ELSE 0 END)",
+   "clase": "código",
+   "valor": "'V'",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 35,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "ROUND((p.compras - p.ventas) * p.tc_cierre, 2) AS posicion_mxn",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    35
+   ]
+  },
+  {
+   "categoria": "division_entera",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*): entero entre entero, el cociente se trunca",
+   "fragmento": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*) AS pct_conciliadas,",
+   "expresion": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*)"
+  },
+  {
+   "categoria": "division_entera",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60: entero entre entero, el cociente se trunca; además AVG de un entero devuelve entero en SQL Server, y en PostgreSQL avg(integer) devuelve numeric: el mismo SQL da otro resultado",
+   "fragmento": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60 AS horas_promedio_envio",
+   "expresion": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "código en duro 'CONCILIADA' (1 vez/veces)",
+   "fragmento": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*) AS pct_conciliadas,",
+   "clase": "código",
+   "valor": "'CONCILIADA'",
+   "lineas": [
+    10
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "número en duro 60 (1 vez/veces)",
+   "fragmento": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60 AS horas_promedio_envio",
+   "clase": "número",
+   "valor": "60",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 14,
+   "detalle": "código en duro 'REEMPLAZADA' (1 vez/veces)",
+   "fragmento": "WHERE p.estatus <> 'REEMPLAZADA' AND p.fecha_envio >= @desde AND p.fecha_envio < DATEADD(day, 1, @hasta)",
+   "clase": "código",
+   "valor": "'REEMPLAZADA'",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.vw_liquidaciones_recientes",
+   "tipo_objeto": "VISTA",
+   "linea": 4,
+   "detalle": "TOP 100 PERCENT con ORDER BY en una vista: el optimizador descarta ese TOP y su ORDER BY, así que el orden que promete no existe; quien la lea sin ORDER BY recibe las filas en el orden que entregue el plan",
+   "fragmento": "SELECT TOP 100 PERCENT p.folio, p.uetr, p.bic_corresponsal, p.moneda, s.monto, s.fecha_hora, s.referencia",
+   "forma": "orden_que_no_ordena",
+   "contexto": "vista"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.vw_liquidaciones_recientes",
+   "tipo_objeto": "VISTA",
+   "linea": 7,
+   "detalle": "código en duro 'ABONO' (1 vez/veces)",
+   "fragmento": "WHERE s.concepto = 'ABONO'",
+   "clase": "código",
+   "valor": "'ABONO'",
+   "lineas": [
+    7
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "dbo.vw_reporte_ordenes",
+   "tipo_objeto": "VISTA",
+   "linea": 8,
+   "detalle": "INNER JOIN de dbo.orden_pago a su tabla hija dbo.partida_solicitada: descarta los registros de dbo.orden_pago sin dbo.partida_solicitada",
+   "fragmento": "INNER JOIN dbo.partida_solicitada p ON p.orden_id = o.id",
+   "padre": "dbo.orden_pago",
+   "hija": "dbo.partida_solicitada"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.vw_reporte_ordenes",
+   "tipo_objeto": "VISTA",
+   "linea": 9,
+   "detalle": "código en duro 'REEMPLAZADA' (1 vez/veces)",
+   "fragmento": "WHERE o.estatus <> 'REEMPLAZADA';",
+   "clase": "código",
+   "valor": "'REEMPLAZADA'",
+   "lineas": [
+    9
+   ]
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "dbo.bitacora",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "dbo.folio.actualizado",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "dbo.moneda.numerico",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "dbo.moneda.activa",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "dbo.orden_pago.codigo_proposito",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "dbo.operacion.cuenta_clabe",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "107,265 filas (26.0%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL",
+   "valor": "NA",
+   "filas": 107265,
+   "total": 412125,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "dbo.operacion.tipo_cambio_referencia",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "53,702 filas (13.0%) con Decimal('0.000000'): 0.000000 queda fuera del rango del resto de la columna (0.113984 … 71.214699); la columna no usa NULL",
+   "valor": "0.000000",
+   "filas": 53702,
+   "total": 412125,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "dbo.orden_pago.bic_intermediario",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "230,297 filas (85.1%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL",
+   "valor": "NA",
+   "filas": 230297,
+   "total": 270616,
+   "usa_null": false
+  },
+  {
+   "categoria": "mojibake",
+   "objeto": "dbo.operacion.cliente",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "21,189 filas con secuencias de UTF-8 leído como latin-1; en la muestra, 400 de 400 valores distintos se reparan al revertir la decodificación",
+   "filas": 21189,
+   "ejemplos": [
+    "'ARTESAN\\xc3\\x8dAS DEL LAGO, S.C.'",
+    "'M\\xc3\\x93NICA MENDOZA RODR\\xc3\\x8dGUEZ'",
+    "'RAM\\xc3\\x93N D\\xc3\\x8dAZ P\\xc3\\x89REZ'"
+   ]
+  },
+  {
+   "categoria": "espacios_finales",
+   "objeto": "dbo.partida_solicitada.referencia",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "48,013 de 244,869 valores con espacios al final (19.6%), medidos con DATALENGTH en el motor: SQL Server los ignora al comparar (=, DISTINCT, GROUP BY) y LEN no los cuenta; PostgreSQL sí los distingue; ventana en fecha_hora: 2022-07-04 08:00:15 → 2023-01-27 17:54:05 (la tabla va de 2021-01-01 08:11:34 a 2023-12-28 17:58:52); concentrados en esa ventana",
+   "filas": 48013,
+   "total": 244869,
+   "ventana": {
+    "columna": "fecha_hora",
+    "desde": "2022-07-04 08:00:15",
+    "hasta": "2023-01-27 17:54:05",
+    "tabla_desde": "2021-01-01 08:11:34",
+    "tabla_hasta": "2023-12-28 17:58:52"
+   }
+  },
+  {
+   "categoria": "re_registro",
+   "objeto": "dbo.orden_pago.folio",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
+   "similitud": 0.814,
+   "similitud_base": 0.196,
+   "repetidas": 119897
+  },
+  {
+   "categoria": "re_registro",
+   "objeto": "dbo.orden_pago.uetr",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 82% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
+   "similitud": 0.817,
+   "similitud_base": 0.196,
+   "repetidas": 119897
+  },
+  {
+   "categoria": "re_registro",
+   "objeto": "dbo.orden_pago.referencia_mt103",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
+   "similitud": 0.814,
+   "similitud_base": 0.196,
+   "repetidas": 119897
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "dbo.partida_solicitada.referencia",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "100,686 filas repiten un valor (144,183 distintos en 244,869); las filas repetidas comparten el 50% de sus columnas (dos filas cualesquiera, el 24%); en 40 de 40 grupos la fila de id mayor es la de fecha_hora más reciente",
+   "similitud": 0.5,
+   "similitud_base": 0.236,
+   "repetidas": 100686
+  }
+ ],
+ "resumen": {
+  "literal_magico": 44,
+  "top_sin_order_by": 8,
+  "reloj_en_regla": 3,
+  "desfase_horario_fijo": 1,
+  "if_exists_sin_else": 1,
+  "round_trunca": 1,
+  "division_entera": 2,
+  "inner_join_hija": 1,
+  "tabla_sin_lectura": 1,
+  "columna_sin_lectura": 4,
+  "centinela": 3,
+  "mojibake": 1,
+  "espacios_finales": 1,
+  "re_registro": 3,
+  "llave_candidata_con_duplicados": 1
+ },
+ "tiempos": {
+  "arranque_contenedor": 8.3,
+  "restauracion": 4.2,
+  "inventario": 0.9,
+  "patrones_codigo": 0.1,
+  "patrones_datos": 15.2,
+  "criterio_salida": 1.4,
+  "total": 30.6
+ }
+}
