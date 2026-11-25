@@ -12,15 +12,19 @@ documento cambia dos veces. Y una reversa decidida «por criterio» el día del 
 - **Cifras de control por DOCUMENTO** en origen y destino, firmadas antes de cambiar.
 - **Jobs con reloj:** se apagan en el legado al cortar. Las primeras noches el TO-BE corre en «sólo marca» contra la
   última bitácora del legado (ADR 0010). Nunca actúan los dos la misma noche.
-- **Legado después del corte:** en sólo lectura y vigilado. Cualquier ejecución de sus procedimientos es un
-  consumidor que no estaba en el inventario (ADR 0014) y abre un hallazgo.
+- **Legado después del corte:** en sólo lectura y vigilado. El vigía cuenta conexiones y lecturas, no sólo EXEC:
+  cualquier login o ejecución que no estaba en el inventario (ADR 0014) es un consumidor nuevo y abre un hallazgo.
 - **Criterio de reversa, fijado ANTES:** revierte cualquiera de estas diferencias:
-  - un total de una tabla distinto de 0;
+  - una diferencia de totales de una tabla distinta de 0;
   - un mes que no cuadra;
   - un documento con cifra distinta;
   - una noche con doble acción.
 
-  Pasado el punto de no retorno (documentado con negocio), sólo se corrige hacia adelante.
+  El **punto de no retorno es un evento medible**: la primera escritura de negocio aceptada en el TO-BE o el primer
+  aviso al exterior. El sistema lo registra, y desde ahí `reversa` se niega, porque volver a la huella previa borraría
+  lo capturado (control negativo en el CI). Pasado ese punto, sólo se corrige hacia adelante.
+- «Sólo marca» se mide en las dos mitades: 0 noches con doble acción y 0 diferencias entre lo que el TO-BE marca y
+  la bitácora del legado, en 3 de 3 noches. No actuar no cumple el criterio.
 
 ## Alternativas descartadas
 - **Correr los dos en paralelo actuando:** doble efecto sobre el mismo documento.

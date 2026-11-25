@@ -21,7 +21,9 @@ compara, y lo que no se compara pasa.
   Nunca se retira sólo por el silencio de las estadísticas.
 - Lo que escribe pasa por la paridad de ESTADO (ADR 0015) se haya observado o no su ejecución: es la única forma de
   ver su efecto.
-- **La puerta:** 0 objetos del código sin renglón. Es un check del CI que falla nombrando el objeto.
+- **La puerta:** 0 objetos del código sin renglón y 0 CONSUMIDORES sin renglón. Los consumidores son los logins y
+  aplicaciones conectados durante el ciclo: un lector que hace SELECT directo no es un objeto y se escaparía. Es un
+  check del CI que falla nombrando el objeto o el login.
 - **Oráculo capturado EN el corte:** la salida de cada objeto de lectura con parámetros representativos (incluido el
   borde de fin de mes) y el instante del servidor al correrla. El TO-BE las re-corre con ese reloj inyectado.
 - **Lo latente** se mide con las variantes del plan del piso (ADR 0011). Si el legado no coincide consigo mismo, es

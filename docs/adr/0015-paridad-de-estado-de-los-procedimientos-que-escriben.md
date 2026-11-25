@@ -18,6 +18,11 @@ Comparar la salida de un procedimiento que escribe no dice qué dejó en la base
 - Lo que el reloj decide se corre con el instante del corte. Como `GETDATE()` no se inyecta en el legado, la
   medición usa una copia temporal del procedimiento en un esquema aparte, nunca el original.
 - Cada diferencia se arbitra como en S2: defecto nuestro, regla real del legado o defecto del legado a decidir.
+- Los escritores salen del inventario (procedimientos, triggers y pasos de jobs): N de N, no una lista fija.
+- El arnés falla si `@@TRANCOUNT` cambia durante la llamada. Un ROLLBACK propio se llevaría la transacción externa y
+  el volcado saldría vacío sin avisar.
+- La transacción revertida no deshace efectos fuera de la base (correo, arranque de jobs, servidores enlazados,
+  archivos). Se declaran por objeto y se neutralizan o emulan durante la corrida.
 
 ## Alternativas descartadas
 - **Confiar en las pruebas unitarias del TO-BE:** prueban la regla que escribimos, no la que el legado ejecuta.
