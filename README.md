@@ -156,6 +156,7 @@ docker run -d --name decant-pg -e POSTGRES_USER=decant -e POSTGRES_PASSWORD="$DE
 python -m paridad --manifiesto respaldos/respaldo_2023-12-29.json   # → paridad/informe/paridad.md
 pytest -m paridad                                # T4 y las demás pruebas sobre el informe
 dotnet src/Decant.Cli/bin/Release/net10.0/decant.dll configuracion   # banderas y destinos por ambiente
+docker rm -f -v decant-pg                        # -v: también el volumen de datos (≈ 2.7 GB)
 ```
 
 Paso a paso del legado:

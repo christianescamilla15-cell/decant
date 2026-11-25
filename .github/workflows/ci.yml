@@ -235,5 +235,5 @@ jobs:
         if: always()
         run: |
           docker compose -f legado/docker-compose.yml down -v
-          docker rm -f decant-pg || true
+          docker rm -f -v decant-pg || true   # -v: también su volumen anónimo de datos
           docker ps -aq --filter name=decant-radiografia- | xargs -r docker rm -f
