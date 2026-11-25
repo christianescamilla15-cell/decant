@@ -6,17 +6,20 @@ from collections import Counter
 from pathlib import Path
 
 ORDEN_CATEGORIAS = ('top_sin_order_by', 'inner_join_hija', 'reloj_en_regla', 'if_exists_sin_else',
-                    'if_exists_guarda', 'desfase_horario_fijo', 'round_trunca', 'centinela', 'mojibake',
+                    'if_exists_guarda', 'desfase_horario_fijo', 'round_trunca', 'division_entera', 'centinela',
+                    'mojibake',
                     'espacios_finales', 're_registro',
                     'llave_candidata_con_duplicados', 'columna_sin_lectura', 'tabla_sin_lectura', 'literal_magico')
 TITULOS = {
-    'top_sin_order_by': 'Selección no determinista: TOP sin ORDER BY o asignación desde varias filas',
+    'top_sin_order_by': ('Selección no determinista: TOP sin ORDER BY, asignación desde varias filas u ORDER BY '
+                         'que no ordena (vista o tabla derivada)'),
     'inner_join_hija': 'INNER JOIN a una tabla hija',
     'reloj_en_regla': 'Reloj del servidor (GETDATE y similares) en una regla, directo o por una variable',
     'if_exists_sin_else': 'IF EXISTS sin ELSE que escribe datos (camino silencioso)',
     'if_exists_guarda': 'IF EXISTS sin ELSE con cuerpo de guarda o DDL (informativo)',
     'desfase_horario_fijo': 'Conversión de zona con desfase fijo',
     'round_trunca': 'ROUND con tercer argumento: trunca en vez de redondear',
+    'division_entera': 'División entera: entero entre entero (el cociente se trunca)',
     'centinela': 'Centinelas en vez de NULL (por distribución de valores)',
     'mojibake': 'Texto con mojibake (UTF-8 leído como latin-1)',
     'espacios_finales': 'Espacios finales que SQL Server ignora al comparar y PostgreSQL no',
