@@ -13,5 +13,7 @@
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.17.0" />
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
     <PackageVersion Include="Mono.Cecil" Version="0.11.6" />
+    <!-- GraphQL de sólo lectura (ADR 0017): versión EXACTA, revisada contra los avisos de seguridad de la biblioteca. -->
+    <PackageVersion Include="HotChocolate.AspNetCore" Version="[16.7.7]" />
   </ItemGroup>
 </Project>

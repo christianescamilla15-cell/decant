@@ -102,17 +102,21 @@ public class ContratoDeErroresTests(BaseDePrueba baseDePrueba) : IAsyncLifetime
 
     /// <summary>
     /// ADR 0012: la API es de SÓLO LECTURA y sin autenticación en el alcance de la demo. Si aparece una ruta o un
-    /// verbo nuevo, esta prueba falla hasta que se decida su autorización (401/403 por ruta) y se actualice el ADR.
+    /// verbo nuevo, esta prueba falla hasta que se decida su autorización (401/403 por ruta) y se actualice el ADR
+    /// (así entró /graphql: ADR 0017).
     /// </summary>
     [Fact]
     public void La_superficie_es_la_del_adr_de_solo_lectura()
     {
         var rutas = _fabrica.Services.GetRequiredService<EndpointDataSource>().Endpoints.OfType<RouteEndpoint>()
             .Select(e => $"{string.Join(',', e.Metadata.GetMetadata<Microsoft.AspNetCore.Routing.HttpMethodMetadata>()
-                ?.HttpMethods ?? [])} {e.RoutePattern.RawText}")
+                ?.HttpMethods ?? ["*"])} {e.RoutePattern.RawText}")
             .Order(StringComparer.Ordinal).ToList();
+        // GraphQL (ADR 0017) se enruta con todos los verbos y es HotChocolate quien sólo ejecuta POST con JSON: GET,
+        // QUERY y multipart están apagados y los prueba GraphQL.ContratoTests.
         Assert.Equal(
         [
+            "* /graphql",
             "GET /api/configuracion",
             "GET /api/operaciones",
             "GET /api/operaciones/{id:long}",
