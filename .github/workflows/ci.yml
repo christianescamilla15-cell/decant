@@ -1,0 +1,114 @@
+# CI de Decant (S1): pruebas por regla, el ciclo completo del legado contra SQL Server real y el control público.
+# Un job «skipped» por depender de otro en rojo NO es verde: en la rama protegida todos son requeridos.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: pruebas (generador y detectores, sin base)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: ruff check .
+      # pytest sale con 5 si no encontró pruebas: eso ya falla. La cobertura se reporta, no es la compuerta.
+      - run: pytest -q --junitxml=reporte.xml --cov --cov-report=xml --cov-report=term
+      - run: python3 herramientas/verificar_reportes.py pytest reporte.xml
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: pruebas
+          path: |
+            reporte.xml
+            coverage.xml
+
+  legado:
+    name: legado en SQL Server → respaldo → vivo → radiografía (integración)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      # SQL Server corre como servicio del job con el MISMO docker-compose que usa quien clona el repo
+      # (legado/docker-compose.yml). La contraseña de sa nace y muere con la corrida: no es un secreto del repo.
+      - name: contraseña de sa por corrida
+        run: |
+          clave="Dc1-$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"
+          echo "::add-mask::$clave"
+          echo "DECANT_SA_PASSWORD=$clave" >> "$GITHUB_ENV"
+      - name: ciclo completo (levantar, esquema, generar y cargar, pantalla, respaldar, vivo, radiografiar, medir)
+        run: ./ciclo.sh
+      - name: integración contra el motor real
+        run: pytest -q -m integracion --junitxml=reporte-integracion.xml
+      - run: python3 herramientas/verificar_reportes.py pytest reporte-integracion.xml
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: radiografia-del-legado
+          path: |
+            radiografia/informe/
+            respaldos/*.json
+            legado/datos/*.json
+            legado/datos/tiempos.txt
+            legado/datos/pantalla.log
+            reporte-integracion.xml
+      - name: apagar el legado
+        if: always()
+        run: docker compose -f legado/docker-compose.yml down -v
+
+  control-publico:
+    name: control (radiografía sobre WideWorldImporters)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      URL_MUESTRA: https://github.com/Microsoft/sql-server-samples/releases/download/wide-world-importers-v1.0/WideWorldImporters-Full.bak
+      SHA256_MUESTRA: e842bad6ce02f74f166947e559dab1b476edd7eaae3da2ab9e3f522f1dd87124
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: descargar el respaldo oficial y verificar su sha256
+        run: |
+          mkdir -p muestras
+          curl -fsSL --retry 3 -o muestras/WideWorldImporters-Full.bak "$URL_MUESTRA"
+          echo "$SHA256_MUESTRA  muestras/WideWorldImporters-Full.bak" | sha256sum -c -
+      - name: radiografía de la base pública
+        run: >-
+          python -m radiografia --bak muestras/WideWorldImporters-Full.bak --base WideWorldImporters
+          --salida control-ci
+      - name: los detectores de alta señal siguen sin falsos positivos y el mojibake real sigue apareciendo
+        run: |
+          python3 - <<'PY'
+          import json
+          from collections import Counter
+          informe = json.load(open('control-ci/radiografia.json', encoding='utf-8'))
+          c = Counter(h['categoria'] for h in informe['hallazgos'])
+          print(dict(c))
+          for categoria in ('top_sin_order_by', 'reloj_en_regla', 'if_exists_sin_else', 'desfase_horario_fijo',
+                            're_registro'):
+              assert c[categoria] == 0, (categoria, c[categoria])
+          assert c['mojibake'] == 5, c['mojibake']
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: control-wideworldimporters
+          path: control-ci/
