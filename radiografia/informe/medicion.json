@@ -1,0 +1,178 @@
+{
+ "trampas": 9,
+ "detectadas": 8,
+ "pct_deteccion": 88.9,
+ "parciales": 0,
+ "filas": [
+  {
+   "id": "T1",
+   "nombre": "TOP sin ORDER BY con empates reales",
+   "senales": [
+    "top_sin_order_by → dbo.sp_lista_operaciones"
+   ],
+   "encontradas": [
+    "top_sin_order_by → dbo.sp_lista_operaciones"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "T2",
+   "nombre": "INNER JOIN que pierde hijos",
+   "senales": [
+    "inner_join_hija → dbo.vw_reporte_ordenes"
+   ],
+   "encontradas": [
+    "inner_join_hija → dbo.vw_reporte_ordenes"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "T3",
+   "nombre": "Centinelas («NA», 0) en vez de NULL",
+   "senales": [
+    "centinela → dbo.operacion.cuenta_clabe",
+    "centinela → dbo.orden_pago.bic_intermediario",
+    "centinela → dbo.operacion.tipo_cambio_referencia"
+   ],
+   "encontradas": [
+    "centinela → dbo.operacion.cuenta_clabe",
+    "centinela → dbo.orden_pago.bic_intermediario",
+    "centinela → dbo.operacion.tipo_cambio_referencia"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "T4",
+   "nombre": "Lados invertidos en el detalle",
+   "senales": [],
+   "encontradas": [],
+   "estado": "sin patrón en S1"
+  },
+  {
+   "id": "T5",
+   "nombre": "Horario de verano (hora local, corresponsal en Nueva York)",
+   "senales": [
+    "desfase_horario_fijo → dbo.sp_conciliar"
+   ],
+   "encontradas": [
+    "desfase_horario_fijo → dbo.sp_conciliar"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "T6",
+   "nombre": "Columna que ningún reporte ni procedimiento imprime",
+   "senales": [
+    "columna_sin_lectura → dbo.orden_pago.codigo_proposito"
+   ],
+   "encontradas": [
+    "columna_sin_lectura → dbo.orden_pago.codigo_proposito"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "T7",
+   "nombre": "Acentos latin-1 en columnas Unicode",
+   "senales": [
+    "mojibake → dbo.operacion.cliente"
+   ],
+   "encontradas": [
+    "mojibake → dbo.operacion.cliente"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "T8",
+   "nombre": "GETDATE() dentro de una regla",
+   "senales": [
+    "reloj_en_regla → dbo.sp_conciliar"
+   ],
+   "encontradas": [
+    "reloj_en_regla → dbo.sp_conciliar"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "T9",
+   "nombre": "Re-registro: el mismo documento con otra llave cada día",
+   "senales": [
+    "re_registro → dbo.orden_pago.uetr"
+   ],
+   "encontradas": [
+    "re_registro → dbo.orden_pago.uetr"
+   ],
+   "estado": "detectada"
+  },
+  {
+   "id": "D1",
+   "nombre": "La comisión se trunca en vez de redondearse",
+   "senales": [],
+   "encontradas": [],
+   "estado": "sin patrón en S1"
+  },
+  {
+   "id": "D2",
+   "nombre": "Los montos ignoran los decimales de ISO 4217",
+   "senales": [],
+   "encontradas": [],
+   "estado": "sin patrón en S1"
+  },
+  {
+   "id": "D3",
+   "nombre": "Liquidaciones descartadas en silencio",
+   "senales": [
+    "if_exists_sin_else → dbo.sp_registrar_liquidacion"
+   ],
+   "encontradas": [
+    "if_exists_sin_else → dbo.sp_registrar_liquidacion"
+   ],
+   "estado": "detectada"
+  }
+ ],
+ "hallazgos_sin_trampa": [
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "dbo.folio.actualizado"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "dbo.moneda.activa"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "dbo.moneda.numerico"
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "dbo.partida_solicitada.referencia"
+  },
+  {
+   "categoria": "re_registro",
+   "objeto": "dbo.orden_pago.folio"
+  },
+  {
+   "categoria": "re_registro",
+   "objeto": "dbo.orden_pago.referencia_mt103"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "dbo.bitacora"
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_conciliar"
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_detalle_operacion"
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_registrar_liquidacion"
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_registrar_orden"
+  }
+ ]
+}
