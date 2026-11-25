@@ -1,15 +1,15 @@
 {
  "base": "BFN_DIVISAS",
- "generado_utc": "2026-11-25T03:07:15+00:00",
+ "generado_utc": "2026-11-25T04:12:38+00:00",
  "respaldo": {
   "base": "BFN_DIVISAS",
   "fecha_negocio": "2023-12-29",
-  "tomado_utc": "2026-11-25T03:05:03+00:00",
+  "tomado_utc": "2026-11-25T04:10:12+00:00",
   "tabla_principal": "dbo.operacion",
   "pantalla": {
-   "url": "http://127.0.0.1:8080/",
-   "leido_antes_utc": "2026-11-25T03:05:02+00:00",
-   "leido_despues_utc": "2026-11-25T03:05:04+00:00",
+   "url": "http://127.0.0.1:18090/",
+   "leido_antes_utc": "2026-11-25T04:10:11+00:00",
+   "leido_despues_utc": "2026-11-25T04:10:12+00:00",
    "cifras": [
     {
      "etiqueta": "Operaciones registradas",
@@ -83,7 +83,7 @@
     ],
     "archivo": "salida_reporte_del_mes_2023-12-29.jsonl",
     "filas": 7492,
-    "sha256": "2f362be6d93b8be98134c4f0f68311bffff5ccc1323bf9106b5557833c2831ad"
+    "sha256": "c3afd6debc2f1e6fb1f1404270ad827ed36e7d4d418ab1382157039e176ab510"
    },
    {
     "nombre": "lista_del_dia_anterior",
@@ -108,16 +108,16 @@
    "base": "BFN_DIVISAS",
    "restaurada_como": "BFN_DIVISAS",
    "archivo": "bfn_divisas_2023-12-29.bak",
-   "sha256": "9c061d7f998940c55d90e6ab73e085743089f694d4212589ae2b9010cce4ec9f",
+   "sha256": "07d139c215930d55e168c8dbb971fd92d45c9cf9eb2a10ce6d8e7e3839bdc1a2",
    "sha256_ok": true,
    "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
-   "segundos": 2.8
+   "segundos": 2.3
   },
   {
    "base": "msdb",
    "restaurada_como": "legado_msdb",
    "archivo": "msdb_2023-12-29.bak",
-   "sha256": "19dc302450de7883085e864ab3ddea36aaf0ee6db039b0b32034b2ef7ab3750c",
+   "sha256": "2444bb9248fb2bb826f4e50ec8e93ceab17268232e9ccd2eae872b666cfcee68",
    "sha256_ok": true,
    "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
    "segundos": 0.5
@@ -275,9 +275,9 @@
     "pares_contrato": 26515033,
     "inversiones_contrato": 0,
     "pares_empatados": 1546253,
-    "inversiones_empatados": 40410,
-    "pct_empatados_invertidos": 2.61,
-    "pct_posiciones_distintas": 5.6,
+    "inversiones_empatados": 159980,
+    "pct_empatados_invertidos": 10.35,
+    "pct_posiciones_distintas": 25.8,
     "reproducible": true,
     "cumple": true
    },
@@ -507,9 +507,19 @@
     "lineas": 22
    },
    {
+    "nombre": "dbo.sp_constancia_operacion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 21
+   },
+   {
     "nombre": "dbo.sp_detalle_operacion",
     "tipo": "PROCEDIMIENTO",
     "lineas": 26
+   },
+   {
+    "nombre": "dbo.sp_liquidaciones_recientes",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 10
    },
    {
     "nombre": "dbo.sp_lista_operaciones",
@@ -547,9 +557,19 @@
     "lineas": 39
    },
    {
+    "nombre": "dbo.sp_tablero_corresponsales",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 17
+   },
+   {
     "nombre": "dbo.tr_orden_pago_bitacora",
     "tipo": "TRIGGER",
     "lineas": 11
+   },
+   {
+    "nombre": "dbo.vw_liquidaciones_recientes",
+    "tipo": "VISTA",
+    "lineas": 8
    },
    {
     "nombre": "dbo.vw_reporte_ordenes",
@@ -701,6 +721,19 @@
    "valor": "-3",
    "lineas": [
     21
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_constancia_operacion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "asigna @folio_orden, @uetr, @estatus_orden, @fecha_envio sin TOP ni agregado desde un conjunto que puede traer varias filas: dbo.orden_pago (p) entra por un LEFT JOIN que iguala operacion_id, sin cubrir ninguna llave única suya (id). La variable se queda con la última fila que entregue el plan",
+   "fragmento": "SELECT @folio = o.folio, @cliente = o.cliente, @moneda = o.moneda, @monto_divisa = o.monto_divisa,",
+   "asigna_variable": true,
+   "forma": "asignacion_multifila",
+   "tablas_sin_fijar": [
+    "dbo.orden_pago"
    ]
   },
   {
@@ -1095,10 +1128,13 @@
    "objeto": "dbo.sp_reporte_posicion",
    "tipo_objeto": "PROCEDIMIENTO",
    "linea": 24,
-   "detalle": "asigna @tc_cierre desde dbo.operacion sin TOP ni agregado y sin filtro único (el WHERE iguala moneda; llaves únicas de la tabla: id): la variable se queda con la última fila que entregue el plan",
+   "detalle": "asigna @tc_cierre sin TOP ni agregado desde un conjunto que puede traer varias filas: dbo.operacion: el filtro iguala moneda (llaves únicas: id). La variable se queda con la última fila que entregue el plan",
    "fragmento": "SELECT @tc_cierre = tipo_cambio",
    "asigna_variable": true,
-   "forma": "asignacion_multifila"
+   "forma": "asignacion_multifila",
+   "tablas_sin_fijar": [
+    "dbo.operacion"
+   ]
   },
   {
    "categoria": "literal_magico",
@@ -1137,6 +1173,86 @@
    "valor": "2",
    "lineas": [
     35
+   ]
+  },
+  {
+   "categoria": "division_entera",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*): entero entre entero, el cociente se trunca",
+   "fragmento": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*) AS pct_conciliadas,",
+   "expresion": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*)"
+  },
+  {
+   "categoria": "division_entera",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60: entero entre entero, el cociente se trunca; además AVG de un entero devuelve entero en SQL Server, y en PostgreSQL avg(integer) devuelve numeric: el mismo SQL da otro resultado",
+   "fragmento": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60 AS horas_promedio_envio",
+   "expresion": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "código en duro 'CONCILIADA' (1 vez/veces)",
+   "fragmento": "SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*) AS pct_conciliadas,",
+   "clase": "código",
+   "valor": "'CONCILIADA'",
+   "lineas": [
+    10
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "número en duro 60 (1 vez/veces)",
+   "fragmento": "AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60 AS horas_promedio_envio",
+   "clase": "número",
+   "valor": "60",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_tablero_corresponsales",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 14,
+   "detalle": "código en duro 'REEMPLAZADA' (1 vez/veces)",
+   "fragmento": "WHERE p.estatus <> 'REEMPLAZADA' AND p.fecha_envio >= @desde AND p.fecha_envio < DATEADD(day, 1, @hasta)",
+   "clase": "código",
+   "valor": "'REEMPLAZADA'",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.vw_liquidaciones_recientes",
+   "tipo_objeto": "VISTA",
+   "linea": 4,
+   "detalle": "TOP 100 PERCENT con ORDER BY en una vista: el optimizador descarta ese TOP y su ORDER BY, así que el orden que promete no existe; quien la lea sin ORDER BY recibe las filas en el orden que entregue el plan",
+   "fragmento": "SELECT TOP 100 PERCENT p.folio, p.uetr, p.bic_corresponsal, p.moneda, s.monto, s.fecha_hora, s.referencia",
+   "forma": "orden_que_no_ordena",
+   "contexto": "vista"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.vw_liquidaciones_recientes",
+   "tipo_objeto": "VISTA",
+   "linea": 7,
+   "detalle": "código en duro 'ABONO' (1 vez/veces)",
+   "fragmento": "WHERE s.concepto = 'ABONO'",
+   "clase": "código",
+   "valor": "'ABONO'",
+   "lineas": [
+    7
    ]
   },
   {
@@ -1315,12 +1431,13 @@
   }
  ],
  "resumen": {
-  "top_sin_order_by": 6,
+  "top_sin_order_by": 8,
   "reloj_en_regla": 3,
   "desfase_horario_fijo": 1,
-  "literal_magico": 35,
+  "literal_magico": 39,
   "if_exists_sin_else": 1,
   "round_trunca": 1,
+  "division_entera": 2,
   "inner_join_hija": 1,
   "tabla_sin_lectura": 1,
   "columna_sin_lectura": 4,
@@ -1331,12 +1448,12 @@
   "llave_candidata_con_duplicados": 1
  },
  "tiempos": {
-  "arranque_contenedor": 6.3,
-  "restauracion": 4.5,
-  "inventario": 1.2,
+  "arranque_contenedor": 6.2,
+  "restauracion": 3.9,
+  "inventario": 1.0,
   "patrones_codigo": 0.1,
-  "patrones_datos": 17.2,
-  "criterio_salida": 1.5,
-  "total": 31.3
+  "patrones_datos": 14.7,
+  "criterio_salida": 1.3,
+  "total": 27.6
  }
 }

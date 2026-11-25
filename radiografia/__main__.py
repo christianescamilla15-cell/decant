@@ -78,8 +78,12 @@ def radiografiar(archivos: list[dict], base: str, manifiesto: dict | None, conse
             for c in columnas:
                 por_tabla.setdefault(f"{c['esquema']}.{c['tabla']}".lower(), []).append(c['columna'])
             unicas = inventario.llaves_unicas(cursor)
+            tipos: dict[str, dict[str, str]] = {}
+            for c in columnas:
+                tipos.setdefault(f"{c['esquema']}.{c['tabla']}".lower(), {})[c['columna'].lower()] = c['tipo']
             hallazgos = patrones.analizar_codigo(codigo, padres_de, unicas,
-                                                 {t: {c.lower() for c in cols} for t, cols in por_tabla.items()})
+                                                 {t: {c.lower() for c in cols} for t, cols in por_tabla.items()},
+                                                 tipos)
             hallazgos += patrones.columnas_sin_lectura(codigo, por_tabla)
             tiempos['patrones_codigo'] = round(time.perf_counter() - t, 1)
 

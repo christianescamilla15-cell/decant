@@ -194,20 +194,34 @@ def test_columna_que_solo_se_escribe_no_cuenta_como_leida():
 
 # ── el código del legado ────────────────────────────────────────────────────────────────────────────────────
 
+# Los tipos de módulo con los nombres que les da la radiografía (radiografia/inventario.py, TIPOS_MODULO).
+_TIPO_DE_MODULO = {'VIEW': 'VISTA', 'PROCEDURE': 'PROCEDIMIENTO', 'TRIGGER': 'TRIGGER', 'FUNCTION': 'FUNCION'}
+
+
 def _modulos_del_legado() -> list[Modulo]:
     modulos = []
     for ruta in sorted(Path('legado/sql').glob('0[3-5]_*.sql')):
         for lote in lotes(ruta.read_text(encoding='utf-8')):
             creado = re.search(r'CREATE\s+OR\s+ALTER\s+(\w+)\s+([\w.]+)', lote)
             if creado:
-                modulos.append(Modulo(creado.group(2).lower(), creado.group(1).upper(), lote))
+                modulos.append(Modulo(creado.group(2).lower(), _TIPO_DE_MODULO[creado.group(1).upper()], lote))
     return modulos
+
+
+def _tipos_del_ddl() -> dict[str, dict[str, str]]:
+    """{tabla: {columna: tipo}} leídos de legado/sql/02_tablas.sql, como los lee la radiografía de sys.columns."""
+    tipos: dict[str, dict[str, str]] = {}
+    ddl = Path('legado/sql/02_tablas.sql').read_text(encoding='utf-8')
+    for tabla in re.finditer(r'CREATE TABLE (\S+) \((.*?)\n\);', ddl, re.DOTALL):
+        for columna in re.finditer(r'^\s+(\w+)\s+(\w+)', tabla.group(2), re.MULTILINE):
+            tipos.setdefault(tabla.group(1).lower(), {})[columna.group(1).lower()] = columna.group(2).lower()
+    return tipos
 
 
 def test_sobre_el_codigo_del_legado_aparecen_los_patrones_sembrados():
     padres = {'dbo.partida_solicitada': {'dbo.orden_pago'}, 'dbo.partida_liquidada': {'dbo.orden_pago'},
               'dbo.orden_pago': {'dbo.operacion', 'dbo.moneda'}, 'dbo.operacion': {'dbo.moneda'}}
-    todos = patrones.analizar_codigo(_modulos_del_legado(), padres, UNICAS_LEGADO, COLUMNAS_LEGADO)
+    todos = patrones.analizar_codigo(_modulos_del_legado(), padres, UNICAS_LEGADO, COLUMNAS_LEGADO, _tipos_del_ddl())
     hallazgos = {(h['categoria'], h['objeto']) for h in todos}
     assert ('top_sin_order_by', 'dbo.sp_lista_operaciones') in hallazgos
     assert ('inner_join_hija', 'dbo.vw_reporte_ordenes') in hallazgos
@@ -222,7 +236,16 @@ def test_sobre_el_codigo_del_legado_aparecen_los_patrones_sembrados():
     assert ('reloj_en_regla', 'dbo.sp_ordenes_por_vencer') in hallazgos
     # control de falsos positivos en el propio legado: la asignación por PK de sp_registrar_orden NO se marca
     asignaciones = [h for h in todos if h.get('forma') == 'asignacion_multifila']
-    assert [h['objeto'] for h in asignaciones] == ['dbo.sp_reporte_posicion']
+    assert [h['objeto'] for h in asignaciones] == ['dbo.sp_reporte_posicion', 'dbo.sp_constancia_operacion']
+    # detectores-v4 sobre las formas de la siembra a ciegas, ronda 2 (catálogo ya conocido: no es control)
+    assert ('top_sin_order_by', 'dbo.vw_liquidaciones_recientes') in hallazgos
+    assert ('top_sin_order_by', 'dbo.sp_constancia_operacion') in hallazgos
+    assert ('division_entera', 'dbo.sp_tablero_corresponsales') in hallazgos
+    # control dentro del legado: sp_conciliar divide entre 60.0 (decimal) y NO se marca; la vista sin TOP tampoco
+    divisiones = [h['objeto'] for h in todos if h['categoria'] == 'division_entera']
+    assert divisiones == ['dbo.sp_tablero_corresponsales'] * 2
+    ordenes = [h['objeto'] for h in todos if h.get('forma') == 'orden_que_no_ordena']
+    assert ordenes == ['dbo.vw_liquidaciones_recientes']
 
 
 # Llaves únicas del legado como las ve la radiografía: las PK de legado/sql/02_tablas.sql (ningún otro índice único).
@@ -332,3 +355,178 @@ def test_la_variable_del_set_de_un_update_no_hereda_el_reloj_de_otra_columna():
              "WHERE serie = 'OP';\nIF @folio IS NULL SET @folio = 'OP-' + CAST(@n AS varchar(9));")
     assert patrones.variables_de_reloj(_m(texto)) == {}
     assert patrones.reloj_por_variable(_m(texto)) == []
+
+
+# ── detectores-v4: ORDER BY que no ordena (vista o tabla derivada con TOP 100 PERCENT) ──────────────────────
+
+VISTA_RECIENTES = """CREATE OR ALTER VIEW dbo.vw_recientes
+AS
+SELECT TOP 100 PERCENT p.folio, s.monto, s.fecha_hora
+FROM dbo.partida_solicitada s
+INNER JOIN dbo.orden_pago p ON p.id = s.orden_id
+ORDER BY s.fecha_hora DESC;"""
+
+
+def test_top_100_percent_con_order_by_en_una_vista_es_orden_que_no_existe():
+    # forma de la siembra a ciegas, ronda 2: el optimizador descarta ese TOP y su ORDER BY desde SQL Server 2005
+    h = patrones.top_sin_order_by(Modulo('dbo.vw_recientes', 'VISTA', VISTA_RECIENTES))
+    assert [(x['categoria'], x['forma'], x['contexto'], x['linea']) for x in h] == [
+        ('top_sin_order_by', 'orden_que_no_ordena', 'vista', 3)]
+    entre_parentesis = VISTA_RECIENTES.replace('TOP 100 PERCENT', 'TOP (100) PERCENT')
+    assert patrones.top_sin_order_by(Modulo('dbo.vw_recientes', 'VISTA', entre_parentesis))
+
+
+def test_top_100_percent_en_una_tabla_derivada_o_una_cte_tampoco_ordena():
+    derivada = 'SELECT d.a FROM (SELECT TOP 100 PERCENT a FROM t ORDER BY a) d'
+    cte = 'WITH c AS (SELECT TOP (100) PERCENT a FROM t ORDER BY a) SELECT a FROM c'
+    en_linea = Modulo('dbo.f', 'FUNCION', 'CREATE FUNCTION dbo.f() RETURNS TABLE AS RETURN (SELECT TOP 100 PERCENT a '
+                                         'FROM t ORDER BY a)')
+    assert [x['contexto'] for x in patrones.top_sin_order_by(_m(derivada))] == ['tabla derivada']
+    assert [x['contexto'] for x in patrones.top_sin_order_by(_m(cte))] == ['tabla derivada']
+    assert [x['contexto'] for x in patrones.top_sin_order_by(en_linea)] == ['función en línea']
+
+
+def test_order_by_que_si_ordena_no_se_marca():
+    # el SELECT final de un procedimiento SÍ ordena su resultado; TOP n con ORDER BY en una vista elige filas
+    # (no promete orden); dentro de EXISTS o IN el orden no importa
+    assert patrones.top_sin_order_by(_m('SELECT TOP 100 PERCENT a FROM t ORDER BY a')) == []
+    assert patrones.top_sin_order_by(Modulo('dbo.v', 'VISTA', 'CREATE VIEW dbo.v AS SELECT TOP 10 a FROM t '
+                                                              'ORDER BY a')) == []
+    assert patrones.top_sin_order_by(Modulo('dbo.v', 'VISTA', 'CREATE VIEW dbo.v AS SELECT a FROM t WHERE a IN ('
+                                                              'SELECT TOP 100 PERCENT b FROM u ORDER BY b)')) == []
+
+
+# ── detectores-v4: la unicidad es la del CONJUNTO (FROM + JOIN … ON) ───────────────────────────────────────
+
+CONSTANCIA = """SELECT @folio = o.folio, @cliente = o.cliente, @estatus_orden = p.estatus, @fecha_envio = p.fecha_envio
+FROM dbo.operacion o
+LEFT JOIN dbo.orden_pago p ON p.operacion_id = o.id
+WHERE o.id = @operacion_id;"""
+
+
+def test_tabla_unida_por_el_lado_n_de_una_llave_foranea_multiplica_aunque_el_where_cubra_la_pk():
+    # forma de la siembra a ciegas, ronda 2: orden_pago es 1:N con la operación (re-registros)
+    h = _multifila(CONSTANCIA)
+    assert [x['tablas_sin_fijar'] for x in h] == [['dbo.orden_pago']]
+    assert 'LEFT JOIN' in h[0]['detalle'] and 'operacion_id' in h[0]['detalle']
+    # sólo las variables que toman de la tabla sin fijar: las de la operación son las mismas en todas las filas
+    assert '@estatus_orden, @fecha_envio' in h[0]['detalle'] and '@cliente' not in h[0]['detalle']
+
+
+def test_tabla_unida_por_su_llave_unica_no_multiplica():
+    # el catálogo de monedas entra por su PK; orden_pago queda fija por su PK en el WHERE y la operación por el ON
+    assert _multifila('SELECT @v = o.monto_mxn, @n = m.nombre FROM dbo.operacion o LEFT JOIN dbo.moneda m '
+                      'ON m.codigo = o.moneda WHERE o.id = @id') == []
+    assert _multifila('SELECT @v = o.monto_mxn FROM dbo.operacion o JOIN dbo.orden_pago p ON p.uetr = o.moneda '
+                      'AND o.id = p.id WHERE p.id = @id') == []
+
+
+def test_variable_que_solo_toma_de_tablas_fijas_no_se_marca():
+    # el JOIN multiplica filas, pero todas traen el mismo valor de la operación: no hay selección arbitraria
+    assert _multifila('SELECT @c = o.cliente FROM dbo.operacion o JOIN dbo.orden_pago p ON p.operacion_id = o.id '
+                      'WHERE o.id = @id') == []
+
+
+def test_or_en_el_on_no_fija_la_tabla_unida():
+    h = _multifila('SELECT @e = p.estatus FROM dbo.operacion o JOIN dbo.orden_pago p ON p.id = @id OR p.uetr = @u '
+                   'WHERE o.id = @id')
+    assert [x['tablas_sin_fijar'] for x in h] == [['dbo.orden_pago']]
+
+
+def test_igualdades_dentro_de_una_subconsulta_no_fijan_la_tabla_de_afuera():
+    assert _multifila('SELECT @v = tipo_cambio FROM dbo.operacion WHERE moneda IN '
+                      '(SELECT codigo FROM dbo.moneda WHERE codigo = @c)')
+    # una subconsulta escalar sí da un solo valor: fija la PK como una variable
+    assert _multifila('SELECT @v = tipo_cambio FROM dbo.operacion WHERE id = (SELECT MAX(id) FROM dbo.operacion)') == []
+
+
+def test_las_tablas_temporales_con_for_system_time_siguen_siendo_fuentes_del_from():
+    # forma real de WideWorldImporters (base de entrenamiento): `FROM t FOR SYSTEM_TIME AS OF @f AS alias JOIN …`
+    texto = ('SELECT @e = p.estatus FROM dbo.operacion FOR SYSTEM_TIME AS OF @f AS o '
+             'JOIN dbo.orden_pago FOR SYSTEM_TIME AS OF @f AS p ON p.operacion_id = o.id WHERE o.id = @id')
+    assert [x['tablas_sin_fijar'] for x in _multifila(texto)] == [['dbo.orden_pago']]
+    assert _multifila(texto.replace('p.operacion_id = o.id', 'p.id = o.id')) == []
+
+
+def test_tabla_unida_sin_metadatos_no_se_juzga():
+    assert _multifila('SELECT @v = d.x FROM dbo.operacion o JOIN dbo.vw_algo d ON d.id = o.id WHERE o.id = @id') == []
+
+
+# Regresión del control apartado con detectores-v3 (AdventureWorks, `ufnGetProductListPrice`, texto público de
+# Microsoft): la v3 la marcaba «sin WHERE» porque el filtro está en el ON. Debe marcarla por el ON.
+UFN_PRECIO = """CREATE FUNCTION [dbo].[ufnGetProductListPrice](@ProductID [int], @OrderDate [datetime])
+RETURNS [money]
+AS
+BEGIN
+    DECLARE @ListPrice money;
+
+    SELECT @ListPrice = plph.[ListPrice]
+    FROM [Production].[Product] p
+        INNER JOIN [Production].[ProductListPriceHistory] plph
+        ON p.[ProductID] = plph.[ProductID]
+            AND p.[ProductID] = @ProductID
+            AND @OrderDate BETWEEN plph.[StartDate] AND COALESCE(plph.[EndDate], CONVERT(datetime, '99991231', 112));
+
+    RETURN @ListPrice;
+END;"""
+
+
+def test_el_filtro_en_el_on_se_lee_y_la_razon_es_la_llave_del_historial():
+    unicas = {'production.product': [{'productid'}], 'production.productlistpricehistory': [{'productid', 'startdate'}]}
+    columnas = {'production.product': {'productid', 'listprice'},
+                'production.productlistpricehistory': {'productid', 'startdate', 'enddate', 'listprice'}}
+    h = patrones.asignacion_multifila(Modulo('dbo.ufngetproductlistprice', 'FUNCION', UFN_PRECIO), unicas, columnas)
+    assert [x['tablas_sin_fijar'] for x in h] == [['production.productlistpricehistory']]
+    assert 'sin WHERE' not in h[0]['detalle'] and 'productid, startdate' in h[0]['detalle']
+
+
+# ── detectores-v4: división entera ──────────────────────────────────────────────────────────────────────────
+
+TIPOS = {'dbo.orden_pago': {'id': 'int', 'operacion_id': 'int', 'estatus': 'varchar', 'fecha_envio': 'datetime',
+                            'monto': 'decimal'},
+         'dbo.operacion': {'id': 'int', 'fecha_operacion': 'smalldatetime', 'monto_mxn': 'decimal'},
+         'dbo.partida_solicitada': {'renglon': 'smallint', 'monto': 'decimal'}}
+
+TABLERO = """SELECT p.bic_corresponsal, COUNT(*) AS ordenes,
+       SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*) AS pct_conciliadas,
+       AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60 AS horas_promedio_envio
+FROM dbo.orden_pago p
+INNER JOIN dbo.operacion o ON o.id = p.operacion_id
+GROUP BY p.bic_corresponsal"""
+
+
+def _divisiones(texto: str) -> list[dict]:
+    return patrones.division_entera(_m(texto), TIPOS)
+
+
+def test_porcentaje_y_promedio_de_enteros_divididos_entre_enteros_se_detectan():
+    # forma de la siembra a ciegas, ronda 2: el porcentaje y las horas se truncan
+    h = _divisiones(TABLERO)
+    assert [(x['categoria'], x['linea']) for x in h] == [('division_entera', 2), ('division_entera', 3)]
+    assert 'avg(integer)' in h[1]['detalle'] and 'avg(integer)' not in h[0]['detalle']
+
+
+def test_division_entre_un_decimal_no_se_detecta():
+    # control dentro del legado: sp_conciliar divide los minutos entre 60.0
+    assert _divisiones('UPDATE o SET horas = DATEDIFF(minute, o.fecha_envio, DATEADD(hour, -1, l.ultima)) / 60.0 '
+                       'FROM dbo.orden_pago o JOIN x l ON l.id = o.id') == []
+    assert _divisiones('SELECT COUNT(*) * 1.0 / 3, p.monto / 2, CAST(COUNT(*) AS decimal(9, 2)) / 7 '
+                       'FROM dbo.orden_pago p GROUP BY p.monto') == []
+
+
+def test_enteros_que_vienen_de_columnas_variables_parametros_y_conversiones():
+    texto = """CREATE PROCEDURE dbo.p @dias int, @factor decimal(9, 2) AS
+    DECLARE @total bigint = 0, @x AS smallint;
+    SELECT s.renglon / 2, @dias / 7, @total / @x, CONVERT(int, s.monto) / 3, ISNULL(SUM(s.renglon), 0) / NULLIF(@x, 0)
+    FROM dbo.partida_solicitada s;
+    SELECT @factor / @dias, CAST(@dias AS int) / @factor"""
+    h = patrones.division_entera(_m(texto), TIPOS)
+    assert [x['expresion'] for x in h] == ['s.renglon / 2', '@dias / 7', '@total / @x', 'CONVERT(int, s.monto) / 3',
+                                         'ISNULL(SUM(s.renglon), 0) / NULLIF(@x, 0)']
+
+
+def test_lo_que_no_se_puede_tipar_no_se_reporta():
+    # columnas de una tabla derivada, funciones del usuario y columnas ambiguas: «no se sabe» no es entero
+    assert _divisiones('SELECT d.n / 2 FROM (SELECT COUNT(*) AS n FROM dbo.operacion) d') == []
+    assert _divisiones('SELECT dbo.f(id) / 2 FROM dbo.operacion') == []
+    assert _divisiones('SELECT id / 2 FROM dbo.operacion o JOIN dbo.orden_pago p ON p.operacion_id = o.id') == []

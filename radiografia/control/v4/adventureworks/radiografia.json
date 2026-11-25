@@ -1,0 +1,3964 @@
+{
+ "base": "AdventureWorks2022",
+ "generado_utc": "2026-11-25T04:16:05+00:00",
+ "respaldo": {},
+ "restauracion": [
+  {
+   "base": "AdventureWorks2022",
+   "restaurada_como": "AdventureWorks2022",
+   "archivo": "AdventureWorks2022.bak",
+   "sha256": "d17567adb1521f972e1dc183a7216cea869c4580b5d75632425bcadbaf82ce5e",
+   "sha256_ok": null,
+   "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
+   "segundos": 2.4
+  }
+ ],
+ "msdb": null,
+ "criterio_salida": {
+  "aplica": false
+ },
+ "corte": {
+  "tabla_principal": null,
+  "principal": null,
+  "tablas": [
+   {
+    "tabla": "dbo.awbuildversion",
+    "identidad": {
+     "columna": "SystemInformationID",
+     "max": 1,
+     "ident_current": 1
+    },
+    "fechas": {
+     "VersionDate": {
+      "min": "2023-01-23 13:08:53.190000",
+      "max": "2023-01-23 13:08:53.190000"
+     },
+     "ModifiedDate": {
+      "min": "2023-05-08 12:07:29.843000",
+      "max": "2023-05-08 12:07:29.843000"
+     }
+    }
+   },
+   {
+    "tabla": "dbo.databaselog",
+    "identidad": {
+     "columna": "DatabaseLogID",
+     "max": 1596,
+     "ident_current": 1596
+    },
+    "fechas": {
+     "PostTime": {
+      "min": "2023-05-08 12:07:29.253000",
+      "max": "2023-05-08 12:07:40.757000"
+     }
+    }
+   },
+   {
+    "tabla": "dbo.errorlog",
+    "identidad": {
+     "columna": "ErrorLogID",
+     "max": null,
+     "ident_current": 1
+    },
+    "fechas": {}
+   },
+   {
+    "tabla": "humanresources.department",
+    "identidad": {
+     "columna": "DepartmentID",
+     "max": 16,
+     "ident_current": 16
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "humanresources.employee",
+    "identidad": null,
+    "fechas": {
+     "BirthDate": {
+      "min": "1951-10-17",
+      "max": "1991-05-31"
+     },
+     "HireDate": {
+      "min": "2006-06-30",
+      "max": "2013-05-30"
+     },
+     "ModifiedDate": {
+      "min": "2014-06-30 00:00:00",
+      "max": "2014-12-26 09:17:08.637000"
+     }
+    }
+   },
+   {
+    "tabla": "humanresources.employeedepartmenthistory",
+    "identidad": null,
+    "fechas": {
+     "StartDate": {
+      "min": "2006-06-30",
+      "max": "2013-11-14"
+     },
+     "EndDate": {
+      "min": "2009-07-14",
+      "max": "2013-11-13"
+     },
+     "ModifiedDate": {
+      "min": "2006-06-29 00:00:00",
+      "max": "2013-11-13 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "humanresources.employeepayhistory",
+    "identidad": null,
+    "fechas": {
+     "RateChangeDate": {
+      "min": "2006-06-30 00:00:00",
+      "max": "2013-07-14 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2007-11-21 00:00:00",
+      "max": "2014-06-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "humanresources.jobcandidate",
+    "identidad": {
+     "columna": "JobCandidateID",
+     "max": 13,
+     "ident_current": 13
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2007-06-23 00:00:00",
+      "max": "2013-12-22 18:32:21.313000"
+     }
+    }
+   },
+   {
+    "tabla": "humanresources.shift",
+    "identidad": {
+     "columna": "ShiftID",
+     "max": 3,
+     "ident_current": 3
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "person.address",
+    "identidad": {
+     "columna": "AddressID",
+     "max": 32521,
+     "ident_current": 32521
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2006-06-23 00:00:00",
+      "max": "2014-06-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "person.addresstype",
+    "identidad": {
+     "columna": "AddressTypeID",
+     "max": 6,
+     "ident_current": 6
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "person.businessentity",
+    "identidad": {
+     "columna": "BusinessEntityID",
+     "max": 20777,
+     "ident_current": 20777
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2017-12-13 13:20:24.150000",
+      "max": "2017-12-13 13:47:22.467000"
+     }
+    }
+   },
+   {
+    "tabla": "person.businessentityaddress",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2011-04-25 00:00:00",
+      "max": "2014-09-12 11:15:06.967000"
+     }
+    }
+   },
+   {
+    "tabla": "person.businessentitycontact",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2011-04-25 00:00:00",
+      "max": "2017-12-13 13:22:01.850000"
+     }
+    }
+   },
+   {
+    "tabla": "person.contacttype",
+    "identidad": {
+     "columna": "ContactTypeID",
+     "max": 20,
+     "ident_current": 20
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "person.countryregion",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "person.emailaddress",
+    "identidad": {
+     "columna": "EmailAddressID",
+     "max": 19972,
+     "ident_current": 19972
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2006-06-23 00:00:00",
+      "max": "2015-04-15 16:33:33.123000"
+     }
+    }
+   },
+   {
+    "tabla": "person.password",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2006-06-23 00:00:00",
+      "max": "2015-04-15 16:33:33.123000"
+     }
+    }
+   },
+   {
+    "tabla": "person.person",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2006-06-23 00:00:00",
+      "max": "2015-04-15 16:33:33.123000"
+     }
+    }
+   },
+   {
+    "tabla": "person.personphone",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2006-06-23 00:00:00",
+      "max": "2015-04-15 16:33:33.123000"
+     }
+    }
+   },
+   {
+    "tabla": "person.phonenumbertype",
+    "identidad": {
+     "columna": "PhoneNumberTypeID",
+     "max": 3,
+     "ident_current": 3
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2017-12-13 13:19:22.273000",
+      "max": "2017-12-13 13:19:22.273000"
+     }
+    }
+   },
+   {
+    "tabla": "person.stateprovince",
+    "identidad": {
+     "columna": "StateProvinceID",
+     "max": 181,
+     "ident_current": 181
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2014-02-08 10:17:21.587000"
+     }
+    }
+   },
+   {
+    "tabla": "production.billofmaterials",
+    "identidad": {
+     "columna": "BillOfMaterialsID",
+     "max": 3482,
+     "ident_current": 3482
+    },
+    "fechas": {
+     "StartDate": {
+      "min": "2010-03-04 00:00:00",
+      "max": "2010-12-23 00:00:00"
+     },
+     "EndDate": {
+      "min": "2010-05-03 00:00:00",
+      "max": "2010-11-14 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2010-02-18 00:00:00",
+      "max": "2010-12-09 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.culture",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.document",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-03-31 00:00:00",
+      "max": "2017-12-13 13:58:04.037000"
+     }
+    }
+   },
+   {
+    "tabla": "production.illustration",
+    "identidad": {
+     "columna": "IllustrationID",
+     "max": 7,
+     "ident_current": 7
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2014-01-09 13:06:11.780000",
+      "max": "2014-01-09 13:06:12.080000"
+     }
+    }
+   },
+   {
+    "tabla": "production.location",
+    "identidad": {
+     "columna": "LocationID",
+     "max": 60,
+     "ident_current": 60
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.product",
+    "identidad": {
+     "columna": "ProductID",
+     "max": 999,
+     "ident_current": 999
+    },
+    "fechas": {
+     "SellStartDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2013-05-30 00:00:00"
+     },
+     "SellEndDate": {
+      "min": "2012-05-29 00:00:00",
+      "max": "2013-05-29 00:00:00"
+     },
+     "DiscontinuedDate": {
+      "min": null,
+      "max": null
+     },
+     "ModifiedDate": {
+      "min": "2014-02-08 10:01:36.827000",
+      "max": "2014-02-08 10:03:55.510000"
+     }
+    }
+   },
+   {
+    "tabla": "production.productcategory",
+    "identidad": {
+     "columna": "ProductCategoryID",
+     "max": 4,
+     "ident_current": 4
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productcosthistory",
+    "identidad": null,
+    "fechas": {
+     "StartDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2013-05-30 00:00:00"
+     },
+     "EndDate": {
+      "min": "2012-05-29 00:00:00",
+      "max": "2013-05-29 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2012-05-29 00:00:00",
+      "max": "2013-05-29 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productdescription",
+    "identidad": {
+     "columna": "ProductDescriptionID",
+     "max": 2010,
+     "ident_current": 2010
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2013-04-30 00:00:00",
+      "max": "2014-02-08 10:32:17.973000"
+     }
+    }
+   },
+   {
+    "tabla": "production.productdocument",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2013-12-29 13:51:58.103000",
+      "max": "2013-12-29 13:51:58.120000"
+     }
+    }
+   },
+   {
+    "tabla": "production.productinventory",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-03-31 00:00:00",
+      "max": "2014-08-12 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productlistpricehistory",
+    "identidad": null,
+    "fechas": {
+     "StartDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2013-05-30 00:00:00"
+     },
+     "EndDate": {
+      "min": "2012-05-29 00:00:00",
+      "max": "2013-05-29 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2012-05-29 00:00:00",
+      "max": "2013-05-29 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productmodel",
+    "identidad": {
+     "columna": "ProductModelID",
+     "max": 128,
+     "ident_current": 128
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-03-31 00:00:00",
+      "max": "2015-04-15 16:34:29.043000"
+     }
+    }
+   },
+   {
+    "tabla": "production.productmodelillustration",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2014-01-09 14:41:02.167000",
+      "max": "2014-01-09 14:41:02.200000"
+     }
+    }
+   },
+   {
+    "tabla": "production.productmodelproductdescriptionculture",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2013-04-30 00:00:00",
+      "max": "2013-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productphoto",
+    "identidad": {
+     "columna": "ProductPhotoID",
+     "max": 181,
+     "ident_current": 181
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-03-31 00:00:00",
+      "max": "2013-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productproductphoto",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-03-31 00:00:00",
+      "max": "2013-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productreview",
+    "identidad": {
+     "columna": "ProductReviewID",
+     "max": 4,
+     "ident_current": 4
+    },
+    "fechas": {
+     "ReviewDate": {
+      "min": "2013-09-18 00:00:00",
+      "max": "2013-11-15 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2013-09-18 00:00:00",
+      "max": "2013-11-15 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.productsubcategory",
+    "identidad": {
+     "columna": "ProductSubcategoryID",
+     "max": 37,
+     "ident_current": 37
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.scrapreason",
+    "identidad": {
+     "columna": "ScrapReasonID",
+     "max": 16,
+     "ident_current": 16
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.transactionhistory",
+    "identidad": {
+     "columna": "TransactionID",
+     "max": 213442,
+     "ident_current": 213442
+    },
+    "fechas": {
+     "TransactionDate": {
+      "min": "2013-07-31 00:00:00",
+      "max": "2014-08-03 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2013-07-31 00:00:00",
+      "max": "2014-08-03 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.transactionhistoryarchive",
+    "identidad": null,
+    "fechas": {
+     "TransactionDate": {
+      "min": "2011-04-16 00:00:00",
+      "max": "2013-07-30 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-04-16 00:00:00",
+      "max": "2013-07-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.unitmeasure",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.workorder",
+    "identidad": {
+     "columna": "WorkOrderID",
+     "max": 72591,
+     "ident_current": 72591
+    },
+    "fechas": {
+     "StartDate": {
+      "min": "2011-06-03 00:00:00",
+      "max": "2014-06-02 00:00:00"
+     },
+     "EndDate": {
+      "min": "2011-06-13 00:00:00",
+      "max": "2014-06-17 00:00:00"
+     },
+     "DueDate": {
+      "min": "2011-06-14 00:00:00",
+      "max": "2014-06-13 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-06-13 00:00:00",
+      "max": "2014-06-17 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "production.workorderrouting",
+    "identidad": null,
+    "fechas": {
+     "ScheduledStartDate": {
+      "min": "2011-06-03 00:00:00",
+      "max": "2014-06-02 00:00:00"
+     },
+     "ScheduledEndDate": {
+      "min": "2011-06-14 00:00:00",
+      "max": "2014-06-13 00:00:00"
+     },
+     "ActualStartDate": {
+      "min": "2011-06-03 00:00:00",
+      "max": "2014-06-17 00:00:00"
+     },
+     "ActualEndDate": {
+      "min": "2011-06-15 00:00:00",
+      "max": "2014-06-28 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-06-15 00:00:00",
+      "max": "2014-06-28 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.productvendor",
+    "identidad": null,
+    "fechas": {
+     "LastReceiptDate": {
+      "min": "2011-07-22 00:00:00",
+      "max": "2014-10-22 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-07-22 00:00:00",
+      "max": "2015-08-12 12:20:28.343000"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.purchaseorderdetail",
+    "identidad": {
+     "columna": "PurchaseOrderDetailID",
+     "max": 8845,
+     "ident_current": 8845
+    },
+    "fechas": {
+     "DueDate": {
+      "min": "2011-04-30 00:00:00",
+      "max": "2014-10-22 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-04-23 00:00:00",
+      "max": "2015-08-12 12:25:46.483000"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.purchaseorderheader",
+    "identidad": {
+     "columna": "PurchaseOrderID",
+     "max": 4012,
+     "ident_current": 4012
+    },
+    "fechas": {
+     "OrderDate": {
+      "min": "2011-04-16 00:00:00",
+      "max": "2014-09-22 00:00:00"
+     },
+     "ShipDate": {
+      "min": "2011-04-25 00:00:00",
+      "max": "2014-10-17 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-04-25 00:00:00",
+      "max": "2015-08-12 12:25:46.483000"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.shipmethod",
+    "identidad": {
+     "columna": "ShipMethodID",
+     "max": 5,
+     "ident_current": 5
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.vendor",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2011-04-25 00:00:00",
+      "max": "2012-02-18 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.countryregioncurrency",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2014-02-08 10:17:21.510000"
+     }
+    }
+   },
+   {
+    "tabla": "sales.creditcard",
+    "identidad": {
+     "columna": "CreditCardID",
+     "max": 19237,
+     "ident_current": 19237
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2006-06-23 00:00:00",
+      "max": "2014-06-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.currency",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.currencyrate",
+    "identidad": {
+     "columna": "CurrencyRateID",
+     "max": 13532,
+     "ident_current": 13532
+    },
+    "fechas": {
+     "CurrencyRateDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2014-05-31 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2014-05-31 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.customer",
+    "identidad": {
+     "columna": "CustomerID",
+     "max": 30118,
+     "ident_current": 30118
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2014-09-12 11:15:07.263000",
+      "max": "2014-09-12 11:15:07.263000"
+     }
+    }
+   },
+   {
+    "tabla": "sales.personcreditcard",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2014-06-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salesorderdetail",
+    "identidad": {
+     "columna": "SalesOrderDetailID",
+     "max": 121317,
+     "ident_current": 121317
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2014-06-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salesorderheader",
+    "identidad": {
+     "columna": "SalesOrderID",
+     "max": 75123,
+     "ident_current": 75123
+    },
+    "fechas": {
+     "OrderDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2014-06-30 00:00:00"
+     },
+     "DueDate": {
+      "min": "2011-06-12 00:00:00",
+      "max": "2014-07-12 00:00:00"
+     },
+     "ShipDate": {
+      "min": "2011-06-07 00:00:00",
+      "max": "2014-07-07 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-06-07 00:00:00",
+      "max": "2014-07-07 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salesorderheadersalesreason",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2014-06-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salesperson",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2010-12-28 00:00:00",
+      "max": "2013-05-23 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salespersonquotahistory",
+    "identidad": null,
+    "fechas": {
+     "QuotaDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2014-03-01 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-04-16 00:00:00",
+      "max": "2014-01-15 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salesreason",
+    "identidad": {
+     "columna": "SalesReasonID",
+     "max": 10,
+     "ident_current": 10
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salestaxrate",
+    "identidad": {
+     "columna": "SalesTaxRateID",
+     "max": 31,
+     "ident_current": 31
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salesterritory",
+    "identidad": {
+     "columna": "TerritoryID",
+     "max": 10,
+     "ident_current": 10
+    },
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2008-04-30 00:00:00",
+      "max": "2008-04-30 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.salesterritoryhistory",
+    "identidad": null,
+    "fechas": {
+     "StartDate": {
+      "min": "2011-05-31 00:00:00",
+      "max": "2013-05-30 00:00:00"
+     },
+     "EndDate": {
+      "min": "2012-05-29 00:00:00",
+      "max": "2012-11-29 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-05-24 00:00:00",
+      "max": "2013-05-23 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.shoppingcartitem",
+    "identidad": {
+     "columna": "ShoppingCartItemID",
+     "max": 5,
+     "ident_current": 5
+    },
+    "fechas": {
+     "DateCreated": {
+      "min": "2013-11-09 17:54:07.603000",
+      "max": "2013-11-09 17:54:07.603000"
+     },
+     "ModifiedDate": {
+      "min": "2013-11-09 17:54:07.603000",
+      "max": "2013-11-09 17:54:07.603000"
+     }
+    }
+   },
+   {
+    "tabla": "sales.specialoffer",
+    "identidad": {
+     "columna": "SpecialOfferID",
+     "max": 16,
+     "ident_current": 16
+    },
+    "fechas": {
+     "StartDate": {
+      "min": "2011-05-01 00:00:00",
+      "max": "2014-03-31 00:00:00"
+     },
+     "EndDate": {
+      "min": "2012-05-29 00:00:00",
+      "max": "2014-11-30 00:00:00"
+     },
+     "ModifiedDate": {
+      "min": "2011-04-01 00:00:00",
+      "max": "2014-03-01 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.specialofferproduct",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2011-04-01 00:00:00",
+      "max": "2014-03-01 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.store",
+    "identidad": null,
+    "fechas": {
+     "ModifiedDate": {
+      "min": "2014-09-12 11:15:07.497000",
+      "max": "2014-09-12 11:15:07.497000"
+     }
+    }
+   }
+  ]
+ },
+ "inventario": {
+  "tablas": [
+   {
+    "esquema": "dbo",
+    "tabla": "AWBuildVersion",
+    "filas": 1,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "DatabaseLog",
+    "filas": 1596,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "dbo",
+    "tabla": "ErrorLog",
+    "filas": 0,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "HumanResources",
+    "tabla": "Department",
+    "filas": 16,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "HumanResources",
+    "tabla": "Employee",
+    "filas": 290,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "HumanResources",
+    "tabla": "EmployeeDepartmentHistory",
+    "filas": 296,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "HumanResources",
+    "tabla": "EmployeePayHistory",
+    "filas": 316,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "HumanResources",
+    "tabla": "JobCandidate",
+    "filas": 13,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "HumanResources",
+    "tabla": "Shift",
+    "filas": 3,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "Address",
+    "filas": 19614,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "AddressType",
+    "filas": 6,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "BusinessEntity",
+    "filas": 20777,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "BusinessEntityAddress",
+    "filas": 19614,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "BusinessEntityContact",
+    "filas": 909,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "ContactType",
+    "filas": 20,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "CountryRegion",
+    "filas": 238,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "EmailAddress",
+    "filas": 19972,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "Password",
+    "filas": 19972,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "Person",
+    "filas": 19972,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "PersonPhone",
+    "filas": 19972,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "PhoneNumberType",
+    "filas": 3,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Person",
+    "tabla": "StateProvince",
+    "filas": 181,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "BillOfMaterials",
+    "filas": 2679,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "Culture",
+    "filas": 8,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "Document",
+    "filas": 13,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "Illustration",
+    "filas": 5,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "Location",
+    "filas": 14,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "Product",
+    "filas": 504,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductCategory",
+    "filas": 4,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductCostHistory",
+    "filas": 395,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductDescription",
+    "filas": 762,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductDocument",
+    "filas": 32,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductInventory",
+    "filas": 1069,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductListPriceHistory",
+    "filas": 395,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductModel",
+    "filas": 128,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductModelIllustration",
+    "filas": 7,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductModelProductDescriptionCulture",
+    "filas": 762,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductPhoto",
+    "filas": 101,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductProductPhoto",
+    "filas": 504,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductReview",
+    "filas": 4,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ProductSubcategory",
+    "filas": 37,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "ScrapReason",
+    "filas": 16,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "TransactionHistory",
+    "filas": 113443,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "TransactionHistoryArchive",
+    "filas": 89253,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "UnitMeasure",
+    "filas": 38,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "WorkOrder",
+    "filas": 72591,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Production",
+    "tabla": "WorkOrderRouting",
+    "filas": 67131,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "ProductVendor",
+    "filas": 460,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "PurchaseOrderDetail",
+    "filas": 8845,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "PurchaseOrderHeader",
+    "filas": 4012,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "ShipMethod",
+    "filas": 5,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "Vendor",
+    "filas": 104,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "CountryRegionCurrency",
+    "filas": 109,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "CreditCard",
+    "filas": 19118,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "Currency",
+    "filas": 105,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "CurrencyRate",
+    "filas": 13532,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "Customer",
+    "filas": 19820,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "PersonCreditCard",
+    "filas": 19118,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesOrderDetail",
+    "filas": 121317,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesOrderHeader",
+    "filas": 31465,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesOrderHeaderSalesReason",
+    "filas": 27647,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesPerson",
+    "filas": 17,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesPersonQuotaHistory",
+    "filas": 163,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesReason",
+    "filas": 10,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesTaxRate",
+    "filas": 29,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesTerritory",
+    "filas": 10,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SalesTerritoryHistory",
+    "filas": 17,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "ShoppingCartItem",
+    "filas": 3,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SpecialOffer",
+    "filas": 16,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SpecialOfferProduct",
+    "filas": 538,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "Store",
+    "filas": 701,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   }
+  ],
+  "columnas": 486,
+  "llaves_foraneas": [
+   {
+    "nombre": "FK_Employee_Person_BusinessEntityID",
+    "hija": "humanresources.employee",
+    "padre": "person.person"
+   },
+   {
+    "nombre": "FK_EmployeeDepartmentHistory_Department_DepartmentID",
+    "hija": "humanresources.employeedepartmenthistory",
+    "padre": "humanresources.department"
+   },
+   {
+    "nombre": "FK_EmployeeDepartmentHistory_Employee_BusinessEntityID",
+    "hija": "humanresources.employeedepartmenthistory",
+    "padre": "humanresources.employee"
+   },
+   {
+    "nombre": "FK_EmployeeDepartmentHistory_Shift_ShiftID",
+    "hija": "humanresources.employeedepartmenthistory",
+    "padre": "humanresources.shift"
+   },
+   {
+    "nombre": "FK_EmployeePayHistory_Employee_BusinessEntityID",
+    "hija": "humanresources.employeepayhistory",
+    "padre": "humanresources.employee"
+   },
+   {
+    "nombre": "FK_JobCandidate_Employee_BusinessEntityID",
+    "hija": "humanresources.jobcandidate",
+    "padre": "humanresources.employee"
+   },
+   {
+    "nombre": "FK_Address_StateProvince_StateProvinceID",
+    "hija": "person.address",
+    "padre": "person.stateprovince"
+   },
+   {
+    "nombre": "FK_BusinessEntityAddress_Address_AddressID",
+    "hija": "person.businessentityaddress",
+    "padre": "person.address"
+   },
+   {
+    "nombre": "FK_BusinessEntityAddress_AddressType_AddressTypeID",
+    "hija": "person.businessentityaddress",
+    "padre": "person.addresstype"
+   },
+   {
+    "nombre": "FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID",
+    "hija": "person.businessentityaddress",
+    "padre": "person.businessentity"
+   },
+   {
+    "nombre": "FK_BusinessEntityContact_BusinessEntity_BusinessEntityID",
+    "hija": "person.businessentitycontact",
+    "padre": "person.businessentity"
+   },
+   {
+    "nombre": "FK_BusinessEntityContact_ContactType_ContactTypeID",
+    "hija": "person.businessentitycontact",
+    "padre": "person.contacttype"
+   },
+   {
+    "nombre": "FK_BusinessEntityContact_Person_PersonID",
+    "hija": "person.businessentitycontact",
+    "padre": "person.person"
+   },
+   {
+    "nombre": "FK_EmailAddress_Person_BusinessEntityID",
+    "hija": "person.emailaddress",
+    "padre": "person.person"
+   },
+   {
+    "nombre": "FK_Password_Person_BusinessEntityID",
+    "hija": "person.password",
+    "padre": "person.person"
+   },
+   {
+    "nombre": "FK_Person_BusinessEntity_BusinessEntityID",
+    "hija": "person.person",
+    "padre": "person.businessentity"
+   },
+   {
+    "nombre": "FK_PersonPhone_Person_BusinessEntityID",
+    "hija": "person.personphone",
+    "padre": "person.person"
+   },
+   {
+    "nombre": "FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID",
+    "hija": "person.personphone",
+    "padre": "person.phonenumbertype"
+   },
+   {
+    "nombre": "FK_StateProvince_CountryRegion_CountryRegionCode",
+    "hija": "person.stateprovince",
+    "padre": "person.countryregion"
+   },
+   {
+    "nombre": "FK_StateProvince_SalesTerritory_TerritoryID",
+    "hija": "person.stateprovince",
+    "padre": "sales.salesterritory"
+   },
+   {
+    "nombre": "FK_BillOfMaterials_Product_ComponentID",
+    "hija": "production.billofmaterials",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_BillOfMaterials_Product_ProductAssemblyID",
+    "hija": "production.billofmaterials",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_BillOfMaterials_UnitMeasure_UnitMeasureCode",
+    "hija": "production.billofmaterials",
+    "padre": "production.unitmeasure"
+   },
+   {
+    "nombre": "FK_Document_Employee_Owner",
+    "hija": "production.document",
+    "padre": "humanresources.employee"
+   },
+   {
+    "nombre": "FK_Product_ProductModel_ProductModelID",
+    "hija": "production.product",
+    "padre": "production.productmodel"
+   },
+   {
+    "nombre": "FK_Product_ProductSubcategory_ProductSubcategoryID",
+    "hija": "production.product",
+    "padre": "production.productsubcategory"
+   },
+   {
+    "nombre": "FK_Product_UnitMeasure_SizeUnitMeasureCode",
+    "hija": "production.product",
+    "padre": "production.unitmeasure"
+   },
+   {
+    "nombre": "FK_Product_UnitMeasure_WeightUnitMeasureCode",
+    "hija": "production.product",
+    "padre": "production.unitmeasure"
+   },
+   {
+    "nombre": "FK_ProductCostHistory_Product_ProductID",
+    "hija": "production.productcosthistory",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_ProductDocument_Document_DocumentNode",
+    "hija": "production.productdocument",
+    "padre": "production.document"
+   },
+   {
+    "nombre": "FK_ProductDocument_Product_ProductID",
+    "hija": "production.productdocument",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_ProductInventory_Location_LocationID",
+    "hija": "production.productinventory",
+    "padre": "production.location"
+   },
+   {
+    "nombre": "FK_ProductInventory_Product_ProductID",
+    "hija": "production.productinventory",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_ProductListPriceHistory_Product_ProductID",
+    "hija": "production.productlistpricehistory",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_ProductModelIllustration_Illustration_IllustrationID",
+    "hija": "production.productmodelillustration",
+    "padre": "production.illustration"
+   },
+   {
+    "nombre": "FK_ProductModelIllustration_ProductModel_ProductModelID",
+    "hija": "production.productmodelillustration",
+    "padre": "production.productmodel"
+   },
+   {
+    "nombre": "FK_ProductModelProductDescriptionCulture_Culture_CultureID",
+    "hija": "production.productmodelproductdescriptionculture",
+    "padre": "production.culture"
+   },
+   {
+    "nombre": "FK_ProductModelProductDescriptionCulture_ProductDescription_ProductDescriptionID",
+    "hija": "production.productmodelproductdescriptionculture",
+    "padre": "production.productdescription"
+   },
+   {
+    "nombre": "FK_ProductModelProductDescriptionCulture_ProductModel_ProductModelID",
+    "hija": "production.productmodelproductdescriptionculture",
+    "padre": "production.productmodel"
+   },
+   {
+    "nombre": "FK_ProductProductPhoto_Product_ProductID",
+    "hija": "production.productproductphoto",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_ProductProductPhoto_ProductPhoto_ProductPhotoID",
+    "hija": "production.productproductphoto",
+    "padre": "production.productphoto"
+   },
+   {
+    "nombre": "FK_ProductReview_Product_ProductID",
+    "hija": "production.productreview",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_ProductSubcategory_ProductCategory_ProductCategoryID",
+    "hija": "production.productsubcategory",
+    "padre": "production.productcategory"
+   },
+   {
+    "nombre": "FK_TransactionHistory_Product_ProductID",
+    "hija": "production.transactionhistory",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_WorkOrder_Product_ProductID",
+    "hija": "production.workorder",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_WorkOrder_ScrapReason_ScrapReasonID",
+    "hija": "production.workorder",
+    "padre": "production.scrapreason"
+   },
+   {
+    "nombre": "FK_WorkOrderRouting_Location_LocationID",
+    "hija": "production.workorderrouting",
+    "padre": "production.location"
+   },
+   {
+    "nombre": "FK_WorkOrderRouting_WorkOrder_WorkOrderID",
+    "hija": "production.workorderrouting",
+    "padre": "production.workorder"
+   },
+   {
+    "nombre": "FK_ProductVendor_Product_ProductID",
+    "hija": "purchasing.productvendor",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_ProductVendor_UnitMeasure_UnitMeasureCode",
+    "hija": "purchasing.productvendor",
+    "padre": "production.unitmeasure"
+   },
+   {
+    "nombre": "FK_ProductVendor_Vendor_BusinessEntityID",
+    "hija": "purchasing.productvendor",
+    "padre": "purchasing.vendor"
+   },
+   {
+    "nombre": "FK_PurchaseOrderDetail_Product_ProductID",
+    "hija": "purchasing.purchaseorderdetail",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_PurchaseOrderDetail_PurchaseOrderHeader_PurchaseOrderID",
+    "hija": "purchasing.purchaseorderdetail",
+    "padre": "purchasing.purchaseorderheader"
+   },
+   {
+    "nombre": "FK_PurchaseOrderHeader_Employee_EmployeeID",
+    "hija": "purchasing.purchaseorderheader",
+    "padre": "humanresources.employee"
+   },
+   {
+    "nombre": "FK_PurchaseOrderHeader_ShipMethod_ShipMethodID",
+    "hija": "purchasing.purchaseorderheader",
+    "padre": "purchasing.shipmethod"
+   },
+   {
+    "nombre": "FK_PurchaseOrderHeader_Vendor_VendorID",
+    "hija": "purchasing.purchaseorderheader",
+    "padre": "purchasing.vendor"
+   },
+   {
+    "nombre": "FK_Vendor_BusinessEntity_BusinessEntityID",
+    "hija": "purchasing.vendor",
+    "padre": "person.businessentity"
+   },
+   {
+    "nombre": "FK_CountryRegionCurrency_CountryRegion_CountryRegionCode",
+    "hija": "sales.countryregioncurrency",
+    "padre": "person.countryregion"
+   },
+   {
+    "nombre": "FK_CountryRegionCurrency_Currency_CurrencyCode",
+    "hija": "sales.countryregioncurrency",
+    "padre": "sales.currency"
+   },
+   {
+    "nombre": "FK_CurrencyRate_Currency_FromCurrencyCode",
+    "hija": "sales.currencyrate",
+    "padre": "sales.currency"
+   },
+   {
+    "nombre": "FK_CurrencyRate_Currency_ToCurrencyCode",
+    "hija": "sales.currencyrate",
+    "padre": "sales.currency"
+   },
+   {
+    "nombre": "FK_Customer_Person_PersonID",
+    "hija": "sales.customer",
+    "padre": "person.person"
+   },
+   {
+    "nombre": "FK_Customer_SalesTerritory_TerritoryID",
+    "hija": "sales.customer",
+    "padre": "sales.salesterritory"
+   },
+   {
+    "nombre": "FK_Customer_Store_StoreID",
+    "hija": "sales.customer",
+    "padre": "sales.store"
+   },
+   {
+    "nombre": "FK_PersonCreditCard_CreditCard_CreditCardID",
+    "hija": "sales.personcreditcard",
+    "padre": "sales.creditcard"
+   },
+   {
+    "nombre": "FK_PersonCreditCard_Person_BusinessEntityID",
+    "hija": "sales.personcreditcard",
+    "padre": "person.person"
+   },
+   {
+    "nombre": "FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID",
+    "hija": "sales.salesorderdetail",
+    "padre": "sales.salesorderheader"
+   },
+   {
+    "nombre": "FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID",
+    "hija": "sales.salesorderdetail",
+    "padre": "sales.specialofferproduct"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_Address_BillToAddressID",
+    "hija": "sales.salesorderheader",
+    "padre": "person.address"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_Address_ShipToAddressID",
+    "hija": "sales.salesorderheader",
+    "padre": "person.address"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_CreditCard_CreditCardID",
+    "hija": "sales.salesorderheader",
+    "padre": "sales.creditcard"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_CurrencyRate_CurrencyRateID",
+    "hija": "sales.salesorderheader",
+    "padre": "sales.currencyrate"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_Customer_CustomerID",
+    "hija": "sales.salesorderheader",
+    "padre": "sales.customer"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_SalesPerson_SalesPersonID",
+    "hija": "sales.salesorderheader",
+    "padre": "sales.salesperson"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_SalesTerritory_TerritoryID",
+    "hija": "sales.salesorderheader",
+    "padre": "sales.salesterritory"
+   },
+   {
+    "nombre": "FK_SalesOrderHeader_ShipMethod_ShipMethodID",
+    "hija": "sales.salesorderheader",
+    "padre": "purchasing.shipmethod"
+   },
+   {
+    "nombre": "FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID",
+    "hija": "sales.salesorderheadersalesreason",
+    "padre": "sales.salesorderheader"
+   },
+   {
+    "nombre": "FK_SalesOrderHeaderSalesReason_SalesReason_SalesReasonID",
+    "hija": "sales.salesorderheadersalesreason",
+    "padre": "sales.salesreason"
+   },
+   {
+    "nombre": "FK_SalesPerson_Employee_BusinessEntityID",
+    "hija": "sales.salesperson",
+    "padre": "humanresources.employee"
+   },
+   {
+    "nombre": "FK_SalesPerson_SalesTerritory_TerritoryID",
+    "hija": "sales.salesperson",
+    "padre": "sales.salesterritory"
+   },
+   {
+    "nombre": "FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID",
+    "hija": "sales.salespersonquotahistory",
+    "padre": "sales.salesperson"
+   },
+   {
+    "nombre": "FK_SalesTaxRate_StateProvince_StateProvinceID",
+    "hija": "sales.salestaxrate",
+    "padre": "person.stateprovince"
+   },
+   {
+    "nombre": "FK_SalesTerritory_CountryRegion_CountryRegionCode",
+    "hija": "sales.salesterritory",
+    "padre": "person.countryregion"
+   },
+   {
+    "nombre": "FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID",
+    "hija": "sales.salesterritoryhistory",
+    "padre": "sales.salesperson"
+   },
+   {
+    "nombre": "FK_SalesTerritoryHistory_SalesTerritory_TerritoryID",
+    "hija": "sales.salesterritoryhistory",
+    "padre": "sales.salesterritory"
+   },
+   {
+    "nombre": "FK_ShoppingCartItem_Product_ProductID",
+    "hija": "sales.shoppingcartitem",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_SpecialOfferProduct_Product_ProductID",
+    "hija": "sales.specialofferproduct",
+    "padre": "production.product"
+   },
+   {
+    "nombre": "FK_SpecialOfferProduct_SpecialOffer_SpecialOfferID",
+    "hija": "sales.specialofferproduct",
+    "padre": "sales.specialoffer"
+   },
+   {
+    "nombre": "FK_Store_BusinessEntity_BusinessEntityID",
+    "hija": "sales.store",
+    "padre": "person.businessentity"
+   },
+   {
+    "nombre": "FK_Store_SalesPerson_SalesPersonID",
+    "hija": "sales.store",
+    "padre": "sales.salesperson"
+   }
+  ],
+  "modulos": [
+   {
+    "nombre": "dbo.ufngetaccountingenddate",
+    "tipo": "FUNCION",
+    "lineas": 8
+   },
+   {
+    "nombre": "dbo.ufngetaccountingstartdate",
+    "tipo": "FUNCION",
+    "lineas": 8
+   },
+   {
+    "nombre": "dbo.ufngetdocumentstatustext",
+    "tipo": "FUNCION",
+    "lineas": 19
+   },
+   {
+    "nombre": "dbo.ufngetproductdealerprice",
+    "tipo": "FUNCION",
+    "lineas": 23
+   },
+   {
+    "nombre": "dbo.ufngetproductlistprice",
+    "tipo": "FUNCION",
+    "lineas": 17
+   },
+   {
+    "nombre": "dbo.ufngetproductstandardcost",
+    "tipo": "FUNCION",
+    "lineas": 18
+   },
+   {
+    "nombre": "dbo.ufngetpurchaseorderstatustext",
+    "tipo": "FUNCION",
+    "lineas": 20
+   },
+   {
+    "nombre": "dbo.ufngetsalesorderstatustext",
+    "tipo": "FUNCION",
+    "lineas": 22
+   },
+   {
+    "nombre": "dbo.ufngetstock",
+    "tipo": "FUNCION",
+    "lineas": 19
+   },
+   {
+    "nombre": "dbo.ufnleadingzeros",
+    "tipo": "FUNCION",
+    "lineas": 16
+   },
+   {
+    "nombre": "dbo.uspgetbillofmaterials",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 38
+   },
+   {
+    "nombre": "dbo.uspgetemployeemanagers",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 35
+   },
+   {
+    "nombre": "dbo.uspgetmanageremployees",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 35
+   },
+   {
+    "nombre": "dbo.uspgetwhereusedproductid",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 36
+   },
+   {
+    "nombre": "dbo.usplogerror",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 62
+   },
+   {
+    "nombre": "dbo.uspprinterror",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 19
+   },
+   {
+    "nombre": "dbo.uspsearchcandidateresumes",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 57
+   },
+   {
+    "nombre": "humanresources.uspupdateemployeehireinfo",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 44
+   },
+   {
+    "nombre": "humanresources.uspupdateemployeelogin",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 27
+   },
+   {
+    "nombre": "humanresources.uspupdateemployeepersonalinfo",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 25
+   },
+   {
+    "nombre": "dbo.ufngetcontactinformation",
+    "tipo": "FUNCION",
+    "lineas": 71
+   },
+   {
+    "nombre": "humanresources.demployee",
+    "tipo": "TRIGGER",
+    "lineas": 26
+   },
+   {
+    "nombre": "person.iuperson",
+    "tipo": "TRIGGER",
+    "lineas": 36
+   },
+   {
+    "nombre": "production.iworkorder",
+    "tipo": "TRIGGER",
+    "lineas": 43
+   },
+   {
+    "nombre": "production.uworkorder",
+    "tipo": "TRIGGER",
+    "lineas": 44
+   },
+   {
+    "nombre": "purchasing.dvendor",
+    "tipo": "TRIGGER",
+    "lineas": 44
+   },
+   {
+    "nombre": "purchasing.ipurchaseorderdetail",
+    "tipo": "TRIGGER",
+    "lineas": 56
+   },
+   {
+    "nombre": "purchasing.upurchaseorderdetail",
+    "tipo": "TRIGGER",
+    "lineas": 68
+   },
+   {
+    "nombre": "purchasing.upurchaseorderheader",
+    "tipo": "TRIGGER",
+    "lineas": 37
+   },
+   {
+    "nombre": "sales.idusalesorderdetail",
+    "tipo": "TRIGGER",
+    "lineas": 85
+   },
+   {
+    "nombre": "sales.usalesorderheader",
+    "tipo": "TRIGGER",
+    "lineas": 70
+   },
+   {
+    "nombre": "humanresources.vemployee",
+    "tipo": "VISTA",
+    "lineas": 40
+   },
+   {
+    "nombre": "humanresources.vemployeedepartment",
+    "tipo": "VISTA",
+    "lineas": 23
+   },
+   {
+    "nombre": "humanresources.vemployeedepartmenthistory",
+    "tipo": "VISTA",
+    "lineas": 25
+   },
+   {
+    "nombre": "humanresources.vjobcandidate",
+    "tipo": "VISTA",
+    "lineas": 37
+   },
+   {
+    "nombre": "humanresources.vjobcandidateeducation",
+    "tipo": "VISTA",
+    "lineas": 33
+   },
+   {
+    "nombre": "humanresources.vjobcandidateemployment",
+    "tipo": "VISTA",
+    "lineas": 29
+   },
+   {
+    "nombre": "person.vadditionalcontactinfo",
+    "tipo": "VISTA",
+    "lineas": 49
+   },
+   {
+    "nombre": "person.vstateprovincecountryregion",
+    "tipo": "VISTA",
+    "lineas": 16
+   },
+   {
+    "nombre": "production.vproductanddescription",
+    "tipo": "VISTA",
+    "lineas": 19
+   },
+   {
+    "nombre": "production.vproductmodelcatalogdescription",
+    "tipo": "VISTA",
+    "lineas": 63
+   },
+   {
+    "nombre": "production.vproductmodelinstructions",
+    "tipo": "VISTA",
+    "lineas": 22
+   },
+   {
+    "nombre": "purchasing.vvendorwithaddresses",
+    "tipo": "VISTA",
+    "lineas": 24
+   },
+   {
+    "nombre": "purchasing.vvendorwithcontacts",
+    "tipo": "VISTA",
+    "lineas": 29
+   },
+   {
+    "nombre": "sales.vindividualcustomer",
+    "tipo": "VISTA",
+    "lineas": 43
+   },
+   {
+    "nombre": "sales.vpersondemographics",
+    "tipo": "VISTA",
+    "lineas": 34
+   },
+   {
+    "nombre": "sales.vsalesperson",
+    "tipo": "VISTA",
+    "lineas": 48
+   },
+   {
+    "nombre": "sales.vsalespersonsalesbyfiscalyears",
+    "tipo": "VISTA",
+    "lineas": 35
+   },
+   {
+    "nombre": "sales.vstorewithaddresses",
+    "tipo": "VISTA",
+    "lineas": 24
+   },
+   {
+    "nombre": "sales.vstorewithcontacts",
+    "tipo": "VISTA",
+    "lineas": 29
+   },
+   {
+    "nombre": "sales.vstorewithdemographics",
+    "tipo": "VISTA",
+    "lineas": 27
+   }
+  ],
+  "triggers": [
+   {
+    "trigger": "humanresources.demployee",
+    "tabla": "humanresources.employee",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "person.iuperson",
+    "tabla": "person.person",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "production.iworkorder",
+    "tabla": "production.workorder",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "production.uworkorder",
+    "tabla": "production.workorder",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "purchasing.dvendor",
+    "tabla": "purchasing.vendor",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "purchasing.ipurchaseorderdetail",
+    "tabla": "purchasing.purchaseorderdetail",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "purchasing.upurchaseorderdetail",
+    "tabla": "purchasing.purchaseorderdetail",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "purchasing.upurchaseorderheader",
+    "tabla": "purchasing.purchaseorderheader",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "sales.idusalesorderdetail",
+    "tabla": "sales.salesorderdetail",
+    "deshabilitado": false
+   },
+   {
+    "trigger": "sales.usalesorderheader",
+    "tabla": "sales.salesorderheader",
+    "deshabilitado": false
+   }
+  ],
+  "jobs": []
+ },
+ "hallazgos": [
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetaccountingenddate",
+   "tipo_objeto": "FUNCION",
+   "linea": 6,
+   "detalle": "número en duro -2 (1 vez/veces)",
+   "fragmento": "RETURN DATEADD(millisecond, -2, CONVERT(datetime, '20040701', 112));",
+   "clase": "número",
+   "valor": "-2",
+   "lineas": [
+    6
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetaccountingenddate",
+   "tipo_objeto": "FUNCION",
+   "linea": 6,
+   "detalle": "número en duro 112 (1 vez/veces)",
+   "fragmento": "RETURN DATEADD(millisecond, -2, CONVERT(datetime, '20040701', 112));",
+   "clase": "número",
+   "valor": "112",
+   "lineas": [
+    6
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetaccountingstartdate",
+   "tipo_objeto": "FUNCION",
+   "linea": 6,
+   "detalle": "número en duro 112 (1 vez/veces)",
+   "fragmento": "RETURN CONVERT(datetime, '20030701', 112);",
+   "clase": "número",
+   "valor": "112",
+   "lineas": [
+    6
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetdocumentstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 12,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "WHEN 2 THEN N'Approved'",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetdocumentstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 13,
+   "detalle": "número en duro 3 (1 vez/veces)",
+   "fragmento": "WHEN 3 THEN N'Obsolete'",
+   "clase": "número",
+   "valor": "3",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.ufngetproductdealerprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 14,
+   "detalle": "asigna @DealerPrice sin TOP ni agregado desde un conjunto que puede traer varias filas: production.productlistpricehistory (plph) entra por un INNER JOIN que iguala productid, sin cubrir ninguna llave única suya (productid, startdate). La variable se queda con la última fila que entregue el plan",
+   "fragmento": "SELECT @DealerPrice = plph.[ListPrice] * @DealerDiscount",
+   "asigna_variable": true,
+   "forma": "asignacion_multifila",
+   "tablas_sin_fijar": [
+    "production.productlistpricehistory"
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "dbo.ufngetproductdealerprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 16,
+   "detalle": "INNER JOIN de production.product a su tabla hija production.productlistpricehistory: descarta los registros de production.product sin production.productlistpricehistory",
+   "fragmento": "INNER JOIN [Production].[ProductListPriceHistory] plph",
+   "padre": "production.product",
+   "hija": "production.productlistpricehistory"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetproductdealerprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 12,
+   "detalle": "número en duro 0.60 (1 vez/veces)",
+   "fragmento": "SET @DealerDiscount = 0.60  -- 60% of list price",
+   "clase": "número",
+   "valor": "0.60",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetproductdealerprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 19,
+   "detalle": "número en duro 112 (1 vez/veces)",
+   "fragmento": "AND @OrderDate BETWEEN plph.[StartDate] AND COALESCE(plph.[EndDate], CONVERT(datetime, '99991231', 112)); -- Make sure we get all the prices!",
+   "clase": "número",
+   "valor": "112",
+   "lineas": [
+    19
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.ufngetproductlistprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 8,
+   "detalle": "asigna @ListPrice sin TOP ni agregado desde un conjunto que puede traer varias filas: production.productlistpricehistory (plph) entra por un INNER JOIN que iguala productid, sin cubrir ninguna llave única suya (productid, startdate). La variable se queda con la última fila que entregue el plan",
+   "fragmento": "SELECT @ListPrice = plph.[ListPrice]",
+   "asigna_variable": true,
+   "forma": "asignacion_multifila",
+   "tablas_sin_fijar": [
+    "production.productlistpricehistory"
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "dbo.ufngetproductlistprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 10,
+   "detalle": "INNER JOIN de production.product a su tabla hija production.productlistpricehistory: descarta los registros de production.product sin production.productlistpricehistory",
+   "fragmento": "INNER JOIN [Production].[ProductListPriceHistory] plph",
+   "padre": "production.product",
+   "hija": "production.productlistpricehistory"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetproductlistprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 13,
+   "detalle": "número en duro 112 (1 vez/veces)",
+   "fragmento": "AND @OrderDate BETWEEN plph.[StartDate] AND COALESCE(plph.[EndDate], CONVERT(datetime, '99991231', 112)); -- Make sure we get all the prices!",
+   "clase": "número",
+   "valor": "112",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.ufngetproductstandardcost",
+   "tipo_objeto": "FUNCION",
+   "linea": 9,
+   "detalle": "asigna @StandardCost sin TOP ni agregado desde un conjunto que puede traer varias filas: production.productcosthistory (pch) entra por un INNER JOIN que iguala productid, sin cubrir ninguna llave única suya (productid, startdate). La variable se queda con la última fila que entregue el plan",
+   "fragmento": "SELECT @StandardCost = pch.[StandardCost]",
+   "asigna_variable": true,
+   "forma": "asignacion_multifila",
+   "tablas_sin_fijar": [
+    "production.productcosthistory"
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "dbo.ufngetproductstandardcost",
+   "tipo_objeto": "FUNCION",
+   "linea": 11,
+   "detalle": "INNER JOIN de production.product a su tabla hija production.productcosthistory: descarta los registros de production.product sin production.productcosthistory",
+   "fragmento": "INNER JOIN [Production].[ProductCostHistory] pch",
+   "padre": "production.product",
+   "hija": "production.productcosthistory"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetproductstandardcost",
+   "tipo_objeto": "FUNCION",
+   "linea": 14,
+   "detalle": "número en duro 112 (1 vez/veces)",
+   "fragmento": "AND @OrderDate BETWEEN pch.[StartDate] AND COALESCE(pch.[EndDate], CONVERT(datetime, '99991231', 112)); -- Make sure we get all the prices!",
+   "clase": "número",
+   "valor": "112",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetpurchaseorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 12,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "WHEN 2 THEN 'Approved'",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetpurchaseorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 13,
+   "detalle": "número en duro 3 (1 vez/veces)",
+   "fragmento": "WHEN 3 THEN 'Rejected'",
+   "clase": "número",
+   "valor": "3",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetpurchaseorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 14,
+   "detalle": "número en duro 4 (1 vez/veces)",
+   "fragmento": "WHEN 4 THEN 'Complete'",
+   "clase": "número",
+   "valor": "4",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetsalesorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 12,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "WHEN 2 THEN 'Approved'",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetsalesorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 13,
+   "detalle": "número en duro 3 (1 vez/veces)",
+   "fragmento": "WHEN 3 THEN 'Backordered'",
+   "clase": "número",
+   "valor": "3",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetsalesorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 14,
+   "detalle": "número en duro 4 (1 vez/veces)",
+   "fragmento": "WHEN 4 THEN 'Rejected'",
+   "clase": "número",
+   "valor": "4",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetsalesorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 15,
+   "detalle": "número en duro 5 (1 vez/veces)",
+   "fragmento": "WHEN 5 THEN 'Shipped'",
+   "clase": "número",
+   "valor": "5",
+   "lineas": [
+    15
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetsalesorderstatustext",
+   "tipo_objeto": "FUNCION",
+   "linea": 16,
+   "detalle": "número en duro 6 (1 vez/veces)",
+   "fragmento": "WHEN 6 THEN 'Cancelled'",
+   "clase": "número",
+   "valor": "6",
+   "lineas": [
+    16
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufngetstock",
+   "tipo_objeto": "FUNCION",
+   "linea": 12,
+   "detalle": "código en duro '6' (1 vez/veces)",
+   "fragmento": "AND p.[LocationID] = '6'; -- Only look at inventory in the misc storage",
+   "clase": "código",
+   "valor": "'6'",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.ufnleadingzeros",
+   "tipo_objeto": "FUNCION",
+   "linea": 12,
+   "detalle": "número en duro 8 (1 vez/veces)",
+   "fragmento": "SET @ReturnValue = REPLICATE('0', 8 - DATALENGTH(@ReturnValue)) + @ReturnValue;",
+   "clase": "número",
+   "valor": "8",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.uspgetbillofmaterials",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 36,
+   "detalle": "número en duro 25 (1 vez/veces)",
+   "fragmento": "OPTION (MAXRECURSION 25)",
+   "clase": "número",
+   "valor": "25",
+   "lineas": [
+    36
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.uspgetemployeemanagers",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 33,
+   "detalle": "número en duro 25 (1 vez/veces)",
+   "fragmento": "OPTION (MAXRECURSION 25)",
+   "clase": "número",
+   "valor": "25",
+   "lineas": [
+    33
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.uspgetmanageremployees",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 33,
+   "detalle": "número en duro 25 (1 vez/veces)",
+   "fragmento": "OPTION (MAXRECURSION 25)",
+   "clase": "número",
+   "valor": "25",
+   "lineas": [
+    33
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.uspgetwhereusedproductid",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 34,
+   "detalle": "número en duro 25 (1 vez/veces)",
+   "fragmento": "OPTION (MAXRECURSION 25)",
+   "clase": "número",
+   "valor": "25",
+   "lineas": [
+    34
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "dbo.ufngetcontactinformation",
+   "tipo_objeto": "FUNCION",
+   "linea": 58,
+   "detalle": "INNER JOIN de person.person a su tabla hija sales.customer: descarta los registros de person.person sin sales.customer",
+   "fragmento": "INNER JOIN [Sales].[Customer] AS c",
+   "padre": "person.person",
+   "hija": "sales.customer"
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "dbo.ufngetcontactinformation",
+   "tipo_objeto": "FUNCION",
+   "linea": 64,
+   "detalle": "INNER JOIN de person.person a su tabla hija sales.customer: descarta los registros de person.person sin sales.customer",
+   "fragmento": "INNER JOIN [Sales].[Customer] AS c",
+   "padre": "person.person",
+   "hija": "sales.customer"
+  },
+  {
+   "categoria": "if_exists_sin_else",
+   "objeto": "dbo.ufngetcontactinformation",
+   "tipo_objeto": "FUNCION",
+   "linea": 18,
+   "detalle": "IF EXISTS sin ELSE que escribe datos: cuando la condición no se cumple no pasa nada y nadie se entera (camino silencioso)",
+   "fragmento": "IF EXISTS(SELECT * FROM [HumanResources].[Employee] e",
+   "cuerpo": "DML"
+  },
+  {
+   "categoria": "if_exists_sin_else",
+   "objeto": "dbo.ufngetcontactinformation",
+   "tipo_objeto": "FUNCION",
+   "linea": 27,
+   "detalle": "IF EXISTS sin ELSE que escribe datos: cuando la condición no se cumple no pasa nada y nadie se entera (camino silencioso)",
+   "fragmento": "IF EXISTS(SELECT * FROM [Purchasing].[Vendor] AS v",
+   "cuerpo": "DML"
+  },
+  {
+   "categoria": "if_exists_sin_else",
+   "objeto": "dbo.ufngetcontactinformation",
+   "tipo_objeto": "FUNCION",
+   "linea": 42,
+   "detalle": "IF EXISTS sin ELSE que escribe datos: cuando la condición no se cumple no pasa nada y nadie se entera (camino silencioso)",
+   "fragmento": "IF EXISTS(SELECT * FROM [Sales].[Store] AS s",
+   "cuerpo": "DML"
+  },
+  {
+   "categoria": "if_exists_sin_else",
+   "objeto": "dbo.ufngetcontactinformation",
+   "tipo_objeto": "FUNCION",
+   "linea": 57,
+   "detalle": "IF EXISTS sin ELSE que escribe datos: cuando la condición no se cumple no pasa nada y nadie se entera (camino silencioso)",
+   "fragmento": "IF EXISTS(SELECT * FROM [Person].[Person] AS p",
+   "cuerpo": "DML"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "person.iuperson",
+   "tipo_objeto": "TRIGGER",
+   "linea": 16,
+   "detalle": "código en duro N'<IndividualSurvey xmlns=\"http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/IndividualSurvey\"> \r\n            <TotalPurchaseYTD>0.00</TotalPurchaseYTD> \r\n            </IndividualSurvey>' (1 vez/veces)",
+   "fragmento": "SET [Person].[Person].[Demographics] = N'<IndividualSurvey xmlns=\"http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/IndividualSurvey\">",
+   "clase": "código",
+   "valor": "N'<IndividualSurvey xmlns=\"http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/IndividualSurvey\"> \r\n            <TotalPurchaseYTD>0.00</TotalPurchaseYTD> \r\n            </IndividualSurvey>'",
+   "lineas": [
+    16
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "sales.usalesorderheader",
+   "tipo_objeto": "TRIGGER",
+   "linea": 38,
+   "detalle": "número en duro 5 (2 vez/veces)",
+   "fragmento": "AND ([Sales].[SalesOrderHeader].[Status] = 5) -- Shipped",
+   "clase": "número",
+   "valor": "5",
+   "lineas": [
+    38,
+    50
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "humanresources.vemployeedepartment",
+   "tipo_objeto": "VISTA",
+   "linea": 18,
+   "detalle": "INNER JOIN de humanresources.employee a su tabla hija humanresources.employeedepartmenthistory: descarta los registros de humanresources.employee sin humanresources.employeedepartmenthistory",
+   "fragmento": "INNER JOIN [HumanResources].[EmployeeDepartmentHistory] edh",
+   "padre": "humanresources.employee",
+   "hija": "humanresources.employeedepartmenthistory"
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "humanresources.vemployeedepartmenthistory",
+   "tipo_objeto": "VISTA",
+   "linea": 19,
+   "detalle": "INNER JOIN de humanresources.employee a su tabla hija humanresources.employeedepartmenthistory: descarta los registros de humanresources.employee sin humanresources.employeedepartmenthistory",
+   "fragmento": "INNER JOIN [HumanResources].[EmployeeDepartmentHistory] edh",
+   "padre": "humanresources.employee",
+   "hija": "humanresources.employeedepartmenthistory"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "humanresources.vjobcandidateeducation",
+   "tipo_objeto": "VISTA",
+   "linea": 9,
+   "detalle": "número en duro 101 (2 vez/veces)",
+   "fragmento": "(Edu.StartDate)[1]', 'nvarchar(20)') ,'Z', ''), 101) AS [Edu.StartDate]",
+   "clase": "número",
+   "valor": "101",
+   "lineas": [
+    9,
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "humanresources.vjobcandidateemployment",
+   "tipo_objeto": "VISTA",
+   "linea": 7,
+   "detalle": "número en duro 101 (2 vez/veces)",
+   "fragmento": "(Emp.StartDate)[1]', 'nvarchar(20)') ,'Z', ''), 101) AS [Emp.StartDate]",
+   "clase": "número",
+   "valor": "101",
+   "lineas": [
+    7,
+    9
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "production.vproductanddescription",
+   "tipo_objeto": "VISTA",
+   "linea": 15,
+   "detalle": "INNER JOIN de production.productmodel a su tabla hija production.productmodelproductdescriptionculture: descarta los registros de production.productmodel sin production.productmodelproductdescriptionculture",
+   "fragmento": "INNER JOIN [Production].[ProductModelProductDescriptionCulture] pmx",
+   "padre": "production.productmodel",
+   "hija": "production.productmodelproductdescriptionculture"
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "sales.vindividualcustomer",
+   "tipo_objeto": "VISTA",
+   "linea": 34,
+   "detalle": "INNER JOIN de person.person a su tabla hija sales.customer: descarta los registros de person.person sin sales.customer",
+   "fragmento": "INNER JOIN [Sales].[Customer] c",
+   "padre": "person.person",
+   "hija": "sales.customer"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "sales.vpersondemographics",
+   "tipo_objeto": "VISTA",
+   "linea": 9,
+   "detalle": "número en duro 101 (2 vez/veces)",
+   "fragmento": "DateFirstPurchase[1]', 'nvarchar(20)') ,'Z', ''), 101) AS [DateFirstPurchase]",
+   "clase": "número",
+   "valor": "101",
+   "lineas": [
+    9,
+    11
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "sales.vsalespersonsalesbyfiscalyears",
+   "tipo_objeto": "VISTA",
+   "linea": 20,
+   "detalle": "INNER JOIN de sales.salesperson a su tabla hija sales.salesorderheader: descarta los registros de sales.salesperson sin sales.salesorderheader",
+   "fragmento": "INNER JOIN [Sales].[SalesOrderHeader] soh",
+   "padre": "sales.salesperson",
+   "hija": "sales.salesorderheader"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "sales.vsalespersonsalesbyfiscalyears",
+   "tipo_objeto": "VISTA",
+   "linea": 18,
+   "detalle": "número en duro 6 (1 vez/veces)",
+   "fragmento": ",YEAR(DATEADD(m, 6, soh.[OrderDate])) AS [FiscalYear]",
+   "clase": "número",
+   "valor": "6",
+   "lineas": [
+    18
+   ]
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "dbo.awbuildversion",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "dbo.databaselog",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "dbo.errorlog",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.nationalidnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.loginid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.organizationlevel",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.hiredate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.salariedflag",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.vacationhours",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.sickleavehours",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.employee.currentflag",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "humanresources.employeepayhistory",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.shift.starttime",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "humanresources.shift.endtime",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "person.address.spatiallocation",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "person.businessentity",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "person.emailaddress.emailaddressid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "person.password",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "person.person.persontype",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "person.person.namestyle",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.billofmaterials.billofmaterialsid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.billofmaterials.unitmeasurecode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.culture",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.document",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.illustration",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.location",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.productnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.makeflag",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.finishedgoodsflag",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.safetystocklevel",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.reorderpoint",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.size",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.sizeunitmeasurecode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.weightunitmeasurecode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.weight",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.daystomanufacture",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.class",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.productsubcategoryid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.sellstartdate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.sellenddate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.product.discontinueddate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.productcategory",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.productdocument",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.productinventory.shelf",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "production.productinventory.bin",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.productmodelillustration",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.productphoto",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.productproductphoto",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.productreview",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.productsubcategory",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.scrapreason",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.transactionhistory",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.transactionhistoryarchive",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.unitmeasure",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.workorder",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "production.workorderrouting",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "purchasing.productvendor",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderdetail.duedate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderdetail.receivedqty",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderdetail.rejectedqty",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderdetail.stockedqty",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderheader.employeeid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderheader.vendorid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderheader.shipmethodid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderheader.shipdate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderheader.taxamt",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderheader.freight",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderheader.totaldue",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "purchasing.shipmethod",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.vendor.accountnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.vendor.creditrating",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.vendor.preferredvendorstatus",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.vendor.activeflag",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.vendor.purchasingwebserviceurl",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.countryregioncurrency",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.creditcard",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.currency",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.currencyrate",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customer.accountnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.personcreditcard",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderdetail.carriertrackingnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderdetail.specialofferid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.duedate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.shipdate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.onlineorderflag",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.salesordernumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.purchaseordernumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.accountnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.billtoaddressid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.shiptoaddressid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.shipmethodid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.creditcardid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.creditcardapprovalcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.currencyrateid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.taxamt",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.freight",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.totaldue",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesorderheader.comment",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.salesorderheadersalesreason",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesperson.bonus",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesperson.commissionpct",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.salespersonquotahistory",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.salesreason",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.salestaxrate",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesterritory.costytd",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.salesterritory.costlastyear",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.salesterritoryhistory",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.shoppingcartitem",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.specialoffer",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "sales.specialofferproduct",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "person.person.emailpromotion",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "11,158 filas (55.9%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 2); la columna no usa NULL",
+   "valor": "0",
+   "filas": 11158,
+   "total": 19972,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.billofmaterials.bomlevel",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "103 filas (3.8%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 4); la columna no usa NULL",
+   "valor": "0",
+   "filas": 103,
+   "total": 2679,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.product.standardcost",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "200 filas (39.7%) con Decimal('0.0000'): 0.0000 queda fuera del rango del resto de la columna (0.8565 … 2171.2942); la columna no usa NULL",
+   "valor": "0.0000",
+   "filas": 200,
+   "total": 504,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.product.listprice",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "200 filas (39.7%) con Decimal('0.0000'): 0.0000 queda fuera del rango del resto de la columna (2.2900 … 3578.2700); la columna no usa NULL",
+   "valor": "0.0000",
+   "filas": 200,
+   "total": 504,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.product.daystomanufacture",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "246 filas (48.8%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 4); la columna no usa NULL",
+   "valor": "0",
+   "filas": 246,
+   "total": 504,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.productinventory.shelf",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "290 filas (27.1%) con 'N/A': valor de relleno típico ('N/A'); la columna no usa NULL",
+   "valor": "N/A",
+   "filas": 290,
+   "total": 1069,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.productinventory.bin",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "328 filas (30.7%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 61); la columna no usa NULL",
+   "valor": "0",
+   "filas": 328,
+   "total": 1069,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.transactionhistory.referenceorderlineid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "31,002 filas (27.3%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 71); la columna no usa NULL",
+   "valor": "0",
+   "filas": 31002,
+   "total": 113443,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.transactionhistory.actualcost",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "31,002 filas (27.3%) con Decimal('0.0000'): 0.0000 queda fuera del rango del resto de la columna (0.2100 … 2443.3500); la columna no usa NULL",
+   "valor": "0.0000",
+   "filas": 31002,
+   "total": 113443,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.transactionhistoryarchive.referenceorderlineid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "41,589 filas (46.6%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 72); la columna no usa NULL",
+   "valor": "0",
+   "filas": 41589,
+   "total": 89253,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.transactionhistoryarchive.actualcost",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "41,589 filas (46.6%) con Decimal('0.0000'): 0.0000 queda fuera del rango del resto de la columna (0.2100 … 3578.2700); la columna no usa NULL",
+   "valor": "0.0000",
+   "filas": 41589,
+   "total": 89253,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "production.workorder.scrappedqty",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "71,862 filas (99.0%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 673); la columna no usa NULL",
+   "valor": "0",
+   "filas": 71862,
+   "total": 72591,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "purchasing.purchaseorderdetail.rejectedqty",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "8,282 filas (93.6%) con Decimal('0.00'): 0.00 queda fuera del rango del resto de la columna (1.00 … 1250.00); la columna no usa NULL",
+   "valor": "0.00",
+   "filas": 8282,
+   "total": 8845,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "sales.salesorderdetail.unitpricediscount",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "118,035 filas (97.3%) con Decimal('0.0000'): 0.0000 queda fuera del rango del resto de la columna (0.0200 … 0.4000); la columna no usa NULL",
+   "valor": "0.0000",
+   "filas": 118035,
+   "total": 121317,
+   "usa_null": false
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "person.address.addressline1",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "6,047 filas repiten un valor (13,567 distintos en 19,614); las filas repetidas comparten el 20% de sus columnas (dos filas cualesquiera, el 45%); en 28 de 40 grupos la fila de id mayor es la de ModifiedDate más reciente",
+   "similitud": 0.196,
+   "similitud_base": 0.449,
+   "repetidas": 6047
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "person.address.addressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "167 filas repiten un valor (195 distintos en 362); las filas repetidas comparten el 9% de sus columnas (dos filas cualesquiera, el 45%); en 20 de 40 grupos la fila de id mayor es la de ModifiedDate más reciente",
+   "similitud": 0.086,
+   "similitud_base": 0.449,
+   "repetidas": 167
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "production.productdescription.description",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "29 filas repiten un valor (733 distintos en 762); las filas repetidas comparten el 50% de sus columnas (dos filas cualesquiera, el 24%); en 29 de 29 grupos la fila de id mayor es la de ModifiedDate más reciente",
+   "similitud": 0.5,
+   "similitud_base": 0.243,
+   "repetidas": 29
+  }
+ ],
+ "resumen": {
+  "literal_magico": 29,
+  "top_sin_order_by": 3,
+  "inner_join_hija": 10,
+  "if_exists_sin_else": 4,
+  "tabla_sin_lectura": 38,
+  "columna_sin_lectura": 72,
+  "centinela": 14,
+  "llave_candidata_con_duplicados": 3
+ },
+ "tiempos": {
+  "arranque_contenedor": 6.3,
+  "restauracion": 4.1,
+  "inventario": 2.1,
+  "patrones_codigo": 0.1,
+  "patrones_datos": 12.8,
+  "total": 25.8
+ }
+}

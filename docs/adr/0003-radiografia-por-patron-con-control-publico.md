@@ -37,8 +37,11 @@ legado que nadie documentó.
   sha256 de su catálogo. El procedimiento está en el README.
   - La ronda 1 dio **0 de 3** con `detectores-v2` (`radiografia/CONTROL_CIEGO.md`): los detectores acertaban en
     precisión pero no generalizaban más allá de la forma literal.
-  - `detectores-v3` agrega los 3 arreglos genéricos que propuso quien sembró y queda congelado en espera de la
-    ronda 2. Detectar ahora las 3 trampas de la ronda 1 no cuenta como control.
+  - `detectores-v3` agregó los 3 arreglos genéricos que propuso quien sembró. La ronda 2 le dio **0 de 3**
+    (`radiografia/CONTROL_CIEGO_2.md`): dos trampas cayeron en límites que la v3 ya había documentado (vistas y el
+    `JOIN … ON`) y una en una clase nueva (división entera). Documentar un límite no lo cubre.
+  - `detectores-v4` agrega los 3 arreglos genéricos de la ronda 2 y queda congelado en espera de la ronda 3.
+    Detectar ahora las 6 trampas de las rondas 1 y 2 no cuenta como control.
 - **Control:** la misma radiografía, sin cambios, corre sobre WideWorldImporters (respaldo oficial, sha256 fijado),
   y `radiografia/CONTROL.md` publica todo lo que encuentra ahí, falsos positivos incluidos. Un arreglo a un detector
   sólo se acepta si es genérico, tiene su prueba de regresión y no baja la detección en el legado. La versión 1 de

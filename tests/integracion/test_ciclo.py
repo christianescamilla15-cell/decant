@@ -209,8 +209,10 @@ def test_los_espacios_finales_se_cuentan_en_el_motor_y_la_radiografia_los_ve_con
     assert ventana['desde'].startswith('2022-07') and ventana['hasta'].startswith('2023-01')
 
 
-def test_la_medicion_separa_el_catalogo_propio_del_ciego_ya_conocido():
+def test_la_medicion_separa_el_catalogo_propio_de_los_ciegos_ya_conocidos():
     catalogos = {c['archivo']: c for c in _json(INFORME / 'medicion.json')['catalogos']}
     assert catalogos['legado/TRAMPAS.md']['detectadas'] >= 8 and catalogos['legado/TRAMPAS.md']['nota'] is None
-    ciego = catalogos['legado/TRAMPAS_CIEGAS.md']
-    assert ciego['detectadas'] == 3 and 'NO cuenta como control' in ciego['nota']
+    # las dos rondas a ciegas ya se revelaron: cada una se mide aparte y marcada como NO control
+    for archivo in ('legado/TRAMPAS_CIEGAS.md', 'legado/TRAMPAS_CIEGAS_2.md'):
+        ciego = catalogos[archivo]
+        assert ciego['detectadas'] == 3 and 'NO cuenta como control' in ciego['nota'], archivo

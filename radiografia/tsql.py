@@ -112,6 +112,45 @@ def apertura(fs: list[Ficha], i: int) -> int | None:
     return None
 
 
+def abre_de(fs: list[Ficha], j: int) -> int | None:
+    """Índice del '(' que abre el ')' en la posición j."""
+    objetivo = fs[j].nivel - 1
+    for k in range(j - 1, -1, -1):
+        if fs[k].tipo == 'op' and fs[k].texto == '(' and fs[k].nivel == objetivo:
+            return k
+    return None
+
+
+def fin_de_caso(fs: list[Ficha], i: int) -> int:
+    """Índice del END que cierra el CASE en la posición i (o el último índice si no cierra)."""
+    nivel, abiertos = fs[i].nivel, 0
+    for k in range(i, len(fs)):
+        if fs[k].nivel != nivel:
+            continue
+        if fs[k].es('CASE'):
+            abiertos += 1
+        elif fs[k].es('END') and fs[k].en_caso:
+            abiertos -= 1
+            if abiertos == 0:
+                return k
+    return len(fs) - 1
+
+
+def inicio_de_caso(fs: list[Ficha], j: int) -> int | None:
+    """Índice del CASE que abre el END en la posición j."""
+    nivel, abiertos = fs[j].nivel, 0
+    for k in range(j, -1, -1):
+        if fs[k].nivel != nivel:
+            continue
+        if fs[k].es('END') and fs[k].en_caso:
+            abiertos += 1
+        elif fs[k].es('CASE'):
+            abiertos -= 1
+            if abiertos == 0:
+                return k
+    return None
+
+
 # Palabras que abren una sentencia nueva cuando aparecen en el nivel del bloque.
 INICIO_SENTENCIA = frozenset((
     'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'MERGE', 'IF', 'ELSE', 'WHILE', 'BEGIN', 'END', 'SET', 'DECLARE',

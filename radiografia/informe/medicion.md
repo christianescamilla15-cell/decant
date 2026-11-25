@@ -33,6 +33,18 @@ Los detectores corrieron sin leer los catálogos; estas tablas sólo cuentan qu�
 | T2 | Reloj del servidor que entra a la regla por una variable | detectada | reloj_en_regla → dbo.sp_ordenes_por_vencer | reloj_en_regla → dbo.sp_ordenes_por_vencer |
 | T3 | Espacios finales que SQL Server ignora al comparar y PostgreSQL no | detectada | espacios_finales → dbo.partida_solicitada.referencia | espacios_finales → dbo.partida_solicitada.referencia |
 
+## `legado/TRAMPAS_CIEGAS_2.md`
+
+> Catálogo CONOCIDO: el autor de los detectores ya lo leyó, y los detectores de esta versión se escribieron después de verlo. Detectar estas trampas ahora NO cuenta como control; el control real de esta versión es una siembra a ciegas nueva.
+
+**Detección: 3 de 3 trampas (100.0 %)**.
+
+| Id | Trampa | Estado | Señales esperadas | Encontradas |
+|---|---|---|---|---|
+| T1 | Vista con `TOP 100 PERCENT … ORDER BY`: el orden que promete no existe | detectada | top_sin_order_by → dbo.vw_liquidaciones_recientes | top_sin_order_by → dbo.vw_liquidaciones_recientes |
+| T2 | Asignación que parece única por la PK pero el JOIN la multiplica | detectada | top_sin_order_by → dbo.sp_constancia_operacion | top_sin_order_by → dbo.sp_constancia_operacion |
+| T3 | División entera y `AVG` de enteros (SQL Server trunca; PostgreSQL no en `avg`) | detectada | division_entera → dbo.sp_tablero_corresponsales | division_entera → dbo.sp_tablero_corresponsales |
+
 ## Hallazgos que no corresponden a ninguna trampa (11)
 
 Cada uno lleva su veredicto MEDIDO sobre el respaldo restaurado (`radiografia/veredictos.py`; la medición completa está en `veredictos.json`).
