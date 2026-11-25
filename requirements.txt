@@ -1,0 +1,4 @@
+# Decant: dependencias del legado (generador, pantalla, vivo) y de la radiografía.
+# Versiones fijas con == (Trivy no inventaría rangos).
+pymssql==2.4.6     # driver de SQL Server con FreeTDS incluido (sin ODBC del sistema)
+tzdata==2026.6     # base de zonas horarias FIJA: el generador no depende de la del sistema operativo

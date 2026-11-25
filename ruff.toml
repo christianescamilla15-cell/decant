@@ -1,0 +1,14 @@
+# ruff: la misma configuración en local y en el CI.
+target-version = "py312"
+line-length = 120
+extend-exclude = [".venv-calidad"]
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = [
+  "UP017",  # timezone.utc se queda: es lo que se lee en el resto del código
+  "B905",   # zip() sin strict: varios cortes comparan listas de largo distinto a propósito
+]
+
+[lint.isort]
+known-first-party = ["legado", "radiografia"]

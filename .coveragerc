@@ -1,0 +1,5 @@
+[run]
+source = legado, radiografia
+
+[report]
+skip_empty = true

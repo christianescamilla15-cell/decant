@@ -1,0 +1,33 @@
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+.venv-calidad/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+reporte.xml
+# Reportes de los escaneos del CI (se suben como artefactos)
+*.sarif
+semgrep.json
+trivy.json
+gitleaks.log
+sbom.spdx.json
+
+# ── Datos generados (se reproducen con la semilla; no se versionan) ───────
+legado/datos/
+respaldos/
+muestras/
+*.bak
+
+# ── Configuración local / secretos ────────────────────────────────────────
+.env
+.env.*
+
+# ── Editores y sistema operativo ──────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
