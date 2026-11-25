@@ -33,8 +33,12 @@ legado que nadie documentó.
   el tag `detectores-v2` con su sha256 en `CONTROL.md`, y una prueba falla si cambian. Después, y una sola vez, se
   corre AdventureWorks y se publica tal cual salió. La validación del detector de D1 (`round_trunca`, agregado
   después de la v1) sólo cuenta contra ese control.
-- **Control a ciegas (pendiente):** otra sesión siembra trampas en una rama sin que este autor las conozca y
-  publica sólo el sha256 de su catálogo. El procedimiento está en el README.
+- **Control a ciegas:** otra sesión siembra trampas en una rama sin que este autor las conozca y publica sólo el
+  sha256 de su catálogo. El procedimiento está en el README.
+  - La ronda 1 dio **0 de 3** con `detectores-v2` (`radiografia/CONTROL_CIEGO.md`): los detectores acertaban en
+    precisión pero no generalizaban más allá de la forma literal.
+  - `detectores-v3` agrega los 3 arreglos genéricos que propuso quien sembró y queda congelado en espera de la
+    ronda 2. Detectar ahora las 3 trampas de la ronda 1 no cuenta como control.
 - **Control:** la misma radiografía, sin cambios, corre sobre WideWorldImporters (respaldo oficial, sha256 fijado),
   y `radiografia/CONTROL.md` publica todo lo que encuentra ahí, falsos positivos incluidos. Un arreglo a un detector
   sólo se acepta si es genérico, tiene su prueba de regresión y no baja la detección en el legado. La versión 1 de

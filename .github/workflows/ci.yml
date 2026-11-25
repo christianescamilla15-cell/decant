@@ -94,7 +94,7 @@ jobs:
         run: >-
           python -m radiografia --bak muestras/WideWorldImporters-Full.bak --base WideWorldImporters
           --salida control-ci
-      - name: los detectores de alta señal siguen sin falsos positivos y el mojibake real sigue apareciendo
+      - name: los detectores de alta señal siguen sin falsos positivos y los hallazgos reales siguen apareciendo
         run: |
           python3 - <<'PY'
           import json
@@ -106,6 +106,7 @@ jobs:
                             're_registro'):
               assert c[categoria] == 0, (categoria, c[categoria])
           assert c['mojibake'] == 5, c['mojibake']
+          assert c['espacios_finales'] == 11, c['espacios_finales']    # valores que de verdad terminan en espacio
           PY
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

@@ -50,7 +50,29 @@ Historial de congelamientos:
 
 ## Corrida de `detectores-v3` sobre los controles públicos
 
-Pendiente.
+Corridas una vez el 24-nov-2026, con el árbol limpio en el tag `detectores-v3`, sobre los mismos respaldos
+oficiales (sha256 verificados). Los informes completos, sin editar, están en
+[`control/v3/wideworldimporters/`](control/v3/wideworldimporters/radiografia.md) y
+[`control/v3/adventureworks/`](control/v3/adventureworks/radiografia.md). Los de la v2 se conservan donde estaban.
+
+**Lo que cambió respecto a la v2:** ningún hallazgo de la v2 desapareció. Los nuevos son exactamente estos 14. Se
+clasificaron leyendo el código y los datos en una restauración aparte, de sólo lectura, sin volver a correr los
+detectores.
+
+| Control | Hallazgos v2 → v3 | Nuevos | Patrón real | Falso positivo | Lectura |
+|---|---:|---:|---:|---:|---|
+| WideWorldImporters | 262 → 273 | 11 `espacios_finales` | 11 | 0 | Los 11 valores terminan de verdad en espacio, por ejemplo `'Isabell '` y `'David Novacek '`. En datos capturados: `People.PreferredName` (8), `People.FullName`, `Customers.CustomerName`, `PackageTypes.PackageTypeName` y sus copias `_Archive`. Tres son columnas CALCULADAS: `People.SearchName` y `StockItems.SearchDetails` son `concat(…, N' ', …)` y rellenan por diseño cuando el segundo término es NULL (199 de 227 artículos); `Invoices.ConfirmedReceivedBy` sale de un JSON con el nombre ya relleno (87 facturas). **Límite:** el detector no omite columnas calculadas, que no se migran como dato. |
+| AdventureWorks | 170 → 173 | 3 `top_sin_order_by` (asignación desde varias filas) | 3 | 0 | `ufnGetProductListPrice`, `ufnGetProductDealerPrice` y `ufnGetProductStandardCost` asignan el precio o el costo desde un historial filtrado por `@OrderDate BETWEEN StartDate AND EndDate`: ninguna llave única garantiza una sola fila. Hoy es latente (0 periodos traslapados en los dos historiales). **Pero el detector lo marca por la razón EQUIVOCADA:** dice «sin WHERE» porque el filtro va en el `JOIN … ON` y sólo lee el WHERE. Si leyera el ON, juzgaría sólo la tabla del FROM (`Product`, única por `ProductID`) y NO lo marcaría: un falso negativo escondido detrás de un acierto. |
+
+**Lectura:**
+
+1. Los 3 arreglos no metieron ningún falso positivo en sentido estricto: la forma existe en los 14 hallazgos nuevos.
+2. Sí aparecieron dos límites nuevos, que no se corrigen bajo este congelamiento:
+   - las columnas calculadas cuentan como dato;
+   - la asignación desde varias filas no lee el `ON`, y con un JOIN sólo juzga la tabla del FROM.
+3. Reloj por variable: 0 hallazgos en los dos controles. Sin casos positivos fuera del legado, no hay sensibilidad
+   medida, sólo especificidad.
+4. Nada de esto valida la v3. Su control real es la siembra a ciegas ronda 2.
 
 ---
 
