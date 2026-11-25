@@ -3,52 +3,65 @@
 Una radiografía que sólo se prueba sobre el legado que uno mismo sembró puede «detectar» lo que su autor ya sabía.
 El control la corre, sin cambiar nada, sobre bases que no escribimos y que se tienen por limpias.
 
-## Estado de los controles con `detectores-v3`
+## Estado de los controles con `detectores-v4`
 
-- **Ninguno de los dos controles públicos es ya un control de generalización.**
-  - WideWorldImporters es de ENTRENAMIENTO desde la v1.
-  - AdventureWorks fue el control APARTADO de la v2. Los detectores v3 se escribieron después de ver la siembra a
-    ciegas, no AdventureWorks, pero su resultado de la v2 ya es conocido: re-correrlo sólo mide los falsos
-    positivos NUEVOS que meten los detectores v3. Eso se publica abajo, tal cual.
-- **El control real de la v3 es una NUEVA siembra a ciegas** (ronda 2, procedimiento en el README). La ronda 1
-  (`CONTROL_CIEGO.md`) dio 0 de 3 con la v2. Detectar ahora sus 3 trampas no cuenta como control: el catálogo es
-  conocido y los arreglos de la v3 salieron de él.
+- **Ninguno de los dos controles públicos es un control de generalización.**
+  - WideWorldImporters es de ENTRENAMIENTO desde la v1. Para la v4 se usó, además, una forma de su código ya
+    publicada en el informe de la v3: `FROM t FOR SYSTEM_TIME AS OF @f AS alias` (tablas temporales), que el lector
+    de fuentes del FROM ahora salta.
+  - AdventureWorks fue el control APARTADO de la v2. Su resultado ya es conocido, y la v4 se escribió sabiendo qué
+    hacían sus tres `ufnGetProduct*` (límite «el ON» documentado con la v3). Re-correrlo sólo mide los falsos
+    positivos NUEVOS que meten los detectores v4, y si esas tres funciones salen ahora por la razón correcta.
+- **El control real de la v4 es una NUEVA siembra a ciegas** (ronda 3, procedimiento en el README). La ronda 1
+  (`CONTROL_CIEGO.md`) dio 0 de 3 con la v2 y la ronda 2 (`CONTROL_CIEGO_2.md`) 0 de 3 con la v3. Detectar ahora sus
+  6 trampas no cuenta como control: los catálogos son conocidos y los arreglos de la v3 y la v4 salieron de ellos.
 
-## Detectores congelados vigentes: `detectores-v3`
+## Detectores congelados vigentes: `detectores-v4`
 
-Los detectores son tres archivos. Se congelaron en el tag `detectores-v3` con estos sha256, y la prueba
+Los detectores son tres archivos. Se congelaron en el tag `detectores-v4` con estos sha256, y la prueba
 `test_los_detectores_estan_congelados` falla si cualquiera cambia:
 
 ```
-f79f123a08aa370e2a9dd10053f03f36c8b089b06e4616843ddd4e908465f2bd  radiografia/tsql.py
-071d6b38652fa72e5508601cc0ea45efffd8f3a7fe1830635d5409d75ee16bbe  radiografia/patrones.py
+5cf30e52b92687831c998b0f869dfbb980578e91af9a290b44f09fe4f79c2192  radiografia/tsql.py
+d1babf3b81166df433b8ac1186930b8cd94c4d0ddc1a847d250f2b6404cffdf7  radiografia/patrones.py
 43aa47868fb8f6c919b4d8df3cd63d084511dd3426529fc8d03e54277fd9256d  radiografia/datos.py
 ```
 
-Qué cambió de la v2 a la v3. Son los tres arreglos genéricos que propuso quien sembró a ciegas, y ninguno depende
-de los nombres de sus trampas:
+`datos.py` no cambió desde la v3. Qué cambió de la v3 a la v4: los tres arreglos genéricos que propuso quien sembró
+la ronda 2. Ninguno depende de los nombres de sus trampas:
 
-1. **Selección no determinista también sin TOP:** `SELECT @v = col FROM t …` sin agregado y sin un filtro que
-   cubra una llave ÚNICA real de `t`. Las llaves son la PK y los índices únicos sin filtro, leídos del esquema
-   restaurado. La categoría conserva su clave `top_sin_order_by`. Control dentro del propio legado: la asignación
-   por PK de `sp_registrar_orden` no se marca, y una prueba lo exige.
-2. **Reloj por variable:** dentro de cada módulo, las variables asignadas desde el reloj (directo o desde otra
-   variable con reloj) se siguen hasta un WHERE, CASE, JOIN … ON o el SET de un UPDATE. Categoría
-   `reloj_en_regla`.
-3. **Espacios finales:** `DATALENGTH(c) > DATALENGTH(RTRIM(c))` por columna varchar o nvarchar, medido en el
-   motor, con la ventana de fechas de las filas afectadas. Categoría nueva, `espacios_finales`. Se compara contra
-   `DATALENGTH(RTRIM(c))` y no contra `LEN(c)` porque `DATALENGTH` cuenta BYTES: en nvarchar «> LEN» marcaría
-   todas las filas.
+1. **ORDER BY que no ordena:** `TOP 100 PERCENT` o `TOP (100) PERCENT` con ORDER BY en una vista, una tabla
+   derivada (`FROM/JOIN/APPLY ( … )`), una CTE o el `RETURN` de una función en línea. El optimizador descarta ese
+   TOP y su ORDER BY. Es forma léxica y se reporta en el objeto que lo define, con la clave `top_sin_order_by` y
+   `forma: orden_que_no_ordena`. No se marca el SELECT final de un procedimiento (ése sí ordena), un `TOP n` con
+   ORDER BY (elige filas) ni un `TOP 100 PERCENT` dentro de EXISTS o IN.
+2. **La unicidad es la del CONJUNTO:** en `SELECT @v = … FROM … [JOIN …]`, cada tabla debe quedar fija por una
+   llave ÚNICA suya (PK o índice único sin filtro del esquema restaurado), igualada con AND, en el WHERE o en su
+   ON, a constantes, variables o columnas de tablas ya fijas. Una tabla que entra por el lado N de una llave
+   foránea no queda fija aunque el WHERE cubra la PK del FROM. Sólo se reporta si alguna variable toma una
+   columna de una tabla sin fijar: si toma sólo de tablas fijas, todas las filas le dan el mismo valor. Vistas,
+   tablas derivadas, funciones, variables de tabla y temporales no tienen metadatos: no se juzgan. Control
+   dentro del legado: la asignación por PK de `sp_registrar_orden` sigue sin marcarse.
+3. **División entera:** categoría nueva `division_entera`. Se reporta `/` cuando los DOS lados son enteros, con
+   una inferencia mínima de tipos: literales sin punto decimal, columnas int/bigint/smallint/tinyint (resueltas
+   por las fuentes del FROM de su consulta), `COUNT(*)`, `DATEDIFF` y `AVG(<entero>)` (lo que propuso la ronda 2),
+   y además variables y parámetros declarados enteros, `SUM`/`MIN`/`MAX` de enteros, `CAST`/`CONVERT` a entero,
+   `ISNULL`/`NULLIF`/`COALESCE`, un `CASE` con todos sus resultados enteros y la aritmética entre enteros. Lo que no
+   se puede tipar no se reporta. Control dentro del legado: las divisiones entre `60.0` de `sp_conciliar` no se
+   marcan, y una prueba lo exige.
 
 Historial de congelamientos:
 
 | Tag | Archivo | sha256 |
 |---|---|---|
+| `detectores-v3` | `radiografia/tsql.py` | `f79f123a08aa370e2a9dd10053f03f36c8b089b06e4616843ddd4e908465f2bd` |
+| `detectores-v3` | `radiografia/patrones.py` | `071d6b38652fa72e5508601cc0ea45efffd8f3a7fe1830635d5409d75ee16bbe` |
+| `detectores-v3` | `radiografia/datos.py` | `43aa47868fb8f6c919b4d8df3cd63d084511dd3426529fc8d03e54277fd9256d` |
 | `detectores-v2` | `radiografia/tsql.py` | `8e29395ee20f056a02e1858abb3812dd0a05747a6d0c531ada5881e34e86ff6b` |
 | `detectores-v2` | `radiografia/patrones.py` | `70f4415556b3386b31264bbe8a28eededb35c548b351b9f0157fddf0d8788b3e` |
 | `detectores-v2` | `radiografia/datos.py` | `ab60df538a88a6423e1cb734abc7c5e33d620425e580f33d18573b01fc29a5a9` |
 
-## Corrida de `detectores-v3` sobre los controles públicos
+## Historial: corrida de `detectores-v3` sobre los controles públicos
 
 Corridas una vez el 24-nov-2026, con el árbol limpio en el tag `detectores-v3`, sobre los mismos respaldos
 oficiales (sha256 verificados). Los informes completos, sin editar, están en

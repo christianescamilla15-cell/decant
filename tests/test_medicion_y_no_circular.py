@@ -65,7 +65,7 @@ def test_cada_hallazgo_fuera_del_catalogo_lleva_su_veredicto_medido():
 
 
 def test_los_detectores_estan_congelados():
-    """Tras congelar (tag `detectores-v3`), la siembra a ciegas sólo vale si los detectores no cambian. Los sha256
+    """Tras congelar (tag `detectores-v4`), la siembra a ciegas sólo vale si los detectores no cambian. Los sha256
     vigentes viven en radiografia/CONTROL.md: cambiar un detector exige un tag nuevo y una siembra nueva."""
     import hashlib
     congelados = re.findall(r'^([0-9a-f]{64})  (radiografia/\w+\.py)$', Path('radiografia/CONTROL.md').read_text(
