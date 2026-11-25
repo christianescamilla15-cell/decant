@@ -219,9 +219,11 @@ jobs:
       - name: ciclo completo del legado
         run: ./ciclo.sh
       # Imagen fija por digest y con tope de memoria; la espera es explícita (puerto y una consulta), no un retraso.
+      # Tope medido: con 1 GB el pico (memory.peak, incluye caché de páginas) tocó el tope y las cinco cargas
+      # tardaron ~50 s cada una; 2 GB deja holgura sin acercarse a los 16 GB del runner.
       - name: PostgreSQL del TO-BE (imagen fija por digest)
         run: |
-          docker run -d --name decant-pg --memory 1g -e POSTGRES_USER=decant \
+          docker run -d --name decant-pg --memory 2g -e POSTGRES_USER=decant \
             -e POSTGRES_PASSWORD="$DECANT_PG_PASSWORD" -p "127.0.0.1:$DECANT_PG_PUERTO:5432" \
             postgres:16-alpine@sha256:f2f98726820d0342055351c6e9d36e705f5bfffb3dd53ff556325114b08afb6d
           for _ in $(seq 1 60); do
