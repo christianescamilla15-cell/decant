@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Casos de uso, puertos y opciones. Depende sólo del dominio. -->
+  <PropertyGroup>
+    <RootNamespace>Decant.Application</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Decant.Domain\Decant.Domain.csproj" />
+  </ItemGroup>
+</Project>
