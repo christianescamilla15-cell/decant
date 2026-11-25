@@ -133,10 +133,14 @@ jobs:
       - run: dotnet build Decant.slnx -c Release --no-restore
       - name: pruebas de dominio (casos reales), aplicación (dobles a mano) y arquitectura
         run: |
-          for p in Domain Application Architecture; do
+          for p in Domain Application; do
             dotnet test "tests/Decant.$p.Tests" -c Release --no-build --results-directory resultados \
               --logger "trx;LogFileName=$p.trx" --collect "XPlat Code Coverage"
           done
+          # Arquitectura SIN cobertura: lee el IL de los ensamblados y coverlet los instrumenta (agrega tipos
+          # Coverlet.* y la referencia a netstandard), lo que daría falsos positivos.
+          dotnet test tests/Decant.Architecture.Tests -c Release --no-build --results-directory resultados \
+            --logger "trx;LogFileName=Architecture.trx"
       - name: probar que corrieron pruebas en cada proyecto
         run: python3 herramientas_ci/contar_trx.py resultados/Domain.trx resultados/Application.trx resultados/Architecture.trx
       - name: configuración por ambiente (banderas y destinos, sin secretos)

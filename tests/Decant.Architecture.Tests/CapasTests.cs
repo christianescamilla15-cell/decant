@@ -18,6 +18,20 @@ public class CapasTests
     private static readonly Assembly Api = typeof(Decant.Api.Presentacion).Assembly;
     private static readonly Assembly Cli = typeof(Decant.Cli.Program).Assembly;
 
+    /// <summary>
+    /// Estas pruebas leen el IL: si alguien las corre con cobertura, coverlet instrumenta los ensamblados (tipos
+    /// Coverlet.* y referencia a netstandard) y las demás fallarían por una razón que no es de arquitectura.
+    /// </summary>
+    [Fact]
+    public void Los_ensamblados_que_se_inspeccionan_no_estan_instrumentados()
+    {
+        var instrumentados = new[] { Dominio, Aplicacion, Infraestructura, Api, Cli }
+            .Where(a => a.GetTypes().Any(t => t.FullName?.StartsWith("Coverlet.", StringComparison.Ordinal) == true))
+            .Select(a => a.GetName().Name).ToList();
+        Assert.True(instrumentados.Count == 0,
+            "Las pruebas de arquitectura deben correr sin --collect: instrumentados " + string.Join(", ", instrumentados));
+    }
+
     [Fact]
     public void El_dominio_no_depende_de_ningun_otro_proyecto_ni_paquete()
     {
