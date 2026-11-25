@@ -200,3 +200,59 @@ BEGIN
     ORDER BY fecha_valor;
 END
 GO
+-- Reporte regulatorio: posición del día por moneda, valuada al tipo de cambio de cierre.
+CREATE OR ALTER PROCEDURE dbo.sp_reporte_posicion
+    @fecha date
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @moneda char(3), @tc_cierre decimal(18, 6);
+    DECLARE @posicion TABLE (moneda char(3) NOT NULL PRIMARY KEY, compras decimal(18, 2) NOT NULL,
+                             ventas decimal(18, 2) NOT NULL, tc_cierre decimal(18, 6) NULL);
+
+    INSERT INTO @posicion (moneda, compras, ventas)
+    SELECT moneda, SUM(CASE WHEN tipo = 'C' THEN monto_divisa ELSE 0 END),
+           SUM(CASE WHEN tipo = 'V' THEN monto_divisa ELSE 0 END)
+    FROM dbo.operacion
+    WHERE fecha_operacion >= @fecha AND fecha_operacion < DATEADD(day, 1, @fecha)
+    GROUP BY moneda;
+
+    DECLARE monedas CURSOR LOCAL FAST_FORWARD FOR SELECT moneda FROM @posicion;
+    OPEN monedas;
+    FETCH NEXT FROM monedas INTO @moneda;
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- tipo de cambio de cierre: el de la última operación del día en esa moneda
+        SELECT @tc_cierre = tipo_cambio
+        FROM dbo.operacion
+        WHERE moneda = @moneda AND fecha_operacion >= @fecha AND fecha_operacion < DATEADD(day, 1, @fecha);
+
+        UPDATE @posicion SET tc_cierre = @tc_cierre WHERE moneda = @moneda;
+        FETCH NEXT FROM monedas INTO @moneda;
+    END
+    CLOSE monedas;
+    DEALLOCATE monedas;
+
+    SELECT p.moneda, m.nombre, p.compras, p.ventas, p.compras - p.ventas AS posicion, p.tc_cierre,
+           ROUND((p.compras - p.ventas) * p.tc_cierre, 2) AS posicion_mxn
+    FROM @posicion p
+    LEFT JOIN dbo.moneda m ON m.codigo = p.moneda
+    ORDER BY p.moneda;
+END
+GO
+-- Mesa de operaciones: órdenes enviadas que el proceso nocturno vencerá si el corresponsal no confirma.
+CREATE OR ALTER PROCEDURE dbo.sp_ordenes_por_vencer
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @hoy datetime, @limite datetime;
+    SET @hoy = GETDATE();
+    SET @limite = DATEADD(day, -2, @hoy);
+
+    SELECT folio, uetr, fecha_envio, bic_corresponsal, beneficiario, moneda, monto,
+           CASE WHEN fecha_envio < DATEADD(day, -1, @limite) THEN 'VENCE HOY' ELSE 'VENCE MANANA' END AS aviso
+    FROM dbo.orden_pago
+    WHERE estatus = 'ENVIADA' AND fecha_envio < @limite
+    ORDER BY fecha_envio, folio;
+END
+GO
