@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Decant.Api/Decant.Api.csproj" />
+    <Project Path="src/Decant.Application/Decant.Application.csproj" />
+    <Project Path="src/Decant.Cli/Decant.Cli.csproj" />
+    <Project Path="src/Decant.Domain/Decant.Domain.csproj" />
+    <Project Path="src/Decant.Infrastructure/Decant.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Decant.Api.Tests/Decant.Api.Tests.csproj" />
+    <Project Path="tests/Decant.Application.Tests/Decant.Application.Tests.csproj" />
+    <Project Path="tests/Decant.Architecture.Tests/Decant.Architecture.Tests.csproj" />
+    <Project Path="tests/Decant.Domain.Tests/Decant.Domain.Tests.csproj" />
+    <Project Path="tests/Decant.Infrastructure.Tests/Decant.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
