@@ -29,16 +29,42 @@ def _indices(columnas: list[str], nombres) -> list[int]:
     return [columnas.index(n) for n in nombres]
 
 
+# El piso es el CONTROL NEGATIVO: el legado contra sí mismo. Una sola re-corrida puede salir en 0 % aunque el orden de
+# los empates no sea contrato (pasó en un clon limpio: 0 % aquí y 13.78 % en la radiografía del mismo ciclo). Se
+# mide con el plan variado como en legado/VOLUMEN.md, sobre el contenedor LIMPIO (desechable): tal cual, con
+# estadísticas nuevas y la caché de planes vacía, y con MAXDOP 4. El piso es el mayor; se publican los tres.
+VARIANTES = (
+    ('tal cual', ()),
+    ('estadísticas nuevas y caché de planes vacía', (
+        'UPDATE STATISTICS dbo.orden_pago WITH FULLSCAN', 'UPDATE STATISTICS dbo.partida_solicitada WITH FULLSCAN',
+        'DBCC FREEPROCCACHE')),
+    ('MAXDOP 4 (los núcleos del runner de GitHub)', (
+        "EXEC sp_configure 'show advanced options', 1", 'RECONFIGURE',
+        "EXEC sp_configure 'max degree of parallelism', 4", 'RECONFIGURE', 'DBCC FREEPROCCACHE')),
+)
+
+
 def piso(cursor, publicada: dict, carpeta: Path) -> dict:
-    """El legado re-corrido sobre el respaldo restaurado contra lo que publicó, EN ESTA corrida."""
+    """El legado re-corrido sobre el respaldo restaurado contra lo que publicó, EN ESTA corrida, con el plan variado."""
     columnas, capturada = formato.leer(carpeta / publicada['archivo'])
-    columnas_re, recorrida = cuadre.recorrer(cursor, publicada['procedimiento'], publicada['parametros'],
-                                             publicada['conjunto'])
-    if columnas_re != columnas:
-        raise SystemExit('el reporte re-corrido no tiene las columnas del publicado')
-    medida = orden.comparar([tuple(f) for f in capturada], [tuple(f) for f in recorrida],
-                            _indices(columnas, LLAVE), _indices(columnas, publicada['llave_orden']))
-    return medida
+    muestras = []
+    for nombre, preparacion in VARIANTES:
+        for sentencia in preparacion:
+            cursor.execute(sentencia)
+            while cursor.nextset():
+                pass
+        columnas_re, recorrida = cuadre.recorrer(cursor, publicada['procedimiento'], publicada['parametros'],
+                                                 publicada['conjunto'])
+        if columnas_re != columnas:
+            raise SystemExit('el reporte re-corrido no tiene las columnas del publicado')
+        medida = orden.comparar([tuple(f) for f in capturada], [tuple(f) for f in recorrida],
+                                _indices(columnas, LLAVE), _indices(columnas, publicada['llave_orden']))
+        muestras.append({'variante': nombre, **medida})
+    mayor = max(muestras, key=lambda m: m['pct_empatados_invertidos'])
+    return {**mayor, 'inversiones_contrato': max(m['inversiones_contrato'] for m in muestras),
+            'mismo_contenido': all(m['mismo_contenido'] for m in muestras),
+            'muestras': [{k: m[k] for k in ('variante', 'inversiones_contrato', 'inversiones_empatados',
+                                            'pct_empatados_invertidos', 'mismo_contenido')} for m in muestras]}
 
 
 def _local(valor: str, zona) -> tuple[str, bool]:
@@ -137,9 +163,9 @@ def comparar(publicada: dict, carpeta: Path, ruta_tobe: Path, piso_medido: dict,
         'tobe': {'renglones': len(tobe)}, **por_tipo,
         'orden': {'tobe_contra_publicado': medida, 'piso_misma_corrida': piso_medido,
                   'contrato_en_cero': contrato_ok, 'empates_libres': empates_libres,
-                  'veredicto': ('contrato en 0; los empates no son contrato: el propio legado invierte '
+                  'veredicto': ('contrato en 0; los empates no son contrato: el propio legado invierte hasta '
                                 f"{piso_medido['pct_empatados_invertidos']} % de sus pares empatados en esta "
-                                f"corrida y el TO-BE {medida['pct_empatados_invertidos']} %")
+                                f"corrida (con el plan variado) y el TO-BE {medida['pct_empatados_invertidos']} %")
                   if contrato_ok and empates_libres else 'REVISAR: contrato roto o empates que el legado sí repite'},
         'arbitraje': arbitrado,
         'cumple': contrato_ok and empates_libres and arbitrado['por_categoria'][arbitraje.DEFECTO] == 0,

@@ -157,6 +157,9 @@ def markdown(r: dict) -> str:
                       ('TO-BE contra lo publicado', o['tobe_contra_publicado'])):
         md.append(f"| {nombre} | {_n(m['pares_contrato'])} | {_n(m['inversiones_contrato'])} | "
                  f"{_n(m['pares_empatados'])} | {m['pct_empatados_invertidos']} |")
+    md += ['', 'Piso (control negativo) con el plan variado en el contenedor limpio: ' + '; '.join(
+        f"{m['variante']}: {m['pct_empatados_invertidos']} % de empatados invertidos, {m['inversiones_contrato']} de "
+        f"contrato" for m in o['piso_misma_corrida'].get('muestras', [])) + '.']
     md += ['', f"**Veredicto del orden:** {o['veredicto']}.", '', '| Categoría | Diferencias |', '|---|---:|']
     md += [f'| {k} | {_n(v)} |' for k, v in p['arbitraje']['por_categoria'].items()]
     md += ['']

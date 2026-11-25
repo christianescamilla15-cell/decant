@@ -189,3 +189,44 @@ def test_el_tobe_nombra_sus_listas_como_las_rejillas_que_ve_el_usuario():
     for r in binding.rejillas():
         campo = binding.campo_json(r['titulo'])
         assert campo[0].upper() + campo[1:] in propiedades, campo
+
+
+# ── piso del orden: el control negativo con el plan variado ──────────────────────────────────────────────────
+
+class _CursorDelLegado:
+    """Doble del cursor del legado: cada llamada al procedimiento devuelve la siguiente corrida."""
+
+    def __init__(self, corridas):
+        self._corridas = iter(corridas)
+        self.preparaciones: list[str] = []
+        self.description = None
+
+    def execute(self, sentencia):
+        self.preparaciones.append(sentencia)
+        self.description = None
+
+    def callproc(self, _nombre, _parametros):
+        self._filas = next(self._corridas)
+        self.description = [('uetr',), ('concepto',), ('fecha_valor',)]
+
+    def fetchall(self):
+        return self._filas
+
+    def nextset(self):
+        return False
+
+
+def test_el_piso_no_se_conforma_con_una_corrida_que_reproduce_el_orden(tmp_path):
+    """Regresión (clon limpio del 24-nov): una sola re-corrida reprodujo el orden publicado (0 %) y la paridad tomó
+    los empates como contrato. El piso se mide con el plan variado y se queda con el mayor."""
+    publicado = [['a', 'ABONO', '2023-12-01'], ['b', 'ABONO', '2023-12-01'], ['c', 'ABONO', '2023-12-02']]
+    from paridad import formato
+    formato.escribir(tmp_path / 'p.jsonl', ['uetr', 'concepto', 'fecha_valor'], publicado)
+    invertido = [publicado[1], publicado[0], publicado[2]]
+    cursor = _CursorDelLegado([publicado, invertido, publicado])
+    salida = {'archivo': 'p.jsonl', 'procedimiento': 'dbo.sp_reporte_ordenes', 'parametros': [], 'conjunto': 0,
+              'llave_orden': ['fecha_valor']}
+    piso = reporte.piso(cursor, salida, tmp_path)
+    assert [m['pct_empatados_invertidos'] for m in piso['muestras']] == [0.0, 100.0, 0.0]
+    assert piso['pct_empatados_invertidos'] == 100.0 and piso['inversiones_contrato'] == 0
+    assert any('DBCC FREEPROCCACHE' in s for s in cursor.preparaciones)

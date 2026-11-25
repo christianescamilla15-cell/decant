@@ -50,8 +50,9 @@ la última escritura), extrae universo y oráculo por columna, carga el TO-BE ci
   respaldar, por llave natural: 0 defectos nuestros, 181 renglones de **avance de producción** (confirmaciones
   posteriores al corte, auditadas en el legado vivo por identidad) y 14,984 celdas por una **regla real del legado**
   (publica la hora local sin zona; el TO-BE publica la misma hora con su desfase). Orden: **0 inversiones de
-  contrato**; los empates se juzgan contra el piso de la misma corrida (el propio legado invierte entre 7 % y 25 % de
-  sus empates de una corrida a otra).
+  contrato**; los empates se juzgan contra el piso de la misma corrida, medido con el plan variado (una sola
+  re-corrida llegó a reproducir el orden exacto en un clon limpio, mientras la radiografía del mismo ciclo medía
+  13.78 %).
 - **Gemelos** (pantalla de detalle del legado contra el JSON de la API) en 3 casos estratificados, y **T4** probado por
   el binding de la pantalla: el TO-BE publica en `liquidadoPorElCorresponsal` lo que la rejilla «Liquidado por el
   corresponsal» pinta, que vive en la tabla `partida_solicitada`.

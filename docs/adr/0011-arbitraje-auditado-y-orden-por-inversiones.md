@@ -17,9 +17,13 @@ movido. El legado tampoco se repite a sí mismo: su orden entre empates depende 
   valor) deben dar 0; los empatados se juzgan contra el piso que la paridad mide EN LA MISMA corrida (el legado
   re-corrido sobre el respaldo contra lo que publicó). Si el legado no se repite (piso > 0), el orden de los empates no
   es contrato.
+- El piso se mide con el PLAN VARIADO (tal cual; estadísticas nuevas y caché de planes vacía; MAXDOP 4) sobre el
+  contenedor limpio, y se toma el mayor. Una sola re-corrida no basta: en un clon limpio salió en 0 % mientras la
+  radiografía del mismo ciclo, contra otra restauración, medía 13.78 %. Si las tres variantes dan 0, la paridad falla.
 
 ## Alternativas descartadas
-- **Umbral fijo de % de empates:** el piso varió de 7.08 % a 22.3 % entre corridas de la misma laptop.
+- **Umbral fijo de % de empates:** el piso varió de 0 % a 22.3 % entre corridas de la misma laptop.
+- **Una sola re-corrida como piso:** un plan que reproduce el orden convierte en «contrato» lo que no lo es.
 - **Comparar por id:** empareja documentos distintos (T9).
 
 ## Consecuencias
