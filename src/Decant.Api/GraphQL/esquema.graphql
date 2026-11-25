@@ -1,0 +1,227 @@
+schema {
+  query: Query
+}
+
+type Query {
+  "Una operación por su id, o nula si no existe. Equivale a GET /api/operaciones/{id}."
+  operacion(id: Long!): Operacion @cost(weight: "10")
+  "Las operaciones de un día del calendario de la Ciudad de México en orden explícito (fecha y id, T1), por páginas. Equivale a GET /api/operaciones?fecha=."
+  operaciones(
+    fecha: LocalDate!
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+  ): OperacionesConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first"]
+      slicingArgumentDefaultValue: 20
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+  "Lo abonado por el corresponsal entre dos fechas valor (inclusivas), un renglón por partida, en orden explícito (fecha valor, folio y renglón, T2), por páginas. Equivale a GET /api/reportes/ordenes."
+  reporteDeOrdenes(
+    desde: LocalDate!
+    hasta: LocalDate!
+    "Returns the first _n_ elements from the list."
+    first: Int
+    "Returns the elements in the list that come after the specified cursor."
+    after: String
+  ): ReporteDeOrdenesConnection
+    @listSize(
+      assumedSize: 100
+      slicingArguments: ["first"]
+      slicingArgumentDefaultValue: 20
+      sizedFields: ["edges", "nodes"]
+      requireOneSlicingArgument: false
+    )
+    @cost(weight: "10")
+}
+
+"Una operación de divisas. Equivale al objeto «operacion» de GET /api/operaciones/{id}."
+type Operacion {
+  "El documento de pago de la operación (el registro más reciente) o nulo si no tiene."
+  orden: Orden @cost(weight: "10")
+  id: Long!
+  folio: String!
+  "Instante de la operación con el desfase de la Ciudad de México."
+  fechaOperacion: DateTime!
+  sucursal: String!
+  canal: String!
+  cliente: String!
+  "CLABE del cliente; nula donde el legado guardaba el centinela «NA» (T3)."
+  cuentaClabe: String
+  tipo: String!
+  moneda: String!
+  nombreMoneda: String
+  decimales: Int
+  montoDivisa: Decimal!
+  tipoCambio: Decimal!
+  "Tipo de cambio de referencia; nulo donde el legado guardaba 0 (T3)."
+  tipoCambioReferencia: Decimal
+  montoMxn: Decimal!
+  estatus: String!
+}
+
+"A connection to a list of items."
+type OperacionesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [OperacionesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Operacion!]
+}
+
+"An edge in a connection."
+type OperacionesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Operacion!
+}
+
+"Una orden de pago: un DOCUMENTO por UETR (sus re-registros no son órdenes nuevas, T9)."
+type Orden {
+  "La operación de la que nace el documento."
+  operacion: Operacion! @cost(weight: "10")
+  "Lo que pidió el cliente (en el legado, la tabla mal llamada partida_liquidada, T4)."
+  solicitadoPorElCliente: [Partida!]!
+    @listSize(assumedSize: 4, requireOneSlicingArgument: false)
+    @cost(weight: "10")
+  "Lo que abonó el corresponsal (en el legado, la tabla mal llamada partida_solicitada, T4)."
+  liquidadoPorElCorresponsal: [Partida!]!
+    @listSize(assumedSize: 4, requireOneSlicingArgument: false)
+    @cost(weight: "10")
+  uetr: UUID!
+  folio: String!
+  referenciaMt103: String!
+  fechaRegistro: DateTime!
+  registros: Int!
+  fechaEnvio: DateTime!
+  fechaValor: LocalDate!
+  bicCorresponsal: String!
+  bicIntermediario: String
+  beneficiario: String!
+  cuentaBeneficiario: String!
+  moneda: String!
+  monto: Decimal!
+  gastos: String!
+  codigoProposito: String
+  "ENVIADA, CONCILIADA, DIFERENCIA o VENCIDA."
+  estatus: String!
+  "Horas de liquidación (R08: réplica del cálculo del legado, ADR 0006)."
+  horasLiquidacion: Decimal
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+"Una partida de la orden; su hora va en la zona de quien la registró."
+type Partida {
+  renglon: Short!
+  concepto: String!
+  moneda: String!
+  monto: Decimal!
+  "Ciudad de México si la pidió el cliente; Nueva York si la abonó el corresponsal."
+  fechaHora: DateTime!
+  referencia: String!
+}
+
+"Un renglón del reporte de lo abonado: uno por partida del corresponsal (T2, ADR 0006)."
+type RenglonDeReporte {
+  folio: String!
+  uetr: UUID!
+  referenciaMt103: String!
+  fechaEnvio: DateTime!
+  fechaValor: LocalDate!
+  bicCorresponsal: String!
+  beneficiario: String!
+  moneda: String!
+  monto: Decimal!
+  gastos: String!
+  estatus: String!
+  concepto: String!
+  montoPartida: Decimal!
+  "Hora de la partida en Nueva York, la zona del corresponsal."
+  fechaPartida: DateTime!
+}
+
+"A connection to a list of items."
+type ReporteDeOrdenesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [ReporteDeOrdenesEdge!]
+  "A flattened list of the nodes."
+  nodes: [RenglonDeReporte!]
+}
+
+"An edge in a connection."
+type ReporteDeOrdenesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: RenglonDeReporte!
+}
+
+"The `DateTime` scalar type represents a date and time with time zone offset information."
+scalar DateTime
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/date-time.html")
+
+"The `Decimal` scalar type represents a decimal floating-point number with high precision."
+scalar Decimal
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/decimal.html")
+
+"The `LocalDate` scalar type represents a date without time or time zone information."
+scalar LocalDate
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/local-date.html")
+
+"The `Long` scalar type represents a signed 64-bit integer."
+scalar Long
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/long.html")
+
+"The `Short` scalar type represents a signed 16-bit integer."
+scalar Short
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/short.html")
+
+"The `UUID` scalar type represents a Universally Unique Identifier (UUID) as defined by RFC 9562."
+scalar UUID
+  @specifiedBy(url: "https://scalars.graphql.org/chillicream/uuid.html")
+
+"The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."
+directive @cost(
+  "The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc."
+  weight: String!
+) on
+  | SCALAR
+  | OBJECT
+  | FIELD_DEFINITION
+  | ARGUMENT_DEFINITION
+  | ENUM
+  | INPUT_FIELD_DEFINITION
+
+"The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information."
+directive @listSize(
+  "The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field."
+  assumedSize: Int
+  "The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments."
+  slicingArguments: [String!]
+  "The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query."
+  slicingArgumentDefaultValue: Int
+  "The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields."
+  sizedFields: [String!]
+  "The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error."
+  requireOneSlicingArgument: Boolean = true
+) on FIELD_DEFINITION

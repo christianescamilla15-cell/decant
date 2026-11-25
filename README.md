@@ -22,10 +22,10 @@ el repositorio.
 | [`legado/VOLUMEN.md`](legado/VOLUMEN.md) | El volumen que hace falta para que el control negativo no salga en 0 % y el piso de la paridad, medidos en inversiones, y los tiempos del ciclo. |
 | [`universo/`](universo) | Lo que ENTRA al replay: la partición por columna (entrada o resultado), la lectura de los archivos de interfaz con sus llaves reales (buzón del corresponsal y archivo de sucursales) y las noches del job. |
 | [`radiografia/`](radiografia) | La radiografía (Python): restaura el respaldo en un contenedor limpio, lo cuadra contra lo que el legado publicaba, mide el corte, inventaría y detecta por patrón genérico. Los detectores están congelados en el tag `detectores-v4`. [`informe/`](radiografia/informe) es su salida sobre el legado, con el veredicto medido de cada hallazgo, y [`CONTROL.md`](radiografia/CONTROL.md) sus dos controles públicos. |
-| [`src/`](src) | El TO-BE en .NET 10: `Decant.Domain` (sólo BCL: reglas puras, `IClock`, `Resultado<T>`), `Decant.Application` (casos de uso, puertos, mediador propio, banderas como records), `Decant.Infrastructure` (EF Core + Npgsql, migraciones, COPY binario) y dos hosts con la misma composición: `Decant.Api` (Minimal API) y `Decant.Cli` (lotes). |
+| [`src/`](src) | El TO-BE en .NET 10: `Decant.Domain` (sólo BCL: reglas puras, `IClock`, `Resultado<T>`), `Decant.Application` (casos de uso, puertos, mediador propio, banderas como records), `Decant.Infrastructure` (EF Core + Npgsql, migraciones, COPY binario) y dos hosts con la misma composición: `Decant.Api` (Minimal API y GraphQL de sólo lectura) y `Decant.Cli` (lotes). |
 | [`tests/Decant.*`](tests) | Pruebas por capa: dominio con casos reales del respaldo, aplicación con dobles a mano, infraestructura y API contra PostgreSQL real (Testcontainers) y arquitectura (NetArchTest + Mono.Cecil). |
 | [`paridad/`](paridad) | La paridad en Python: universo y oráculo en archivos y funciones distintos, los dos ejercicios con nombre, la paridad de reporte con arbitraje y los gemelos. [`informe/`](paridad/informe) es su salida sobre el legado del ciclo. |
-| [`docs/`](docs) | [Arquitectura C4](docs/arquitectura/README.md), [reglas → prueba → origen](docs/reglas.md) y las [decisiones](docs/adr) de S1 (0001–0004) y S2 (0005–0011). |
+| [`docs/`](docs) | [Arquitectura C4](docs/arquitectura/README.md), [reglas → prueba → origen](docs/reglas.md) y las [decisiones](docs/adr) de S1 (0001–0004), S2 (0005–0011), la API sin autenticación (0012) y GraphQL de sólo lectura (0017). |
 
 ## Resultados de la semana 2 ([informe completo](paridad/informe/paridad.md))
 
@@ -155,6 +155,37 @@ Procedimiento (ronda 3):
 6. **Publicación tal cual:** el % de detección, lo que no detectó y los hallazgos fuera de su catálogo. Ningún
    detector cambia antes de publicar; si después se mejora uno, es `detectores-v5` y pide otra siembra.
 
+## API GraphQL de sólo lectura ([ADR 0017](docs/adr/0017-graphql-de-solo-lectura-junto-a-rest.md))
+
+`POST /graphql` publica lo mismo que REST (detalle, lista del día y reporte) como un grafo: operación → orden →
+partidas, y de vuelta. Se hizo con HotChocolate 16.7.7 (MIT), con la versión exacta, el candado en modo bloqueado y
+los avisos de seguridad revisados.
+
+- **Sin mutaciones.** Los filtros son los argumentos de REST (no hay filtrado arbitrario a la base) y las listas son
+  páginas por cursor con llave de conjunto.
+- **Sin N+1, contado en PostgreSQL.** Una página de 1, 10 o 60 operaciones con su orden, sus dos listas de partidas y
+  la vuelta a la operación cuesta **5 consultas SQL** (cuatro cargadores por lote). El mismo grafo por el detalle
+  REST, uno por uno, cuesta 4 por operación.
+- **Límites.** Profundidad 8, costo 10,000 (la página legítima más cara cuesta 4,112), documento de 64 KiB, sólo POST
+  con JSON y sin lotes. Lo abusivo se rechaza antes de ejecutar, con su código y **0 consultas SQL**.
+- **Introspección según el ambiente:** sí en Desarrollo y Pruebas, no en Producción.
+- **Contrato versionado.** El SDL vive en [`esquema.graphql`](src/Decant.Api/GraphQL/esquema.graphql) y una prueba
+  de instantánea clasifica cada cambio como «rompe» o «no rompe». Todo error lleva `extensions.code` y nada interno.
+- **Paridad con REST, probada.** Cada campo de REST sale igual en GraphQL, también recorrido por cursor y en los días
+  de 23 y 25 horas.
+- **Arquitectura.** HotChocolate vive SÓLO en `Decant.Api.GraphQL`; la aplicación no lo conoce (NetArchTest).
+
+Contra la base que deja `python -m paridad` (la carga histórica, `decant_migracion`):
+
+```
+ASPNETCORE_ENVIRONMENT=Desarrollo ASPNETCORE_URLS=http://127.0.0.1:5000 \
+ConnectionStrings__Decant="Host=127.0.0.1;Port=15450;Username=decant;Password=$DECANT_PG_PASSWORD;Database=decant_migracion" \
+  dotnet src/Decant.Api/bin/Release/net10.0/Decant.Api.dll &
+curl -s http://127.0.0.1:5000/graphql -H 'Content-Type: application/json' --data-binary @- <<'JSON'
+{"query": "{ operaciones(fecha: \"2023-12-01\", first: 2) { pageInfo { hasNextPage endCursor } nodes { folio orden { estatus liquidadoPorElCorresponsal { concepto monto fechaHora } } } } }"}
+JSON
+```
+
 ## Cómo ejecutar
 
 Requiere Docker, Python 3.12 y, para el TO-BE, el SDK de .NET 10.
@@ -225,25 +256,33 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md \
   - lo que pierde el delta por la pantalla;
   - los espacios finales contados en el motor y la medición separada por catálogo.
 
-- `dotnet test Decant.slnx`: 189 pruebas del TO-BE.
+- `dotnet test Decant.slnx`: 261 pruebas del TO-BE.
   - `Decant.Domain.Tests` (85): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
     ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón: una fila por cada
     variante de formato que existe entre sus 150,124 mensajes), bordes e invariantes. Mutación del dominio con
     Stryker.NET como compuerta (`.github/workflows/mutacion.yml`, ruptura en 80: en cada PR sólo lo cambiado, cada
     noche completo): **91.62 %** (153 de 164) con los textos de error excluidos por método (`stryker-config.json`);
     sin esa exclusión, 83.87 %. Sobreviven mutantes equivalentes, como `Sum` contra `Max` sobre el único principal.
-  - `Decant.Application.Tests` (23): el replay, la carga histórica y el reproceso con dobles escritos a mano, y las
+  - `Decant.Application.Tests` (31): el replay, la carga histórica y el reproceso con dobles escritos a mano, y las
     invariantes del lote (dos veces no duplica, permutado da lo mismo, un archivo dañado no detiene a los demás, un
-    rechazo de negocio no es error técnico ni se reintenta).
-  - `Decant.Infrastructure.Tests` (31) y `Decant.Api.Tests` (33): EF Core, COPY y la API completa contra PostgreSQL
+    rechazo de negocio no es error técnico ni se reintenta). También las lecturas por página y por lote (página de 1
+    a 100, rango al derecho, cada lista por lo que es).
+  - `Decant.Infrastructure.Tests` (36) y `Decant.Api.Tests` (86): EF Core, COPY y la API completa contra PostgreSQL
     real con Testcontainers: rutas que no salen de la carpeta del universo, bordes de fecha (día local de 23 y 25
     horas, rangos inclusivos), el estatus como texto de ida y vuelta, cargas simultáneas
     contra los índices únicos, la migración nueva sobre una base con datos (y su reversa), el contrato de errores
     `problem+json` (sin autenticación en el alcance: [ADR 0012](docs/adr/0012-api-sin-autenticacion-en-el-alcance-de-la-demo.md))
-    y que cada propiedad de la configuración se lea de su clave.
-  - `Decant.Architecture.Tests` (17): capas, el replay sin acceso al oráculo, nadie usa `DateTime.Now` salvo
+    y que cada propiedad de la configuración se lea de su clave. Para GraphQL (53 de las 86, en
+    `tests/Decant.Api.Tests/GraphQL`):
+    - la paridad campo por campo con REST, también recorrida por cursor;
+    - el N+1 contado con un interceptor de EF Core;
+    - los límites contra consultas abusivas, con 0 SQL;
+    - el contrato de errores y la introspección por ambiente;
+    - el SDL versionado, con sus controles de cambios que rompen.
+  - `Decant.Architecture.Tests` (23): capas, el replay sin acceso al oráculo, nadie usa `DateTime.Now` salvo
     `SystemClock` (recorriendo el IL), ningún tipo de EF fuera de la infraestructura, lecturas sin rastreo, ni
-    defaults de reloj en la base ni conversiones de zona fuera de `Zonas`, y la fecha valor como `date`.
+    defaults de reloj en la base ni conversiones de zona fuera de `Zonas`, y la fecha valor como `date`. GraphQL
+    (HotChocolate, GreenDonut, ChilliCream) sólo en `Decant.Api.GraphQL`, y el esquema sin registros de otras capas.
 - `pytest -m paridad`: 8 pruebas sobre el informe de paridad, entre ellas la de T4 por el binding de la pantalla.
 
 ## Seguridad
