@@ -163,6 +163,18 @@ def test_desfase_horario_fijo_en_dateadd_de_horas():
     assert patrones.desfase_horario_fijo(_m('SELECT DATEADD(day, -3, GETDATE())')) == []
 
 
+# ── ROUND que trunca ────────────────────────────────────────────────────────────────────────────────────────
+
+def test_round_con_tercer_argumento_distinto_de_cero_trunca():
+    h = patrones.round_trunca(_m('SET @comision = ROUND(@monto_mxn * 0.0025, 2, 1);'))
+    assert [x['categoria'] for x in h] == ['round_trunca']
+    assert patrones.round_trunca(_m('SET @c = ROUND(@m, 2, @modo)'))           # no se sabe: se revisa
+
+
+def test_round_normal_no_se_detecta():
+    assert patrones.round_trunca(_m('SELECT ROUND(a * b, 2), ROUND(c, 0, 0), ROUND(ISNULL(x, 1), 2) FROM t')) == []
+
+
 # ── columnas que nadie lee ──────────────────────────────────────────────────────────────────────────────────
 
 def test_columna_que_solo_se_escribe_no_cuenta_como_leida():
@@ -200,5 +212,6 @@ def test_sobre_el_codigo_del_legado_aparecen_los_patrones_sembrados():
     assert ('reloj_en_regla', 'dbo.sp_conciliar') in hallazgos
     assert ('desfase_horario_fijo', 'dbo.sp_conciliar') in hallazgos
     assert ('if_exists_sin_else', 'dbo.sp_registrar_liquidacion') in hallazgos
+    assert ('round_trunca', 'dbo.sp_registrar_orden') in hallazgos
     # el trigger sella la bitácora con GETDATE(): no es una regla
     assert ('reloj_en_regla', 'dbo.tr_orden_pago_bitacora') not in hallazgos

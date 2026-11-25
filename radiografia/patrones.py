@@ -379,7 +379,30 @@ def desfase_horario_fijo(m: Modulo) -> list[dict]:
     return hallazgos
 
 
-# ── 7. Columnas que ningún módulo lee ────────────────────────────────────────────────────────────────────────
+# ── 7. ROUND que trunca ─────────────────────────────────────────────────────────────────────────────────────
+
+def round_trunca(m: Modulo) -> list[dict]:
+    """ROUND(x, n, f) con un tercer argumento distinto de 0 TRUNCA en lugar de redondear (gotcha de T-SQL)."""
+    fs, hallazgos = m.fichas, []
+    for i, f in enumerate(fs):
+        if not (f.es('ROUND') and i + 1 < len(fs) and fs[i + 1].texto == '('):
+            continue
+        fin = cierre(fs, i + 1)
+        nivel = fs[i + 1].nivel + 1
+        comas = [k for k in range(i + 2, fin) if fs[k].texto == ',' and fs[k].nivel == nivel]
+        if len(comas) != 2:
+            continue
+        tercero = fs[comas[1] + 1:fin]
+        if len(tercero) == 1 and tercero[0].tipo == 'numero' and tercero[0].texto.strip('0.') == '':
+            continue            # ROUND(x, n, 0): redondea
+        literal = ' '.join(t.texto for t in tercero)
+        hallazgos.append(_hallazgo('round_trunca', m, f.linea,
+                                   f'ROUND(…, …, {literal}) trunca en vez de redondear: con montos, un centavo '
+                                   f'de diferencia contra cualquier cálculo que redondee'))
+    return hallazgos
+
+
+# ── 8. Columnas que ningún módulo lee ────────────────────────────────────────────────────────────────────────
 
 _OBJETO_TRAS = frozenset(('FROM', 'JOIN', 'INTO', 'UPDATE', 'MERGE', 'USING', 'EXEC', 'EXECUTE', 'TABLE',
                           'TRUNCATE', 'APPLY'))
@@ -465,5 +488,6 @@ def analizar_codigo(modulos: list[Modulo], padres_de: dict[str, set[str]]) -> li
         hallazgos += reloj_en_regla(m)
         hallazgos += if_exists_sin_else(m)
         hallazgos += desfase_horario_fijo(m)
+        hallazgos += round_trunca(m)
         hallazgos += literales(m)
     return hallazgos
