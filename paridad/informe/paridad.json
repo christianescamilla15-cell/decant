@@ -1,5 +1,5 @@
 {
- "generado": "2026-11-24T23:30:05-06:00",
+ "generado": "2026-11-25T00:16:17-06:00",
  "corte": {
   "tablas": {
    "dbo.moneda": {
@@ -216,9 +216,7 @@
      "destino": "decant.consecutivo.serie",
      "estado": "ok",
      "detalle": null,
-     "parches": [
-      "char"
-     ]
+     "parches": []
     },
     {
      "legado": "dbo.folio.siguiente",
@@ -239,7 +237,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:3"
      ]
     },
     {
@@ -248,7 +246,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:3"
      ]
     },
     {
@@ -301,7 +299,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:4"
      ]
     },
     {
@@ -333,7 +331,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:1"
      ]
     },
     {
@@ -342,7 +340,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:3"
      ]
     },
     {
@@ -408,9 +406,7 @@
      "destino": "decant.orden_pago.uetr",
      "estado": "ok",
      "detalle": null,
-     "parches": [
-      "uuid"
-     ]
+     "parches": []
     },
     {
      "legado": "dbo.orden_pago.referencia_mt103",
@@ -450,7 +446,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:11"
      ]
     },
     {
@@ -459,7 +455,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char",
+      "char:11",
       "T3_texto"
      ]
     },
@@ -483,7 +479,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:3"
      ]
     },
     {
@@ -499,7 +495,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:3"
      ]
     },
     {
@@ -508,7 +504,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:4"
      ]
     },
     {
@@ -558,7 +554,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:3"
      ]
     },
     {
@@ -617,7 +613,7 @@
      "estado": "ok",
      "detalle": null,
      "parches": [
-      "char"
+      "char:3"
      ]
     },
     {
@@ -731,6 +727,37 @@
     "celdas_distintas": {},
     "ejemplos": [],
     "parches": {},
+    "parches_medidos_en_origen": {
+     "char:3 → codigo": 0,
+     "char:3 → numerico": 0
+    },
+    "parches_sin_cuadrar": {},
+    "controles_negativos": [
+     {
+      "parche": "char:3 → codigo",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "CAD",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → codigo",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "CAD",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → numerico",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "CAD",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → numerico",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "CAD",
+      "falla": true
+     }
+    ],
     "cuadra": true
    },
    {
@@ -746,6 +773,9 @@
     "celdas_distintas": {},
     "ejemplos": [],
     "parches": {},
+    "parches_medidos_en_origen": {},
+    "parches_sin_cuadrar": {},
+    "controles_negativos": [],
     "cuadra": true
    },
    {
@@ -761,10 +791,81 @@
     "celdas_distintas": {},
     "ejemplos": [],
     "parches": {
-     "T5_cdmx": 412125,
-     "T3_texto": 107265,
-     "T3_numero": 53702
+     "T5_cdmx → fecha_operacion": 412125,
+     "T3_texto → cuenta_clabe": 107265,
+     "T3_numero → tipo_cambio_referencia": 53702
     },
+    "parches_medidos_en_origen": {
+     "T5_cdmx → fecha_operacion": 412125,
+     "char:4 → sucursal": 0,
+     "T3_texto → cuenta_clabe": 107265,
+     "char:1 → tipo": 0,
+     "char:3 → moneda": 0,
+     "T3_numero → tipo_cambio_referencia": 53702
+    },
+    "parches_sin_cuadrar": {},
+    "controles_negativos": [
+     {
+      "parche": "T5_cdmx → fecha_operacion",
+      "inyeccion": "una hora corrida",
+      "llave": "FX-000000001",
+      "falla": true
+     },
+     {
+      "parche": "char:4 → sucursal",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "FX-000000001",
+      "falla": true
+     },
+     {
+      "parche": "char:4 → sucursal",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "FX-000000001",
+      "falla": true
+     },
+     {
+      "parche": "T3_texto → cuenta_clabe",
+      "inyeccion": "«N/A» en lugar de «NA»",
+      "llave": "FX-000000048",
+      "falla": true
+     },
+     {
+      "parche": "T3_texto → cuenta_clabe",
+      "inyeccion": "«NA» con un espacio de más",
+      "llave": "FX-000000048",
+      "falla": true
+     },
+     {
+      "parche": "char:1 → tipo",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "FX-000000001",
+      "falla": true
+     },
+     {
+      "parche": "char:1 → tipo",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "FX-000000001",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "FX-000000001",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "FX-000000001",
+      "falla": true
+     },
+     {
+      "parche": "T3_numero → tipo_cambio_referencia",
+      "inyeccion": "casi cero (0.000001)",
+      "llave": "FX-000000053",
+      "falla": true
+     }
+    ],
     "cuadra": true
    },
    {
@@ -780,10 +881,108 @@
     "celdas_distintas": {},
     "ejemplos": [],
     "parches": {
-     "T5_cdmx_llegada": 301438,
-     "char": 128220,
-     "T3_texto": 128220
+     "T5_cdmx_llegada → fecha_registro": 150719,
+     "T5_cdmx_llegada → fecha_envio": 150719,
+     "char:11 → bic_intermediario": 128220,
+     "T3_texto → bic_intermediario": 128220
     },
+    "parches_medidos_en_origen": {
+     "T5_cdmx_llegada → fecha_registro": 150719,
+     "T5_cdmx_llegada → fecha_envio": 150719,
+     "char:11 → bic_corresponsal": 0,
+     "char:11 → bic_intermediario": 128220,
+     "T3_texto → bic_intermediario": 128220,
+     "char:3 → moneda": 0,
+     "char:3 → gastos": 0,
+     "char:4 → codigo_proposito": 0
+    },
+    "parches_sin_cuadrar": {},
+    "controles_negativos": [
+     {
+      "parche": "T5_cdmx_llegada → fecha_registro",
+      "inyeccion": "una hora corrida",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "T5_cdmx_llegada → fecha_envio",
+      "inyeccion": "una hora corrida",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:11 → bic_corresponsal",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:11 → bic_corresponsal",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:11 → bic_intermediario",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:11 → bic_intermediario",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "T3_texto → bic_intermediario",
+      "inyeccion": "«N/A» en lugar de «NA»",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "T3_texto → bic_intermediario",
+      "inyeccion": "«NA» con un espacio de más",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → gastos",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → gastos",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:4 → codigo_proposito",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     },
+     {
+      "parche": "char:4 → codigo_proposito",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "a8c273d2-2c1d-4f41-8764-35f5bd6d2d5b",
+      "falla": true
+     }
+    ],
     "cuadra": true,
     "documentos_sin_una_fila_vigente": 0,
     "documentos_con_otro_numero_de_registros": 0
@@ -801,8 +1000,20 @@
     "celdas_distintas": {},
     "ejemplos": [],
     "parches": {
-     "T5_cdmx_llegada": 270616
+     "T5_cdmx_llegada → fecha_registro": 270616
     },
+    "parches_medidos_en_origen": {
+     "T5_cdmx_llegada → fecha_registro": 270616
+    },
+    "parches_sin_cuadrar": {},
+    "controles_negativos": [
+     {
+      "parche": "T5_cdmx_llegada → fecha_registro",
+      "inyeccion": "una hora corrida",
+      "llave": "1",
+      "falla": true
+     }
+    ],
     "cuadra": true
    },
    {
@@ -828,10 +1039,61 @@
     "celdas_distintas": {},
     "ejemplos": [],
     "parches": {
-     "T5_ny": 244869,
-     "ciega1_T3": 48013
+     "T5_ny → fecha_hora": 244869,
+     "ciega1_T3 → referencia": 48013
     },
-    "cuadra": true
+    "parches_medidos_en_origen": {
+     "char:3 → moneda": 0,
+     "T5_ny → fecha_hora": 244869,
+     "ciega1_T3 → referencia": 48013
+    },
+    "parches_sin_cuadrar": {},
+    "controles_negativos": [
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "('c4e7a1d7-14f8-49cb-86f1-5f1d80a94209', 1)",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "('c4e7a1d7-14f8-49cb-86f1-5f1d80a94209', 1)",
+      "falla": true
+     },
+     {
+      "parche": "T5_ny → fecha_hora",
+      "inyeccion": "una hora corrida",
+      "llave": "('c4e7a1d7-14f8-49cb-86f1-5f1d80a94209', 1)",
+      "falla": true
+     },
+     {
+      "parche": "ciega1_T3 → referencia",
+      "inyeccion": "relleno fuera de la ventana",
+      "llave": "('ffd51b0a-5df9-4043-8b2d-264bf2b077dc', 1)",
+      "falla": true
+     },
+     {
+      "parche": "ciega1_T3 → referencia",
+      "inyeccion": "tabulador antes del relleno",
+      "llave": "('ffd51b0a-5df9-4043-8b2d-264bf2b077dc', 1)",
+      "falla": true
+     },
+     {
+      "parche": "ciega1_T3 → referencia",
+      "inyeccion": "truncado y rellenado",
+      "llave": "('ffd51b0a-5df9-4043-8b2d-264bf2b077dc', 1)",
+      "falla": true
+     },
+     {
+      "parche": "ciega1_T3 → referencia",
+      "inyeccion": "relleno que no llega al ancho",
+      "llave": "('ffd51b0a-5df9-4043-8b2d-264bf2b077dc', 1)",
+      "falla": true
+     }
+    ],
+    "cuadra": true,
+    "referencias_con_espacios_finales_en_toda_la_columna": 48013
    },
    {
     "tabla": "dbo.partida_liquidada (fila vigente) → decant.partida_cliente (T4)",
@@ -846,8 +1108,33 @@
     "celdas_distintas": {},
     "ejemplos": [],
     "parches": {
-     "T5_cdmx_llegada": 497556
+     "T5_cdmx_llegada → fecha_hora": 497556
     },
+    "parches_medidos_en_origen": {
+     "char:3 → moneda": 0,
+     "T5_cdmx_llegada → fecha_hora": 497556
+    },
+    "parches_sin_cuadrar": {},
+    "controles_negativos": [
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "truncado disfrazado de relleno",
+      "llave": "('79c9b5f6-c014-43c8-873d-3e5ddf253caf', 1)",
+      "falla": true
+     },
+     {
+      "parche": "char:3 → moneda",
+      "inyeccion": "tabulador en el relleno",
+      "llave": "('79c9b5f6-c014-43c8-873d-3e5ddf253caf', 1)",
+      "falla": true
+     },
+     {
+      "parche": "T5_cdmx_llegada → fecha_hora",
+      "inyeccion": "una hora corrida",
+      "llave": "('79c9b5f6-c014-43c8-873d-3e5ddf253caf', 1)",
+      "falla": true
+     }
+    ],
     "cuadra": true
    },
    {
@@ -880,10 +1167,10 @@
      "corresponsal: ENVIADA con partidas": 139
     },
     "ejemplos": {
-     "cliente: principal ≠ total del encabezado": "486a8a75-8f64-4cac-8612-e84f284356d0",
-     "cliente: desglose incompleto (< 3 partidas)": "486a8a75-8f64-4cac-8612-e84f284356d0",
-     "corresponsal: CONCILIADA y Σ ≠ total": "486a8a75-8f64-4cac-8612-e84f284356d0",
-     "corresponsal: VENCIDA con partidas": "b10fdcfd-20dc-4845-aa5c-2e1c90d16644",
+     "cliente: principal ≠ total del encabezado": "b6febee2-f19a-4fa7-b794-90acb4babda1",
+     "cliente: desglose incompleto (< 3 partidas)": "b6febee2-f19a-4fa7-b794-90acb4babda1",
+     "corresponsal: CONCILIADA y Σ ≠ total": "b6febee2-f19a-4fa7-b794-90acb4babda1",
+     "corresponsal: VENCIDA con partidas": "bb35a8f7-e0b5-4c39-99a6-24bcf101cc7e",
      "corresponsal: ENVIADA con partidas": "464c4628-20b2-4878-913d-b1af163f557c"
     },
     "documentos_con_violacion": 446151,
@@ -931,15 +1218,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -971,15 +1249,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1011,15 +1280,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1051,15 +1311,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1091,15 +1342,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1131,15 +1373,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1171,15 +1404,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1196,52 +1420,21 @@
    },
    {
     "regla": "R08",
-    "nombre": "horas de liquidación con los instantes (T5)",
-    "origen": "sp_conciliar",
+    "nombre": "horas de liquidación: réplica de la hora fija del legado (T5, ADR 0006)",
+    "origen": "sp_conciliar línea 128",
     "casos": 144183,
-    "coinciden": 102769,
+    "coinciden": 144183,
     "sobran_en_tobe": 0,
-    "pct": 71.28,
+    "pct": 100.0,
     "arbitraje": {
-     "diferencias": 41414,
+     "diferencias": 0,
      "por_categoria": {
       "defecto nuestro": 0,
       "regla real del legado": 0,
-      "discrepancia del legado": 41414,
+      "discrepancia del legado": 0,
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 41414,
-       "auditoria_fallida": 0,
-       "ejemplos": [
-        {
-         "regla": "R08",
-         "llave": "b884eb6b-8f0d-410b-979e-c0dd44efbd44",
-         "legado": "72.57",
-         "tobe": "71.57",
-         "evidencia": "legado − TO-BE = 1.00 h; (NY − CDMX) − 1 h en esos instantes = 1 h"
-        },
-        {
-         "regla": "R08",
-         "llave": "e39d5b01-afac-4da5-a3ff-b1b764e0e059",
-         "legado": "73.38",
-         "tobe": "72.38",
-         "evidencia": "legado − TO-BE = 1.00 h; (NY − CDMX) − 1 h en esos instantes = 1 h"
-        },
-        {
-         "regla": "R08",
-         "llave": "dd788d10-4e00-4331-bd94-0da14581d3d6",
-         "legado": "70.15",
-         "tobe": "69.15",
-         "evidencia": "legado − TO-BE = 1.00 h; (NY − CDMX) − 1 h en esos instantes = 1 h"
-        }
-       ]
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1273,15 +1466,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1313,15 +1497,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1353,15 +1528,6 @@
       "avance de producción": 0
      },
      "por_arbitro": {
-      "T5-desfase-fijo": {
-       "categoria": "discrepancia del legado",
-       "decision": "ADR 0008",
-       "explicacion": "el legado resta una hora fija a la hora de Nueva York; el TO-BE usa los instantes",
-       "pregunta": "¿Las horas de liquidación se calculan con el desfase real de Nueva York (TO-BE) o se conserva la hora fija del legado (una hora de más entre marzo y noviembre desde 2023)?",
-       "casos": 0,
-       "auditoria_fallida": 0,
-       "ejemplos": []
-      },
       "avance": {
        "categoria": "avance de producción",
        "decision": "corte medido",
@@ -1378,6 +1544,22 @@
    }
   ],
   "hipotesis": [
+   {
+    "regla": "R08 horas (T5)",
+    "hipotesis": "hora fija del legado: su fórmula sobre sus columnas locales crudas",
+    "elegida": true,
+    "casos": 144183,
+    "coinciden": 144183,
+    "pct": 100.0
+   },
+   {
+    "regla": "R08 horas (T5)",
+    "hipotesis": "con los instantes reales (Nueva York por el :13D: del buzón)",
+    "elegida": false,
+    "casos": 144183,
+    "coinciden": 102769,
+    "pct": 71.28
+   },
    {
     "regla": "R05 comisión (D1)",
     "hipotesis": "trunca (ROUND(x, 2, 1))",
@@ -1410,8 +1592,25 @@
     "lectura": "con una clase dominante, el % global de una regla inventada es alto: por eso se publica también por clase"
    }
   ],
-  "notas": {
-   "horas_con_envio_en_hora_repetida": 7
+  "t5": {
+   "casos": 144183,
+   "diferencias": 41414,
+   "conteos": {
+    "extra = 0 y el legado coincide": 102766,
+    "extra ≠ 0 y el legado difiere exactamente en el extra": 41410,
+    "hora repetida de la Ciudad de México (aparte; resuelta por orden de llegada)": 7,
+    "hora repetida: con diferencia": 4
+   },
+   "violaciones": 0,
+   "ventanas": {
+    "2023 (12-mar a 5-nov): Nueva York en horario de verano, México ya sin él": 34595,
+    "otoño 2021: México ya fuera del horario de verano, Nueva York todavía no": 711,
+    "otoño 2022: México ya fuera del horario de verano, Nueva York todavía no": 732,
+    "primavera 2021: Nueva York ya en horario de verano, México todavía no": 2498,
+    "primavera 2022: Nueva York ya en horario de verano, México todavía no": 2878
+   },
+   "suma_de_ventanas": 41414,
+   "ejemplos_de_violacion": []
   },
   "solo_marca": [
    {
@@ -1439,7 +1638,7 @@
  "reporte": {
   "publicado": {
    "archivo": "salida_reporte_del_mes_2023-12-29.jsonl",
-   "sha256": "b72045c846d0d5903078b2ac6b4413f6d2eb799db49caddeee611dce6b71a84a",
+   "sha256": "eae2de5c9144bf5e4a84c81c05f5c100f1c79c4c4927bf5734e8a97a4fe4508b",
    "renglones": 7492
   },
   "tobe": {
@@ -1449,6 +1648,7 @@
   "renglones_solo_legado": 0,
   "renglones_comunes": 7492,
   "renglones_comunes_con_celdas_distintas": 7492,
+  "llaves_repetidas": 0,
   "orden": {
    "tobe_contra_publicado": {
     "renglones": 7492,
@@ -1458,8 +1658,8 @@
     "pares_contrato": 26515033,
     "inversiones_contrato": 0,
     "pares_empatados": 1546253,
-    "inversiones_empatados": 733794,
-    "pct_empatados_invertidos": 47.46,
+    "inversiones_empatados": 735549,
+    "pct_empatados_invertidos": 47.57,
     "pct_posiciones_distintas": 99.7
    },
    "piso_misma_corrida": {
@@ -1471,36 +1671,115 @@
     "pares_contrato": 26515033,
     "inversiones_contrato": 0,
     "pares_empatados": 1546253,
-    "inversiones_empatados": 698537,
-    "pct_empatados_invertidos": 45.18,
-    "pct_posiciones_distintas": 99.6,
+    "inversiones_empatados": 661710,
+    "pct_empatados_invertidos": 42.79,
+    "pct_posiciones_distintas": 99.7,
     "muestras": [
      {
       "variante": "tal cual",
       "inversiones_contrato": 0,
-      "inversiones_empatados": 331503,
-      "pct_empatados_invertidos": 21.44,
+      "inversiones_empatados": 286990,
+      "pct_empatados_invertidos": 18.56,
       "mismo_contenido": true
      },
      {
       "variante": "estadísticas nuevas y caché de planes vacía",
       "inversiones_contrato": 0,
-      "inversiones_empatados": 292451,
-      "pct_empatados_invertidos": 18.91,
+      "inversiones_empatados": 81139,
+      "pct_empatados_invertidos": 5.25,
       "mismo_contenido": true
      },
      {
       "variante": "MAXDOP 4 (los núcleos del runner de GitHub)",
       "inversiones_contrato": 0,
-      "inversiones_empatados": 698537,
-      "pct_empatados_invertidos": 45.18,
+      "inversiones_empatados": 661710,
+      "pct_empatados_invertidos": 42.79,
       "mismo_contenido": true
      }
-    ]
+    ],
+    "candidatas": {
+     "moneda": {
+      "inversiones_por_variante": [
+       139138,
+       38708,
+       315688
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "bic_corresponsal": {
+      "inversiones_por_variante": [
+       139138,
+       38708,
+       315688
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "concepto": {
+      "inversiones_por_variante": [
+       138688,
+       39527,
+       320493
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "folio": {
+      "inversiones_por_variante": [
+       286988,
+       81139,
+       661708
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "uetr": {
+      "inversiones_por_variante": [
+       286988,
+       81139,
+       661708
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "estatus": {
+      "inversiones_por_variante": [
+       20318,
+       6146,
+       45564
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "fecha_envio": {
+      "inversiones_por_variante": [
+       286972,
+       81134,
+       661685
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "fecha_partida": {
+      "inversiones_por_variante": [
+       286975,
+       81130,
+       661671
+      ],
+      "orden_de_hecho_posible": false
+     },
+     "monto_partida": {
+      "inversiones_por_variante": [
+       286978,
+       81138,
+       661680
+      ],
+      "orden_de_hecho_posible": false
+     }
+    }
    },
    "contrato_en_cero": true,
    "empates_libres": true,
-   "veredicto": "contrato en 0; los empates no son contrato: el propio legado invierte hasta 45.18 % de sus pares empatados en esta corrida (con el plan variado) y el TO-BE 47.46 %"
+   "ordenes_de_hecho": {},
+   "veredicto": "contrato en 0; los empates no son contrato: el propio legado invierte hasta 42.79 % de sus pares empatados en esta corrida (con el plan variado) y el TO-BE 47.57 %"
+  },
+  "punto_ciego": {
+   "celdas_en_hora_repetida": 0,
+   "lectura": "en la hora que se repite, la hora local por texto no distingue la primera vuelta de la segunda; esas celdas no quedan verificadas por este nivel"
   },
   "arbitraje": {
    "diferencias": 15165,
@@ -1578,6 +1857,56 @@
    "sin_explicar_total": 0
   },
   "cumple": true,
+  "mutantes": [
+   {
+    "mutante": "un par de contrato invertido",
+    "debe": "inversiones de contrato = 1",
+    "cumple_la_paridad": false,
+    "defectos": 0,
+    "inversiones_contrato": 1,
+    "falla_como_debe": true
+   },
+   {
+    "mutante": "un renglón quitado",
+    "debe": "«sólo en el legado» = 1 y defecto nuestro = 1",
+    "cumple_la_paridad": false,
+    "defectos": 1,
+    "inversiones_contrato": 0,
+    "falla_como_debe": true
+   },
+   {
+    "mutante": "un renglón duplicado",
+    "debe": "llave repetida = 1 y defecto nuestro = 1",
+    "cumple_la_paridad": false,
+    "defectos": 1,
+    "inversiones_contrato": 0,
+    "falla_como_debe": true
+   },
+   {
+    "mutante": "un centavo distinto",
+    "debe": "defecto nuestro = 1",
+    "cumple_la_paridad": false,
+    "defectos": 1,
+    "inversiones_contrato": 0,
+    "falla_como_debe": true
+   },
+   {
+    "mutante": "una hora corrida 1 h con el desfase bien escrito",
+    "debe": "defecto nuestro = 1 (la regla «hora local sin zona» la rechaza)",
+    "cumple_la_paridad": false,
+    "defectos": 1,
+    "inversiones_contrato": 0,
+    "falla_como_debe": true
+   },
+   {
+    "mutante": "un avance que el legado vivo no tiene",
+    "debe": "defecto nuestro = 1 (la auditoría del avance lo rechaza)",
+    "cumple_la_paridad": false,
+    "defectos": 1,
+    "inversiones_contrato": 0,
+    "falla_como_debe": true
+   }
+  ],
   "legado_vivo_disponible": true
  },
  "gemelos": {
@@ -1655,17 +1984,17 @@
   "cumple": true
  },
  "tiempos": {
-  "restaurar el respaldo en un contenedor limpio": 11.2,
-  "extraer universo y oráculo": 37.6,
-  "cargar decant_migracion y comparar su esquema": 37.5,
-  "cargar decant_motor y comparar su esquema": 38.2,
-  "cargar decant_marca_vencimiento y comparar su esquema": 39.0,
-  "cargar decant_marca_conciliacion y comparar su esquema": 42.1,
-  "cargar decant_sombra y comparar su esquema": 41.2,
-  "verificar la migración (byte a byte y cuadres)": 71.7,
-  "medir el motor": 32.0,
-  "paridad de reporte": 10.7,
-  "gemelos": 2.3
+  "restaurar el respaldo en un contenedor limpio": 6.4,
+  "extraer universo y oráculo": 36.3,
+  "cargar decant_migracion y comparar su esquema": 31.9,
+  "cargar decant_motor y comparar su esquema": 33.1,
+  "cargar decant_marca_vencimiento y comparar su esquema": 34.8,
+  "cargar decant_marca_conciliacion y comparar su esquema": 35.4,
+  "cargar decant_sombra y comparar su esquema": 34.7,
+  "verificar la migración (byte a byte y cuadres)": 70.8,
+  "medir el motor": 35.4,
+  "paridad de reporte": 44.1,
+  "gemelos": 1.9
  },
  "trampas_a_ciegas": [
   {
@@ -1690,7 +2019,7 @@
    "descripcion": "espacios finales en la referencia del corresponsal",
    "objeto": "dbo.partida_solicitada.referencia",
    "visto": "sí",
-   "evidencia": "byte a byte, dbo.partida_solicitada → decant.partida_corresponsal (T4): 48,013 celdas de `referencia` difieren del TO-BE (que guarda la referencia del buzón, sin relleno). El parche ciega1_T3 que las explica (48,013) se escribió con el catálogo YA revelado; sin él, la verificación falla con esas celdas. La paridad de reporte no la ve: el reporte no imprime la referencia"
+   "evidencia": "byte a byte, dbo.partida_solicitada → decant.partida_corresponsal (T4): sin su parche, 48,013 celdas de `referencia` difieren del TO-BE (que guarda la referencia del buzón). El parche es exacto (ventana, ancho 35, sólo espacios) y su conteo, medido en el ORIGEN por otro camino, da 48,013; 4 de 4 defectos distintos inyectados en la columna fallan como deben. El parche se escribió con el catálogo YA revelado (ADR 0007). La paridad de reporte no la ve: el reporte no imprime la referencia"
   },
   {
    "ronda": "ronda 2",
@@ -1723,7 +2052,11 @@
   "cuadre_por_lado": true,
   "motor_sin_defectos_nuestros": true,
   "solo_marca": true,
+  "parches_aplicados_igual_a_lo_medido_en_el_origen": true,
+  "controles_negativos_de_parches": true,
+  "r08_replica_y_auditoria_de_t5": true,
   "paridad_de_reporte": true,
+  "mutantes_del_reporte_fallan": true,
   "gemelos": true,
   "todo": true
  }

@@ -33,26 +33,34 @@ Un comando, `python -m paridad`, restaura el respaldo en un contenedor limpio, m
 la última escritura), extrae universo y oráculo por columna, carga el TO-BE cinco veces y escribe el informe.
 
 - **«Verificar la migración»** (carga histórica): las 7 tablas byte a byte, 13.7 millones de celdas y 138 MB después
-  de los parches documentados, **0 faltan, 0 sobran, 0 distintas**. Los parches se cuentan: 107,265 CLABE «NA» y
-  128,220 BIC «NA» a NULL, 53,702 tipos de cambio en 0 a NULL, 48,013 referencias con relleno (las de la ronda 1 a
-  ciegas) y cada hora local a su instante. Las 119,897 filas REEMPLAZADA son copias exactas del documento y sus
-  395,618 partidas se reconstruyen. El **esquema** se compara columna por columna después de cada una de las 5 cargas,
-  y su control negativo (un TO-BE sin `codigo_proposito`, T6) falla nombrándola. El **cuadre por lado** («Σ partes =
-  total del encabezado») da 0 violaciones en el legado (con los lados que pinta la pantalla) y en el TO-BE; con los
-  lados según el NOMBRE de la tabla da 446,151.
-- **«Medir el motor»** (replay sólo del universo, reloj de cada noche del job): 10 de 11 reglas al **100 %**; las
-  horas de liquidación al **71.28 %**, con las 41,414 diferencias auditadas como discrepancia del legado (T5: el legado
-  resta una hora fija) y la misma cifra que da la verdad del generador. La paridad encontró **un defecto nuestro**:
-  5 folios OP en otro orden en la hora que se repite el 31-oct-2021. Se corrigió con su regla (orden de llegada) y su
-  prueba. Con las acciones del job en **«sólo marca»**, las 110,424 marcas de vencimiento y las 144,183 de
-  conciliación coinciden 100 % con la bitácora del legado, noche por noche.
+  de los parches documentados, **0 faltan, 0 sobran, 0 distintas**. Cada parche es una transformación EXACTA con el
+  predicado de su hallazgo ([reglas](docs/parches.md)). Lo que aplica se mide en el ORIGEN por otro camino (SQL en el
+  legado restaurado) y debe coincidir. Los conteos aplicados y medidos son iguales: 107,265 CLABE y 128,220 BIC
+  «NA» a NULL, 53,702 tipos de cambio en 0 a NULL y 48,013 referencias con el relleno de ancho fijo de la ronda 1 a
+  ciegas. Además, cada defecto DISTINTO inyectado en su columna falla (relleno fuera de la ventana, tabulador,
+  truncado, «N/A», una hora corrida). Las 119,897 filas REEMPLAZADA son copias exactas del documento y sus 395,618
+  partidas se reconstruyen. El **esquema** se compara columna por columna después de cada una de las 5 cargas, y su
+  control negativo (un TO-BE sin `codigo_proposito`, T6) falla nombrándola. El **cuadre por lado** («Σ partes = total
+  del encabezado») da 0 violaciones en el legado (con los lados que pinta la pantalla) y en el TO-BE; con los lados
+  según el NOMBRE de la tabla da 446,151.
+- **«Medir el motor»** (replay sólo del universo, reloj de cada noche del job): las **11 reglas al 100 %**. Las horas
+  de liquidación (R08) REPLICAN la hora fija del legado mientras negocio no decida (ADR 0006). La corrección se
+  publica como hipótesis: con los instantes reales coincidiría en 71.28 %, y la auditoría va en los dos sentidos. Con
+  Nueva York por el `:13D:` del buzón, desfase extra ≠ 0 ⇔ diferencia en los 144,183 casos, sin violaciones. Las
+  41,414 diferencias se desglosan por ventana: 34,595 de 2023 y 6,819 de las primaveras y otoños de 2021 y 2022. La
+  paridad encontró **un defecto nuestro**: 5 folios OP en otro orden en la hora que se repite el 31-oct-2021. Se
+  corrigió con su regla (orden de llegada) y su prueba. Con las acciones del job en **«sólo marca»**, las 110,424
+  marcas de vencimiento y las 144,183 de conciliación coinciden 100 % con la bitácora del legado, noche por noche.
 - **Paridad de reporte**: el reporte del TO-BE en sombra (todo el universo) contra el que el legado publicó al
   respaldar, por llave natural: 0 defectos nuestros, 181 renglones de **avance de producción** (confirmaciones
   posteriores al corte, auditadas en el legado vivo por identidad) y 14,984 celdas por una **regla real del legado**
   (publica la hora local sin zona; el TO-BE publica la misma hora con su desfase). Orden: **0 inversiones de
   contrato**; los empates se juzgan contra el piso de la misma corrida, medido con el plan variado (una sola
   re-corrida llegó a reproducir el orden exacto en un clon limpio, mientras la radiografía del mismo ciclo medía
-  13.78 %).
+  13.78 %). Ninguna llave secundaria candidata se salva: el legado las invierte todas en alguna variante del plan.
+  El comparador demuestra que puede fallar con **6 mutantes** del reporte del TO-BE (un par de contrato invertido, un
+  renglón quitado o duplicado, un centavo, una hora corrida con el desfase bien escrito, un avance que el legado vivo
+  no tiene), y todos fallan. El punto ciego de la hora repetida queda declarado (0 celdas en este reporte).
 - **Gemelos** (pantalla de detalle del legado contra el JSON de la API) en 3 casos estratificados, y **T4** probado por
   el binding de la pantalla: el TO-BE publica en `liquidadoPorElCorresponsal` lo que la rejilla «Liquidado por el
   corresponsal» pinta, que vive en la tabla `partida_solicitada`.
@@ -177,15 +185,16 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
 
 ## Pruebas
 
-- `pytest`: 143 pruebas sin base. Cubren:
+- `pytest`: 161 pruebas sin base. Cubren:
   - el determinismo del generador (huella fija) y la existencia de cada trampa en los datos;
   - el universo: partición por columna, llaves reales del buzón, liquidaciones descartadas y nombres sanos en el
     archivo de sucursales;
   - el orden por inversiones;
   - cada detector con casos positivos y negativos, incluidas regresiones de los controles;
   - la no circularidad (ningún detector lee el catálogo) y el congelamiento de los detectores;
-  - la paridad: universo y oráculo atados a la partición, mapeo y parches, esquema con su control de T6, arbitraje,
-    cuadre por lado y el binding de la pantalla.
+  - la paridad: universo y oráculo atados a la partición, cada parche exacto con su control negativo, la conversión
+    de horas contra la del generador, esquema con su control de T6, arbitraje, R08 como hipótesis, los mutantes del
+    reporte, cuadre por lado y el binding de la pantalla.
 - `pytest -m integracion`: 16 pruebas contra SQL Server real. Comprueban:
   - que el generador calcula lo mismo que los procedimientos del legado;
   - el criterio de salida contra el manifiesto;
@@ -198,8 +207,8 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - lo que pierde el delta por la pantalla;
   - los espacios finales contados en el motor y la medición separada por catálogo.
 
-- `dotnet test Decant.slnx`: 120 pruebas del TO-BE.
-  - `Decant.Domain.Tests` (75): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
+- `dotnet test Decant.slnx`: 121 pruebas del TO-BE.
+  - `Decant.Domain.Tests` (76): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
     ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón), bordes e invariantes.
     Mutación del dominio con Stryker.NET: **83.78 %** (155 de 185 mutantes; los que sobreviven son textos de
     mensajes de error y mutantes equivalentes, como `Sum` contra `Max` sobre el único principal).
@@ -208,7 +217,7 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
     real con Testcontainers.
   - `Decant.Architecture.Tests` (7): capas, el replay sin acceso al oráculo y nadie usa `DateTime.Now` salvo
     `SystemClock` (recorriendo el IL).
-- `pytest -m paridad`: 6 pruebas sobre el informe de paridad, entre ellas la de T4 por el binding de la pantalla.
+- `pytest -m paridad`: 8 pruebas sobre el informe de paridad, entre ellas la de T4 por el binding de la pantalla.
 
 ## Seguridad
 
