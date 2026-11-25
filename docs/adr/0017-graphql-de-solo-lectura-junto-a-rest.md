@@ -35,7 +35,9 @@ GraphQL resuelve eso en una petición, pero trae riesgos propios:
 3. **Tipos propios en `Decant.Api.GraphQL`**: `Operacion`, `Orden`, `Partida` y `RenglonDeReporte`. La forma del
    esquema se decide en la API, con los mismos nombres de campo que el JSON de REST. La orden y su operación se
    navegan en los dos sentidos.
-4. **Paginación por cursor** (conexiones de Relay) con llave de conjunto:
+4. **Paginación por cursor** (conexiones de Relay) con llave de conjunto. En SQL es una comparación por fila,
+   `(fecha_valor, folio, renglon) > (@valor, @folio, @renglon)`, con el mismo orden y la misma colación que el
+   `ORDER BY`:
    - el cursor es opaco y lleva la POSICIÓN del último elemento más los argumentos de la consulta que lo dio;
    - un cursor de otro día, de otro rango o de otra lista se rechaza;
    - sólo hacia adelante, con páginas de 1 a 100 (20 por omisión) y sin `totalCount`.
