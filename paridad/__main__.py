@@ -17,10 +17,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
+
+import pymssql
 
 from paridad import binding, esquema, extraer, gemelos, informe, migracion, motor, reporte, tobe
 from paridad.respaldo_limpio import restaurar
@@ -35,11 +38,15 @@ BASES = {
 
 
 def _vivo():
-    """El legado vivo (después del delta), si está arriba: audita el avance de producción."""
+    """El legado vivo (después del delta), si está arriba: audita el avance de producción. Sin legado vivo el avance
+    queda sin auditar (y no se absuelve); cualquier otra falla sube."""
+    if not os.environ.get('DECANT_SA_PASSWORD'):
+        print('  legado vivo no disponible: falta DECANT_SA_PASSWORD', file=sys.stderr)
+        return None
+    from legado.conexion import conectar
     try:
-        from legado.conexion import conectar
         return conectar()
-    except BaseException as error:              # sin legado vivo el avance queda sin auditar (y no se absuelve)
+    except (pymssql.Error, ValueError) as error:   # no está arriba (o el puerto no es un número)
         print(f'  legado vivo no disponible: {error}', file=sys.stderr)
         return None
 

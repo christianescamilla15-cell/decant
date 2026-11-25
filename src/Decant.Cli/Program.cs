@@ -6,6 +6,7 @@ using Decant.Application.Abstracciones;
 using Decant.Application.Carga;
 using Decant.Application.Consultas;
 using Decant.Application.Motor;
+using Decant.Application.Puertos;
 using Decant.Domain.Comun;
 using Decant.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -148,21 +149,23 @@ public static class Program
             "moneda", "monto", "gastos", "estatus", "concepto", "monto_partida", "fecha_partida",
         ];
         await escritor.WriteLineAsync(JsonSerializer.Serialize(columnas, JsonEnLinea));
-        foreach (var r in renglones)
+        foreach (var fila in renglones.Select(Fila))
         {
-            string?[] fila =
-            [
-                r.Folio, r.Uetr.ToString(), r.ReferenciaMt103, Hora(r.FechaEnvio, Zonas.CiudadDeMexico),
-                r.FechaValor.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), r.BicCorresponsal, r.Beneficiario,
-                r.Moneda, r.Monto.ToString(CultureInfo.InvariantCulture), r.Gastos, r.Estatus, r.Concepto,
-                r.MontoPartida.ToString(CultureInfo.InvariantCulture), Hora(r.FechaPartida, Zonas.NuevaYork),
-            ];
             await escritor.WriteLineAsync(JsonSerializer.Serialize(fila, JsonEnLinea));
         }
 
         Console.WriteLine($"{renglones.Count} renglones → {salida}");
         return 0;
     }
+
+    /// <summary>Un renglón del reporte en el orden de columnas del legado, con cada hora en su zona.</summary>
+    private static string?[] Fila(RenglonDeReporte r) =>
+    [
+        r.Folio, r.Uetr.ToString(), r.ReferenciaMt103, Hora(r.FechaEnvio, Zonas.CiudadDeMexico),
+        r.FechaValor.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), r.BicCorresponsal, r.Beneficiario,
+        r.Moneda, r.Monto.ToString(CultureInfo.InvariantCulture), r.Gastos, r.Estatus, r.Concepto,
+        r.MontoPartida.ToString(CultureInfo.InvariantCulture), Hora(r.FechaPartida, Zonas.NuevaYork),
+    ];
 
     private static string Hora(DateTimeOffset instante, TimeZoneInfo zona) =>
         Zonas.EnZona(instante, zona).ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture);

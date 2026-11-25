@@ -483,3 +483,43 @@ def test_cada_tabla_de_las_migraciones_tiene_origen_o_declaracion():
     assert {'orden_pago', 'resultado_archivo'} <= tablas
     con_origen = {c.rsplit('.', 1)[0] for c in destinos()} | {c.rsplit('.', 1)[0] for c in NUEVAS}
     assert sorted(t for t in tablas if T + t not in con_origen) == []
+
+
+def test_sin_legado_vivo_el_avance_queda_sin_auditar_y_otra_falla_sube(monkeypatch):
+    import pymssql
+
+    from legado import conexion
+    from paridad import __main__ as principal
+    monkeypatch.delenv('DECANT_SA_PASSWORD', raising=False)
+    assert principal._vivo() is None                       # sin contraseña ni se intenta
+    monkeypatch.setenv('DECANT_SA_PASSWORD', 'x')
+
+    def caido(*_, **__):
+        raise pymssql.OperationalError('Adaptive Server is unavailable')
+    monkeypatch.setattr(conexion, 'conectar', caido)
+    assert principal._vivo() is None                       # no está arriba
+
+    def interrumpido(*_, **__):
+        raise KeyboardInterrupt
+    monkeypatch.setattr(conexion, 'conectar', interrumpido)
+    with pytest.raises(KeyboardInterrupt):                 # antes se tragaba (except BaseException)
+        principal._vivo()
+
+
+def test_esperar_reporta_por_que_nada_responde():
+    import socket
+    import subprocess
+    import sys
+
+    from paridad import gemelos
+    with socket.socket() as s:
+        s.bind(('127.0.0.1', 0))
+        puerto = s.getsockname()[1]                         # libre: nadie escucha ahí
+    proceso = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])
+    try:
+        with pytest.raises(SystemExit, match='último intento: ConnectionRefusedError'):
+            gemelos._esperar(puerto, '/salud', proceso, segundos=1)
+    finally:
+        proceso.kill()
+        proceso.wait()
+

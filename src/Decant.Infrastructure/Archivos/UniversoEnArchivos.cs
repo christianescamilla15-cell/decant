@@ -68,7 +68,7 @@ public sealed class UniversoEnArchivos(string carpeta) : IUniverso
     /// </summary>
     public IEnumerable<ArchivoDeInterfaz> ArchivosDelBuzon()
     {
-        var buzon = Path.Combine(carpeta, "interfaces", "corresponsal");
+        var buzon = RutaDentro.De(carpeta, "interfaces", "corresponsal");
         foreach (var archivo in Directory.GetFiles(buzon, "*.fin").OrderBy(a => a, StringComparer.Ordinal))
         {
             string? contenido = null;
@@ -92,5 +92,5 @@ public sealed class UniversoEnArchivos(string carpeta) : IUniverso
                 TimeOnly.ParseExact(f.Requerido("hora"), "HH:mm", CultureInfo.InvariantCulture)))
             .ToList();
 
-    private string Ruta(string archivo) => Path.Combine(carpeta, archivo);
+    private string Ruta(string archivo) => RutaDentro.De(carpeta, archivo);
 }

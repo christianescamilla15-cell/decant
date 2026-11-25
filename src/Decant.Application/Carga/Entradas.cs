@@ -39,6 +39,9 @@ public static class Entradas
             e.Estatus);
     }
 
+    /// <summary>Un registro de la orden de pago del legado como DOCUMENTO del TO-BE: su UETR, sus datos y el instante
+    /// del registro (hora local de la Ciudad de México vuelta instante).</summary>
+    /// <param name="e">El registro tal como lo dejó el legado.</param>
     /// <param name="registroAnterior">El instante del alta anterior POR IDENTIDAD (orden de llegada): decide la hora
     /// repetida al terminar el horario de verano.</param>
     /// <param name="primerRegistro">El primer registro del MISMO documento, si ya llegó. El envío se ancla ahí: un

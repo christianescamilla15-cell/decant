@@ -11,6 +11,8 @@ namespace Decant.Api.Tests;
 [Collection(nameof(BaseDePrueba))]
 public class ApiTests(BaseDePrueba baseDePrueba) : IAsyncLifetime
 {
+    /// <summary>La fábrica base: las derivadas (un ambiente, una conexión) cuelgan de ella y se liberan con ella.</summary>
+    private readonly WebApplicationFactory<Program> _base = new();
     private WebApplicationFactory<Program> _fabrica = null!;
     private HttpClient _cliente = null!;
 
@@ -29,10 +31,11 @@ public class ApiTests(BaseDePrueba baseDePrueba) : IAsyncLifetime
     {
         _cliente.Dispose();
         await _fabrica.DisposeAsync();
+        await _base.DisposeAsync();
     }
 
     private WebApplicationFactory<Program> Fabrica(string ambiente) =>
-        new WebApplicationFactory<Program>().WithWebHostBuilder(b => b
+        _base.WithWebHostBuilder(b => b
             .UseEnvironment(ambiente)
             .UseSetting("ConnectionStrings:Decant", baseDePrueba.Conexion));
 

@@ -35,7 +35,8 @@ public class ConfiguracionTests
     [MemberData(nameof(CadaBandera))]
     public void Cada_bandera_se_lee_de_su_clave_y_solo_de_ella(string bandera)
     {
-        var banco = Banderas_.ToDictionary(b => $"Decant:Banderas:{b}", b => (string?)(b == bandera ? "true" : "false"));
+        var banco = Banderas_.ToDictionary<string, string, string?>(b => $"Decant:Banderas:{b}",
+            b => b == bandera ? "true" : "false");
         var leida = Leer(banco).Banderas;
         foreach (var b in Banderas_)
         {
@@ -47,7 +48,7 @@ public class ConfiguracionTests
     [MemberData(nameof(CadaDestino))]
     public void Cada_destino_se_lee_de_su_clave(string destino)
     {
-        var banco = Destinos_.ToDictionary(d => $"Decant:Destinos:{d}", d => (string?)$"valor-de-{d}");
+        var banco = Destinos_.ToDictionary<string, string, string?>(d => $"Decant:Destinos:{d}", d => $"valor-de-{d}");
         Assert.Equal($"valor-de-{destino}", Valor(Leer(banco).Destinos, destino));
     }
 
@@ -68,7 +69,7 @@ public class ConfiguracionTests
     [MemberData(nameof(CadaAppsettings))]
     public void Ninguna_clave_de_los_appsettings_sobra(string archivo)
     {
-        using var json = JsonDocument.Parse(File.ReadAllText(Path.Combine(CarpetaDeLaApi(), archivo)));
+        using var json = JsonDocument.Parse(File.ReadAllText(Path.Join(CarpetaDeLaApi(), archivo)));
         var conocidas = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
             ["Banderas"] = Banderas_,
@@ -76,10 +77,11 @@ public class ConfiguracionTests
         };
         foreach (var seccion in json.RootElement.GetProperty(ConfiguracionPorAmbiente.Seccion).EnumerateObject())
         {
-            Assert.True(conocidas.ContainsKey(seccion.Name), $"{archivo}: sección desconocida {seccion.Name}");
+            Assert.True(conocidas.TryGetValue(seccion.Name, out var claves),
+                $"{archivo}: sección desconocida {seccion.Name}");
             foreach (var clave in seccion.Value.EnumerateObject())
             {
-                Assert.Contains(clave.Name, conocidas[seccion.Name]);
+                Assert.Contains(clave.Name, claves);
             }
         }
     }
@@ -91,8 +93,8 @@ public class ConfiguracionTests
         foreach (var ambiente in ConfiguracionPorAmbiente.Ambientes)
         {
             var configuracion = new ConfigurationBuilder()
-                .AddJsonFile(Path.Combine(CarpetaDeLaApi(), "appsettings.json"))
-                .AddJsonFile(Path.Combine(CarpetaDeLaApi(), $"appsettings.{ambiente}.json"))
+                .AddJsonFile(Path.Join(CarpetaDeLaApi(), "appsettings.json"))
+                .AddJsonFile(Path.Join(CarpetaDeLaApi(), $"appsettings.{ambiente}.json"))
                 .Build();
             var leida = ConfiguracionPorAmbiente.Leer(configuracion, ambiente);
             var texto = string.Join('\n', ConfiguracionPorAmbiente.Describir(leida));
@@ -113,12 +115,12 @@ public class ConfiguracionTests
     private static string CarpetaDeLaApi()
     {
         var carpeta = new DirectoryInfo(AppContext.BaseDirectory);
-        while (carpeta is not null && !File.Exists(Path.Combine(carpeta.FullName, "Decant.slnx")))
+        while (carpeta is not null && !File.Exists(Path.Join(carpeta.FullName, "Decant.slnx")))
         {
             carpeta = carpeta.Parent;
         }
 
-        return Path.Combine(carpeta?.FullName ?? throw new DirectoryNotFoundException("Decant.slnx"), "src",
+        return Path.Join(carpeta?.FullName ?? throw new DirectoryNotFoundException("Decant.slnx"), "src",
             "Decant.Api");
     }
 }

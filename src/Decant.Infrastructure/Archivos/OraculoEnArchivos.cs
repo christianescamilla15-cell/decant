@@ -31,5 +31,5 @@ public sealed class OraculoEnArchivos(string carpeta) : IOraculoHistorico
                 f.Requerido("concepto"), f.Requerido("moneda"), f.Decimal("monto"), f.Hora("fecha_hora"),
                 f.Requerido("referencia")));
 
-    private string Ruta(string archivo) => Path.Combine(carpeta, archivo);
+    private string Ruta(string archivo) => RutaDentro.De(carpeta, archivo);
 }

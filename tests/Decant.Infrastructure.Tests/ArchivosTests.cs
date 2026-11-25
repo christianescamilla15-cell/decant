@@ -10,7 +10,7 @@ public sealed class ArchivosTests : IDisposable
     public void Dispose() => Directory.Delete(_carpeta, recursive: true);
 
     private void Escribir(string archivo, string contenido) =>
-        File.WriteAllText(Path.Combine(_carpeta, archivo), contenido);
+        File.WriteAllText(Path.Join(_carpeta, archivo), contenido);
 
     [Fact]
     public void Un_universo_con_una_columna_de_resultado_no_se_lee()
@@ -36,9 +36,9 @@ public sealed class ArchivosTests : IDisposable
     [Fact]
     public void El_buzon_se_lee_archivo_por_archivo_en_orden_de_fecha()
     {
-        var buzon = Directory.CreateDirectory(Path.Combine(_carpeta, "interfaces", "corresponsal")).FullName;
-        File.WriteAllText(Path.Combine(buzon, "20230602.fin"), "{3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n-}\n");
-        File.WriteAllText(Path.Combine(buzon, "20230601.fin"),
+        var buzon = Directory.CreateDirectory(Path.Join(_carpeta, "interfaces", "corresponsal")).FullName;
+        File.WriteAllText(Path.Join(buzon, "20230602.fin"), "{3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n-}\n");
+        File.WriteAllText(Path.Join(buzon, "20230601.fin"),
             "{3:{121:3edcbeae-c21e-40f1-b309-430eca67e133}}\n:20:A\n-}\n${3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n:20:B\n-}\n");
         var archivos = new UniversoEnArchivos(_carpeta).ArchivosDelBuzon().ToList();
         Assert.Equal(["20230601.fin", "20230602.fin"], archivos.Select(a => a.Nombre));
@@ -50,15 +50,35 @@ public sealed class ArchivosTests : IDisposable
     [Fact]
     public void Un_archivo_danado_deja_su_falla_y_no_detiene_a_los_demas()
     {
-        var buzon = Directory.CreateDirectory(Path.Combine(_carpeta, "interfaces", "corresponsal")).FullName;
-        File.WriteAllText(Path.Combine(buzon, "20230601.fin"), "{3:{121:3edcbeae-c21e-40f1-b309-430eca67e133}}\n-}\n");
-        File.WriteAllBytes(Path.Combine(buzon, "20230602.fin"), [0x3A, 0x32, 0x30, 0x3A, 0xC3, 0x28, 0x0A]);
-        File.WriteAllText(Path.Combine(buzon, "20230603.fin"), "{3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n-}\n");
+        var buzon = Directory.CreateDirectory(Path.Join(_carpeta, "interfaces", "corresponsal")).FullName;
+        File.WriteAllText(Path.Join(buzon, "20230601.fin"), "{3:{121:3edcbeae-c21e-40f1-b309-430eca67e133}}\n-}\n");
+        File.WriteAllBytes(Path.Join(buzon, "20230602.fin"), [0x3A, 0x32, 0x30, 0x3A, 0xC3, 0x28, 0x0A]);
+        File.WriteAllText(Path.Join(buzon, "20230603.fin"), "{3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n-}\n");
         var archivos = new UniversoEnArchivos(_carpeta).ArchivosDelBuzon().ToList();
         Assert.Equal(3, archivos.Count);
         Assert.Equal((null, "DecoderFallbackException"), (archivos[1].Contenido, archivos[1].FallaDeLectura));
         Assert.NotNull(archivos[0].Contenido);
         Assert.NotNull(archivos[2].Contenido);
+    }
+
+    /// <summary>La carpeta llega de datos: ninguna parte puede sacar la ruta de la raíz (control negativo de lo que
+    /// <c>Path.Combine</c> permitía: con una parte absoluta descartaba la raíz sin avisar).</summary>
+    [Theory]
+    [InlineData("/etc/passwd")]
+    [InlineData("../fuera.jsonl")]
+    [InlineData("interfaces/../../fuera.jsonl")]
+    [InlineData("..")]
+    [InlineData("")]
+    public void Una_ruta_que_sale_de_la_raiz_se_rechaza(string parte)
+    {
+        Assert.Throws<ArgumentException>(() => RutaDentro.De(_carpeta, parte));
+    }
+
+    [Fact]
+    public void Una_ruta_dentro_de_la_raiz_se_arma_con_join()
+    {
+        Assert.Equal(Path.Join(Path.GetFullPath(_carpeta), "interfaces", "corresponsal"),
+            RutaDentro.De(_carpeta, "interfaces", "corresponsal"));
     }
 
     [Fact]

@@ -101,8 +101,8 @@ def _n(valor) -> str:
 def markdown(r: dict) -> str:
     c = r['cumple']
     md = ['# Paridad del TO-BE contra el legado', '',
-         f"Generado {r['generado']} con `python -m paridad`. Corte medido de la fuente: "
-         f"**{r['corte']['instante_local']}** (Ciudad de México) = {r['corte']['instante_utc']}; "
+         f"Generado {r['generado']} con `python -m paridad`. Corte medido de la fuente: " +
+         f"**{r['corte']['instante_local']}** (Ciudad de México) = {r['corte']['instante_utc']}; " +
          f"{r['corte']['regla']}.", '',
          '| Ejercicio | Cumple |', '|---|---|']
     md += [f"| {k.replace('_', ' ')} | {'sí' if v else '**NO**'} |" for k, v in c.items() if k != 'todo']
@@ -117,11 +117,11 @@ def markdown(r: dict) -> str:
         md.append(f"| {t['tabla']} | {t['llave']} | {_n(t['filas'])} | {_n(t.get('celdas', '—'))} | "
                  f"{_n(t.get('bytes', '—'))} | {_n(t['faltan'])} | {_n(t['sobran'])} | {_n(distintas)} | {parches} |")
     md += ['', '### Parches: lo aplicado contra lo medido en el ORIGEN, y su control negativo', '',
-           'Cada parche es una transformación exacta con el predicado de su hallazgo '
-           '([reglas](../../docs/parches.md)). '
-           'Su conteo esperado se mide en el legado restaurado con SQL, por otro camino que el diff; en una copia de '
+           'Cada parche es una transformación exacta con el predicado de su hallazgo ' +
+           '([reglas](../../docs/parches.md)). ' +
+           'Su conteo esperado se mide en el legado restaurado con SQL, por otro camino que el diff; en una copia de ' +
            'renglones reales se inyecta un defecto DISTINTO en la misma columna y debe fallar.', '',
-           '| Tabla | Parche → columna | Aplicado | Medido en el origen | Igual | Defectos distintos inyectados que '
+           '| Tabla | Parche → columna | Aplicado | Medido en el origen | Igual | Defectos distintos inyectados que ' +
            'fallan |', '|---|---|---:|---:|---|---|']
     for t in r['migracion']['byte_a_byte']:
         claves = sorted(set(t.get('parches', {})) | set(t.get('parches_medidos_en_origen', {})))
@@ -134,7 +134,7 @@ def markdown(r: dict) -> str:
                       f"{'sí' if aplicado == medido else '**NO**'} | {detalle or '—'} |")
     relleno = next((t.get('referencias_con_espacios_finales_en_toda_la_columna')
                     for t in r['migracion']['byte_a_byte'] if t['tabla'].startswith('dbo.partida_solicitada')), None)
-    md += ['', f'Espacios finales en TODA la columna `partida_solicitada.referencia`: {_n(relleno)} (los que no '
+    md += ['', f'Espacios finales en TODA la columna `partida_solicitada.referencia`: {_n(relleno)} (los que no ' +
                'cumplan el predicado del hallazgo quedarían como diferencias).']
     md += ['', '### Esquema columna por columna, después de cada carga', '',
           '| Carga | Columnas legado | Columnas TO-BE | Errores | Avisos |', '|---|---:|---:|---:|---|']
@@ -144,8 +144,8 @@ def markdown(r: dict) -> str:
         md.append(f"| {r['cargas'][nombre]['base']} | {e['columnas_legado']} | {e['columnas_tobe']} | "
                  f"{len(e['errores'])} | {'; '.join(e['avisos']) or '—'} |")
     t6 = r['esquema']['control_negativo_t6']
-    md += ['', f"**Control negativo (T6):** la misma comparación contra un TO-BE sin `codigo_proposito` "
-              f"{'FALLA y la nombra' if t6['caza_t6'] else 'NO la caza'}: "
+    md += ['', "**Control negativo (T6):** la misma comparación contra un TO-BE sin `codigo_proposito` " +
+              f"{'FALLA y la nombra' if t6['caza_t6'] else 'NO la caza'}: " +
               f"«{t6['errores'][0] if t6['errores'] else ''}».",
           '', '### Cuadre interno por lado (Σ partes = total del encabezado)', '',
           '| Base | Documentos | Con violación | Violaciones |', '|---|---:|---:|---|']
@@ -180,20 +180,21 @@ def markdown(r: dict) -> str:
     t5 = r['motor'].get('t5', {})
     if t5:
         md += ['', '### R08 / T5: la corrección como hipótesis, auditada en los dos sentidos', '',
-               'El TO-BE REPLICA la hora fija del legado (ADR 0006; el instante se guarda en UTC, ADR 0008). La '
-               'corrección se mide aquí desde fuentes independientes: Nueva York por el desfase EXPLÍCITO del `:13D:` '
-               'del buzón; la Ciudad de México por la base de zonas de la paridad; la hora repetida se cuenta aparte '
-               '(resuelta por orden de llegada). Lo que se prueba: «desfase extra ≠ 0 ⇔ el legado difiere», con la '
+               'El TO-BE REPLICA la hora fija del legado (ADR 0006; el instante se guarda en UTC, ADR 0008). La ' +
+               'corrección se mide aquí desde fuentes independientes: Nueva York por el desfase EXPLÍCITO del ' +
+               '`:13D:` ' +
+               'del buzón; la Ciudad de México por la base de zonas de la paridad; la hora repetida se cuenta aparte ' +
+               '(resuelta por orden de llegada). Lo que se prueba: «desfase extra ≠ 0 ⇔ el legado difiere», con la ' +
                'diferencia igual al extra.', '', '| Conteo | Casos |', '|---|---:|']
         md += [f'| {k} | {_n(v)} |' for k, v in t5['conteos'].items()]
         md += [f"| diferencias en total (legado contra la corrección) | {_n(t5['diferencias'])} |",
-               f"| violaciones | {_n(t5['violaciones'])} |", '', '| Ventana (por la fecha de la última partida, '
+               f"| violaciones | {_n(t5['violaciones'])} |", '', '| Ventana (por la fecha de la última partida, ' +
                'hora de Nueva York) | Diferencias |', '|---|---:|']
         md += [f'| {k} | {_n(v)} |' for k, v in t5['ventanas'].items()]
         md += [f"| **suma** | **{_n(t5['suma_de_ventanas'])}** |", '',
-               'Pregunta cerrada a negocio: ¿las horas de liquidación se calculan con el desfase real de Nueva York? '
-               'Hoy el legado suma una hora de más en las semanas en que los dos calendarios no coincidieron: de '
-               'mediados de marzo a inicios de abril y de fines de octubre a inicios de noviembre en 2021 y 2022, y '
+               'Pregunta cerrada a negocio: ¿las horas de liquidación se calculan con el desfase real de Nueva York? ' +
+               'Hoy el legado suma una hora de más en las semanas en que los dos calendarios no coincidieron: de ' +
+               'mediados de marzo a inicios de abril y de fines de octubre a inicios de noviembre en 2021 y 2022, y ' +
                'de marzo a noviembre en 2023.']
     md += ['', '### Sólo marca (bandera apagada: el motor marca ✔/✘ y no actúa)', '',
           '| Regla | Marcas | ✔ | ✘ | Coinciden con la bitácora del legado | % | Actuados por el legado sin marca |',
@@ -204,12 +205,12 @@ def markdown(r: dict) -> str:
     p = r['reporte']
     o = p['orden']
     md += ['', '## 3. Paridad de reporte (TO-BE en sombra contra lo que el legado publicó)', '',
-          f"Publicado: `{p['publicado']['archivo']}` ({p['publicado']['renglones']:,} renglones, sha256 "
-          f"`{p['publicado']['sha256'][:16]}…`). TO-BE: {p['tobe']['renglones']:,} renglones. Comunes "
-          f"{p['renglones_comunes']:,}; sólo en el TO-BE {p['renglones_solo_tobe']:,}; sólo en el legado "
-          f"{p['renglones_solo_legado']:,}; comunes con alguna celda distinta "
+          f"Publicado: `{p['publicado']['archivo']}` ({p['publicado']['renglones']:,} renglones, sha256 " +
+          f"`{p['publicado']['sha256'][:16]}…`). TO-BE: {p['tobe']['renglones']:,} renglones. Comunes " +
+          f"{p['renglones_comunes']:,}; sólo en el TO-BE {p['renglones_solo_tobe']:,}; sólo en el legado " +
+          f"{p['renglones_solo_legado']:,}; comunes con alguna celda distinta " +
           f"{p['renglones_comunes_con_celdas_distintas']:,}.",
-          '', '| Orden (inversiones, por llave natural) | Pares de contrato | Inversiones de contrato | '
+          '', '| Orden (inversiones, por llave natural) | Pares de contrato | Inversiones de contrato | ' +
               'Pares empatados | % empatados invertidos |', '|---|---:|---:|---:|---:|']
     for nombre, m in (('piso: el legado re-corrido contra lo que publicó (esta corrida)', o['piso_misma_corrida']),
                       ('TO-BE contra lo publicado', o['tobe_contra_publicado'])):
@@ -220,17 +221,18 @@ def markdown(r: dict) -> str:
         f"contrato" for m in o['piso_misma_corrida'].get('muestras', [])) + '.']
     candidatas = o['piso_misma_corrida'].get('candidatas', {})
     if candidatas:
-        md += ['', 'Llaves secundarias candidatas (después de la fecha valor): inversiones del legado contra sí mismo '
-                   'en cada variante del plan. Si alguna nunca se invierte, puede ser un orden de hecho y se pregunta '
+        md += ['', 'Llaves secundarias candidatas (después de la fecha valor): inversiones del legado contra ' +
+                   'sí mismo en cada variante del plan. Si alguna nunca se invierte, puede ser un orden de hecho y ' +
+                   'se pregunta ' +
                    'a negocio.', '', '| Llave candidata | Inversiones por variante | ¿Orden de hecho posible? |',
                '|---|---|---|']
-        md += [f"| fecha_valor + {c} | {', '.join(_n(x) for x in v['inversiones_por_variante'])} | "
+        md += [f"| fecha_valor + {c} | {', '.join(_n(x) for x in v['inversiones_por_variante'])} | " +
                f"{'**sí: pregunta a negocio**' if v['orden_de_hecho_posible'] else 'no (el legado la invierte)'} |"
                for c, v in candidatas.items()]
         for x in o.get('ordenes_de_hecho', {}).values():
             md.append(f"\n- {x['pregunta']} El TO-BE la invierte {x['inversiones_del_tobe']:,} veces.")
     ciego = p.get('punto_ciego', {})
-    md += ['', f"**Punto ciego declarado:** {ciego.get('lectura', '')}. Celdas de este reporte en la hora repetida: "
+    md += ['', f"**Punto ciego declarado:** {ciego.get('lectura', '')}. Celdas de este reporte en la hora repetida: " +
                f"{_n(ciego.get('celdas_en_hora_repetida'))}."]
     md += ['', f"**Veredicto del orden:** {o['veredicto']}.", '', '| Categoría | Diferencias |', '|---|---:|']
     md += [f'| {k} | {_n(v)} |' for k, v in p['arbitraje']['por_categoria'].items()]
@@ -248,7 +250,7 @@ def markdown(r: dict) -> str:
                'El piso calibra el ruido del legado; estos mutantes demuestran que la comparación SÍ falla.', '',
                '| Mutante | Debe | Defectos nuestros | Inversiones de contrato | ¿Falla como debe? |',
                '|---|---|---:|---:|---|']
-        md += [f"| {m['mutante']} | {m['debe']} | {m['defectos']} | {m['inversiones_contrato']} | "
+        md += [f"| {m['mutante']} | {m['debe']} | {m['defectos']} | {m['inversiones_contrato']} | " +
                f"{'sí' if m['falla_como_debe'] else '**NO**'} |" for m in p['mutantes']]
     if 'gemelos' in r:
         g = r['gemelos']
@@ -262,13 +264,13 @@ def markdown(r: dict) -> str:
                      f"{len(caso.get('distintos', []))} | {rej} |")
         md += ['', 'No expuestos: ' + '; '.join(f'`{k}`: {v}' for k, v in g['no_expuestos'].items()) + '.']
     md += ['', '## Trampas de las rondas a ciegas: ¿la paridad vio su efecto?', '',
-          'Medido tal cual, sin ajustar nada: la paridad sólo puede ver el efecto de una trampa en una salida que '
+          'Medido tal cual, sin ajustar nada: la paridad sólo puede ver el efecto de una trampa en una salida que ' +
           'compara (' + '; '.join(f'`{k}`: {v}' for k, v in COMPARADAS.items()) + ').', '',
           '| Ronda | Trampa | Objeto | ¿Lo vio? | Evidencia |', '|---|---|---|---|---|']
     for t in r['trampas_a_ciegas']:
         md.append(f"| {t['ronda']} | {t['trampa']} · {t['descripcion']} | `{t['objeto']}` | {t['visto']} | "
                  f"{t['evidencia']} |")
-    md += ['', 'La cobertura de SALIDAS (los procedimientos y vistas que esta paridad no compara) es la puerta de '
+    md += ['', 'La cobertura de SALIDAS (los procedimientos y vistas que esta paridad no compara) es la puerta de ' +
                'entrada de S3.']
     md += ['', '## Tiempos', '', '| Paso | Segundos |', '|---|---:|']
     md += [f'| {k} | {v} |' for k, v in r['tiempos'].items()]

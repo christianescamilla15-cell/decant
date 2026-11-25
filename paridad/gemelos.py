@@ -76,16 +76,20 @@ def _get(puerto: int, ruta: str) -> tuple[int, str]:
 
 def _esperar(puerto: int, ruta: str, proceso: subprocess.Popen, segundos: int = 60) -> None:
     limite = time.monotonic() + segundos
+    ultimo = 'sin respuesta 200'
     while time.monotonic() < limite:
         if proceso.poll() is not None:
             raise SystemExit(f'el proceso en el puerto {puerto} terminó antes de responder')
         try:
-            if _get(puerto, ruta)[0] == 200:
+            estado = _get(puerto, ruta)[0]
+        except OSError as error:            # todavía no escucha: se reintenta hasta el límite y se reporta
+            ultimo = f'{type(error).__name__}: {error}'
+        else:
+            if estado == 200:
                 return
-        except OSError:
-            pass
+            ultimo = f'HTTP {estado}'
         time.sleep(0.5)
-    raise SystemExit(f'nada responde en el puerto {puerto}{ruta}')
+    raise SystemExit(f'nada responde en el puerto {puerto}{ruta} (último intento: {ultimo})')
 
 
 def _valor_json(documento: dict, ruta: str):

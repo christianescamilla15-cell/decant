@@ -69,14 +69,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lenguaje: [python]   # C# va en su propio job, compilado; + javascript-typescript si hay front
+        # TRANSITORIO (un solo push): csharp vuelve a la matriz para que la configuración vieja de C# (sin compilar)
+        # analice el código corregido y sus alertas queden «fixed»; el push siguiente la quita. C# va compilado en
+        # su propio job; + javascript-typescript si hay front.
+        lenguaje: [python, csharp]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           languages: ${{ matrix.lenguaje }}
           queries: security-and-quality
-          build-mode: none     # Python nunca se compila
+          build-mode: none     # Python nunca se compila (y el C# transitorio, como estaba)
       - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
 
   # C# COMPILADO (build-mode manual): sin compilar, CodeQL adivina tipos y dependencias y pierde flujos que pasan

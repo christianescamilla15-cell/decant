@@ -17,6 +17,7 @@ namespace Decant.Application.Motor;
 /// </summary>
 public sealed record ReproducirUniverso(OpcionesDelMotor Opciones, string Origen) : ISolicitud<ResumenDeReplay>;
 
+/// <summary>Lo que hizo un replay del universo: conteos por tipo de evento, el corte y los rechazos por código.</summary>
 /// <remarks>
 /// <see cref="Errores"/> son RECHAZOS de validación o de negocio (un mensaje mal formado, un re-registro de algo no
 /// enviado): se cuentan, quedan con su motivo y NO se reintentan. Un error técnico (la base no responde) es una
@@ -157,23 +158,27 @@ public sealed class ReproducirUniversoManejador(IUniverso universo, IAlmacenTobe
             var c = a.Uetr.CompareTo(b.Uetr);
             return c == 0 ? string.CompareOrdinal(a.TrnCorresponsal, b.TrnCorresponsal) : c;
         });
-        foreach (var leida in lote)
+        // :13D: llega al minuto; si el respaldo guardó los segundos de esa confirmación, se usan
+        ConfirmacionDelCorresponsal ConSegundosDelRespaldo(ConfirmacionDelCorresponsal leida)
         {
-            var confirmacion = leida;
-            if (segundos.TryGetValue(confirmacion.TrnCorresponsal, out var exacta))
+            if (!segundos.TryGetValue(leida.TrnCorresponsal, out var exacta))
             {
-                var precisa = confirmacion.ConSegundos(exacta);
-                if (precisa.EsExito)
-                {
-                    confirmacion = precisa.Valor;
-                    conSegundos++;
-                }
-                else
-                {
-                    Contar(precisa.Error!);
-                }
+                return leida;
             }
 
+            var precisa = leida.ConSegundos(exacta);
+            if (!precisa.EsExito)
+            {
+                Contar(precisa.Error!);
+                return leida;
+            }
+
+            conSegundos++;
+            return precisa.Valor;
+        }
+
+        foreach (var confirmacion in lote.Select(ConSegundosDelRespaldo))
+        {
             confirmaciones++;
             eventos.Add((confirmacion.Instante, Tipo.Confirmacion, secuencia++, confirmacion));
         }

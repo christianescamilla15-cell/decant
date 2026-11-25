@@ -179,7 +179,7 @@ public class PersistenciaYTiempoTests
         {
             var nombre = $"{propiedad.DeclaringType.ClrType.Name}.{propiedad.Name}";
             var tipo = Nullable.GetUnderlyingType(propiedad.ClrType) ?? propiedad.ClrType;
-            if (propiedad.GetDefaultValueSql() is { } d || propiedad.GetComputedColumnSql() is { } c)
+            if (propiedad.GetDefaultValueSql() is not null || propiedad.GetComputedColumnSql() is not null)
             {
                 hallazgos.Add($"{nombre}: default o cálculo en la base");
             }
