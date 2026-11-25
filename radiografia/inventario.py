@@ -62,6 +62,26 @@ def llaves_foraneas(cursor) -> list[dict]:
             for n, sh, th, sp, tp in cursor.fetchall()]
 
 
+def llaves_unicas(cursor) -> dict[str, list[set[str]]]:
+    """Llaves únicas REALES de cada tabla: PK e índices únicos sin filtro (columnas de llave, no las incluidas).
+    Toda tabla de usuario aparece, aunque no tenga ninguna (lista vacía)."""
+    cursor.execute("""
+        SELECT s.name, t.name, i.index_id, c.name
+        FROM sys.tables t
+        JOIN sys.schemas s ON s.schema_id = t.schema_id
+        LEFT JOIN sys.indexes i ON i.object_id = t.object_id AND i.is_unique = 1 AND i.has_filter = 0
+        LEFT JOIN sys.index_columns ic ON ic.object_id = i.object_id AND ic.index_id = i.index_id
+                                       AND ic.is_included_column = 0
+        LEFT JOIN sys.columns c ON c.object_id = ic.object_id AND c.column_id = ic.column_id
+        WHERE t.is_ms_shipped = 0""")
+    llaves: dict[str, dict[int, set[str]]] = {}
+    for esquema, tabla, indice, columna in cursor.fetchall():
+        por_indice = llaves.setdefault(f'{esquema}.{tabla}'.lower(), {})
+        if indice is not None and columna is not None:
+            por_indice.setdefault(indice, set()).add(columna.lower())
+    return {tabla: list(indices.values()) for tabla, indices in llaves.items()}
+
+
 def modulos(cursor) -> list[Modulo]:
     cursor.execute("""
         SELECT s.name, o.name, o.type, m.definition

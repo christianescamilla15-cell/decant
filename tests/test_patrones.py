@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 from legado.conexion import lotes
+from legado.generador.simulacion import COLUMNAS
 from radiografia import patrones
 from radiografia.patrones import Modulo
 from radiografia.tsql import fichas
@@ -206,7 +207,8 @@ def _modulos_del_legado() -> list[Modulo]:
 def test_sobre_el_codigo_del_legado_aparecen_los_patrones_sembrados():
     padres = {'dbo.partida_solicitada': {'dbo.orden_pago'}, 'dbo.partida_liquidada': {'dbo.orden_pago'},
               'dbo.orden_pago': {'dbo.operacion', 'dbo.moneda'}, 'dbo.operacion': {'dbo.moneda'}}
-    hallazgos = {(h['categoria'], h['objeto']) for h in patrones.analizar_codigo(_modulos_del_legado(), padres)}
+    todos = patrones.analizar_codigo(_modulos_del_legado(), padres, UNICAS_LEGADO, COLUMNAS_LEGADO)
+    hallazgos = {(h['categoria'], h['objeto']) for h in todos}
     assert ('top_sin_order_by', 'dbo.sp_lista_operaciones') in hallazgos
     assert ('inner_join_hija', 'dbo.vw_reporte_ordenes') in hallazgos
     assert ('reloj_en_regla', 'dbo.sp_conciliar') in hallazgos
@@ -215,3 +217,118 @@ def test_sobre_el_codigo_del_legado_aparecen_los_patrones_sembrados():
     assert ('round_trunca', 'dbo.sp_registrar_orden') in hallazgos
     # el trigger sella la bitácora con GETDATE(): no es una regla
     assert ('reloj_en_regla', 'dbo.tr_orden_pago_bitacora') not in hallazgos
+    # detectores-v3 sobre las formas de la siembra a ciegas (catálogo ya conocido: no es control)
+    assert ('top_sin_order_by', 'dbo.sp_reporte_posicion') in hallazgos
+    assert ('reloj_en_regla', 'dbo.sp_ordenes_por_vencer') in hallazgos
+    # control de falsos positivos en el propio legado: la asignación por PK de sp_registrar_orden NO se marca
+    asignaciones = [h for h in todos if h.get('forma') == 'asignacion_multifila']
+    assert [h['objeto'] for h in asignaciones] == ['dbo.sp_reporte_posicion']
+
+
+# Llaves únicas del legado como las ve la radiografía: las PK de legado/sql/02_tablas.sql (ningún otro índice único).
+UNICAS_LEGADO = {f'dbo.{t}': [{'codigo'} if t == 'moneda' else {'serie'} if t == 'folio' else {'id'}]
+                 for t in ('moneda', 'folio', 'operacion', 'orden_pago', 'partida_solicitada', 'partida_liquidada',
+                           'bitacora')}
+COLUMNAS_LEGADO = {f'dbo.{t}': set(c) for t, c in COLUMNAS.items()}
+
+
+# ── detectores-v3: asignación desde varias filas ────────────────────────────────────────────────────────────
+
+# Llaves únicas como las lee la radiografía del esquema restaurado (PK de legado/sql/02_tablas.sql).
+UNICAS = {'dbo.operacion': [{'id'}], 'dbo.orden_pago': [{'id'}], 'dbo.moneda': [{'codigo'}],
+          'dbo.t': [{'a'}, {'b', 'c'}], 'dbo.sin_llave': []}
+COLUMNAS_DE = {'dbo.operacion': {'id', 'moneda', 'tipo_cambio', 'fecha_operacion', 'monto_mxn'},
+               'dbo.orden_pago': {'id', 'uetr', 'estatus'}, 'dbo.moneda': {'codigo', 'nombre'},
+               'dbo.t': {'a', 'b', 'c', 'x'}, 'dbo.sin_llave': {'x', 'y'}}
+
+
+def _multifila(texto: str):
+    return patrones.asignacion_multifila(_m(texto), UNICAS, COLUMNAS_DE)
+
+
+def test_asignacion_desde_varias_filas_sin_top_se_detecta():
+    # forma de la siembra a ciegas: el tipo de cambio «de la última operación del día», sin TOP ni ORDER BY
+    h = _multifila('SELECT @tc_cierre = tipo_cambio FROM dbo.operacion WHERE moneda = @moneda '
+                   'AND fecha_operacion >= @fecha AND fecha_operacion < DATEADD(day, 1, @fecha);')
+    assert [x['categoria'] for x in h] == ['top_sin_order_by'] and h[0]['forma'] == 'asignacion_multifila'
+
+
+def test_asignacion_por_llave_primaria_no_se_detecta():
+    # control dentro del legado: sp_registrar_orden lee una sola fila por la PK de operacion
+    assert _multifila('SELECT @monto_mxn = monto_mxn FROM dbo.operacion WHERE id = @operacion_id;') == []
+
+
+def test_asignacion_por_indice_unico_compuesto_o_con_mas_columnas_no_se_detecta():
+    assert _multifila('SELECT @v = x FROM dbo.t WHERE c = @c AND b = @b') == []
+    assert _multifila('SELECT @v = x FROM dbo.t WHERE a = @a AND x > 3') == []
+
+
+def test_asignacion_con_agregado_o_sin_from_no_se_detecta():
+    assert _multifila('SELECT @fecha = CAST(MAX(fecha_operacion) AS date) FROM dbo.operacion') == []
+    assert _multifila('SELECT @n = COUNT(*) FROM dbo.sin_llave WHERE x = 1') == []
+    assert _multifila('SELECT @hoy = GETDATE()') == []
+
+
+def test_asignacion_con_or_sin_where_o_con_group_by_si_se_detecta():
+    assert _multifila('SELECT @v = x FROM dbo.t WHERE a = @a OR b = @b')
+    assert _multifila('SELECT @v = nombre FROM dbo.moneda')
+    assert _multifila('SELECT @v = MAX(x) FROM dbo.sin_llave GROUP BY y')
+
+
+def test_asignacion_desde_vista_variable_o_temporal_no_se_decide():
+    assert _multifila('SELECT @v = x FROM dbo.vw_algo WHERE y = 1') == []
+    assert _multifila('SELECT @v = x FROM @tabla WHERE y = 1') == []
+    assert _multifila('SELECT @v = x FROM #temporal WHERE y = 1') == []
+
+
+def test_asignacion_con_top_queda_para_el_otro_detector():
+    assert _multifila('SELECT TOP 1 @v = x FROM dbo.sin_llave WHERE y = 1') == []
+
+
+# ── detectores-v3: reloj por variable ───────────────────────────────────────────────────────────────────────
+
+POR_VENCER = """CREATE OR ALTER PROCEDURE dbo.sp_ordenes_por_vencer AS
+BEGIN
+    DECLARE @hoy datetime, @limite datetime;
+    SET @hoy = GETDATE();
+    SET @limite = DATEADD(day, -2, @hoy);
+    SELECT folio, CASE WHEN fecha_envio < DATEADD(day, -1, @limite) THEN 'VENCE HOY' ELSE 'MANANA' END AS aviso
+    FROM dbo.orden_pago
+    WHERE estatus = 'ENVIADA' AND fecha_envio < @limite
+END"""
+
+
+def test_el_reloj_que_entra_por_una_variable_se_propaga_hasta_la_regla():
+    assert patrones.variables_de_reloj(_m(POR_VENCER)) == {'@HOY': 'GETDATE()', '@LIMITE': '@hoy'}
+    h = patrones.reloj_por_variable(_m(POR_VENCER))
+    assert [x['linea'] for x in h] == [6, 8] and all(x['categoria'] == 'reloj_en_regla' for x in h)
+    # el reloj directo dentro de un SET de variable sigue sin ser regla
+    assert patrones.reloj_en_regla(_m(POR_VENCER)) == []
+
+
+def test_reloj_por_declare_y_select_y_en_un_join_o_un_update():
+    texto = """DECLARE @ahora datetime2 = SYSDATETIME();
+    SELECT @corte = CAST(@ahora AS date);
+    SELECT a.x FROM a JOIN b ON b.f < @corte;
+    UPDATE t SET vence = DATEADD(day, 3, @corte) WHERE id = 1;"""
+    h = patrones.reloj_por_variable(_m(texto))
+    assert [x['linea'] for x in h] == [3, 4]
+    assert 'UPDATE' in h[1]['detalle']
+
+
+def test_variable_de_reloj_que_solo_sella_un_insert_no_es_regla():
+    texto = "DECLARE @ahora datetime = GETDATE(); INSERT INTO b (a, f) VALUES (1, @ahora); SELECT @ahora AS sello"
+    assert patrones.reloj_por_variable(_m(texto)) == []
+
+
+def test_variable_sin_reloj_no_se_marca():
+    texto = 'DECLARE @limite datetime = DATEADD(day, -2, @fecha); SELECT x FROM t WHERE f < @limite'
+    assert patrones.reloj_por_variable(_m(texto)) == []
+
+
+def test_la_variable_del_set_de_un_update_no_hereda_el_reloj_de_otra_columna():
+    # regresión de detectores-v3 sobre el propio legado (sp_registrar_orden): @n toma el folio, no GETDATE()
+    texto = ("UPDATE dbo.folio SET @n = siguiente, siguiente = siguiente + 1, actualizado = GETDATE() "
+             "WHERE serie = 'OP';\nIF @folio IS NULL SET @folio = 'OP-' + CAST(@n AS varchar(9));")
+    assert patrones.variables_de_reloj(_m(texto)) == {}
+    assert patrones.reloj_por_variable(_m(texto)) == []
