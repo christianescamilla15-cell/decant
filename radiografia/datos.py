@@ -254,3 +254,61 @@ def llaves_duplicadas(cursor, columnas: list[dict], por_tabla: dict[str, list[di
                         + orden),
             'similitud': round(similitud, 3), 'similitud_base': round(base, 3), 'repetidas': repetidos})
     return hallazgos
+
+
+# ── Espacios finales: SQL Server los ignora al comparar; PostgreSQL no ─────────────────────────────────────────
+
+# Se mide EN EL MOTOR, nunca en Python después de un BCP (el BCP de FreeTDS los recorta) ni con rstrip().
+# DATALENGTH(RTRIM(c)) en vez de LEN(c): DATALENGTH cuenta BYTES (2 por carácter en nvarchar, de 1 a 4 en UTF-8),
+# así que «> LEN(c)» marcaría todo nvarchar; comparar bytes contra bytes vale para cualquier tipo de texto.
+_CON_RELLENO = 'DATALENGTH({c}) > DATALENGTH(RTRIM({c}))'
+_DINAMICA_FECHA = ("DECLARE @t nvarchar(300) = QUOTENAME(%s) + N'.' + QUOTENAME(%s), @c nvarchar(300) = QUOTENAME(%s), "
+                   "@d nvarchar(300) = QUOTENAME(%s); "
+                   "DECLARE @sql nvarchar(max) = REPLACE(REPLACE(REPLACE(%s, N'{t}', @t), N'{c}', @c), N'{d}', @d); "
+                   "EXEC sp_executesql @sql")
+
+
+def _ventana(cursor, esquema: str, tabla: str, columna: str, fecha: str) -> dict:
+    cursor.execute(_DINAMICA_FECHA, (esquema, tabla, columna, fecha,
+                                     f'SELECT MIN({{d}}), MAX({{d}}) FROM {{t}} WHERE {_CON_RELLENO}'))
+    dentro = cursor.fetchone()
+    cursor.execute(_DINAMICA_FECHA, (esquema, tabla, columna, fecha, 'SELECT MIN({d}), MAX({d}) FROM {t}'))
+    toda = cursor.fetchone()
+    return {'columna': fecha, 'desde': dentro[0], 'hasta': dentro[1], 'tabla_desde': toda[0], 'tabla_hasta': toda[1]}
+
+
+def _fraccion(v: dict) -> float:
+    try:
+        return (v['hasta'] - v['desde']) / (v['tabla_hasta'] - v['tabla_desde'])
+    except (TypeError, ZeroDivisionError):
+        return 1.0
+
+
+def espacios_finales(cursor, columnas: list[dict], por_tabla: dict[str, list[dict]]) -> list[dict]:
+    """Valores de texto con espacios al final (varchar/nvarchar; char y nchar rellenan por tipo y se omiten)."""
+    hallazgos = []
+    for col in columnas:
+        if col['tipo'] not in ('varchar', 'nvarchar') or col['filas'] == 0:
+            continue
+        esq, tab, nombre = col['esquema'], col['tabla'], col['columna']
+        n, total = consultar(cursor, f'SELECT SUM(CASE WHEN {_CON_RELLENO} THEN 1 ELSE 0 END), COUNT_BIG({{c}}) '
+                                     f'FROM {{t}}', esq, tab, nombre)[0]
+        if not n:
+            continue
+        fechas = [c['columna'] for c in por_tabla[f'{esq}.{tab}'.lower()] if c['tipo'] in FECHA]
+        ventanas = [_ventana(cursor, esq, tab, nombre, f) for f in fechas]
+        ventana = min(ventanas, key=_fraccion) if ventanas else None
+        texto = ''
+        if ventana and ventana['desde'] is not None:
+            texto = (f"; ventana en {ventana['columna']}: {ventana['desde']} → {ventana['hasta']} (la tabla va de "
+                     f"{ventana['tabla_desde']} a {ventana['tabla_hasta']})"
+                     + ('; concentrados en esa ventana' if _fraccion(ventana) < 0.5 else ''))
+        hallazgos.append({
+            'categoria': 'espacios_finales', 'objeto': f'{esq}.{tab}.{nombre}'.lower(), 'tipo_objeto': 'COLUMNA',
+            'linea': None, 'fragmento': '',
+            'detalle': f'{n:,} de {total:,} valores con espacios al final ({n / total:.1%}), medidos con DATALENGTH en '
+                       f'el motor: SQL Server los ignora al comparar (=, DISTINCT, GROUP BY) y LEN no los cuenta; '
+                       f'PostgreSQL sí los distingue' + texto,
+            'filas': n, 'total': total,
+            'ventana': {k: (str(v) if v is not None else None) for k, v in ventana.items()} if ventana else None})
+    return hallazgos
