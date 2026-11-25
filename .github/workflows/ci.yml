@@ -102,8 +102,9 @@ jobs:
           informe = json.load(open('control-ci/radiografia.json', encoding='utf-8'))
           c = Counter(h['categoria'] for h in informe['hallazgos'])
           print(dict(c))
+          # division_entera: sus 5 divisiones son entre 100.0 (decimal) y no deben marcarse
           for categoria in ('top_sin_order_by', 'reloj_en_regla', 'if_exists_sin_else', 'desfase_horario_fijo',
-                            're_registro'):
+                            're_registro', 'division_entera'):
               assert c[categoria] == 0, (categoria, c[categoria])
           assert c['mojibake'] == 5, c['mojibake']
           assert c['espacios_finales'] == 11, c['espacios_finales']    # valores que de verdad terminan en espacio

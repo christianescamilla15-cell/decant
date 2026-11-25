@@ -61,6 +61,50 @@ Historial de congelamientos:
 | `detectores-v2` | `radiografia/patrones.py` | `70f4415556b3386b31264bbe8a28eededb35c548b351b9f0157fddf0d8788b3e` |
 | `detectores-v2` | `radiografia/datos.py` | `ab60df538a88a6423e1cb734abc7c5e33d620425e580f33d18573b01fc29a5a9` |
 
+## Corrida de `detectores-v4` sobre los controles públicos
+
+Corridas una vez el 24-nov-2026, desde un clon limpio en el tag `detectores-v4`, sobre los mismos respaldos
+oficiales (sha256 verificados). Los informes completos, sin editar, están en
+[`control/v4/wideworldimporters/`](control/v4/wideworldimporters/radiografia.md) y
+[`control/v4/adventureworks/`](control/v4/adventureworks/radiografia.md). Los de la v2 y la v3 se conservan donde
+estaban.
+
+**Falsos positivos nuevos: 0 en los dos controles.** Ningún hallazgo aparece ni desaparece respecto a la v3. Lo
+único que cambia es el detalle de las tres asignaciones de AdventureWorks. Lo que sigue se verificó leyendo el
+código y los datos en una restauración aparte, de sólo lectura, sin volver a correr los detectores.
+
+| Control | Hallazgos v3 → v4 | Nuevos | Falso positivo | Lectura |
+|---|---:|---:|---:|---|
+| WideWorldImporters | 273 → 273 | 0 | 0 | Los 273 son idénticos a la v3: categoría, objeto, línea y detalle. Sus 47 módulos traen 5 divisiones y las 5 son entre `100.0` (impuestos y descuentos en `GetOrderUpdates`, `CalculateCustomerPrice` e `InvoiceCustomerOrders`): bien NO marcadas como división entera. No hay `TOP 100 PERCENT` ni asignaciones con JOIN. |
+| AdventureWorks | 173 → 173 | 0 | 0 | Las 3 asignaciones de `ufnGetProductListPrice`, `ufnGetProductDealerPrice` y `ufnGetProductStandardCost` siguen marcadas, **ahora por la razón correcta**: «el historial entra por un INNER JOIN que iguala `productid`, sin cubrir ninguna llave única suya (`productid, startdate`)». La v3 decía «sin WHERE» y miraba sólo `Product`. Siguen latentes: 0 periodos traslapados en `ProductListPriceHistory` y en `ProductCostHistory`. Los 51 módulos no tienen ninguna división ni `TOP 100 PERCENT`, y ésas son las únicas 3 asignaciones con JOIN. |
+
+**Lectura:**
+
+1. **Unicidad del conjunto:** el límite «el ON» de la v3 queda cubierto en el único caso público que lo mostraba.
+   Las 3 funciones de AdventureWorks salen por la llave del historial, no por un WHERE ausente. Es un caso conocido
+   desde la v3: confirma el arreglo, no lo valida.
+2. **ORDER BY que no ordena y división entera:** 0 hallazgos en los dos controles. Sin casos positivos fuera del
+   legado, sólo hay especificidad medida: 5 divisiones entre decimales bien ignoradas, ningún `TOP 100 PERCENT`.
+   La sensibilidad queda por medir en la ronda 3.
+3. Nada de esto valida la v4. Su control real es la siembra a ciegas ronda 3.
+
+### Límites que quedan con la v4
+
+- **Lo que se ve, no lo que se infiere.** Sigue siendo un analizador léxico con niveles de paréntesis, no un parser
+  de T-SQL: SQL dinámico (`EXEC (@sql)`, `sp_executesql`) no se analiza.
+- **ORDER BY que no ordena:** se reporta la vista o la tabla derivada, no el procedimiento que la lee confiando en
+  su orden. Tampoco cubre otras formas del mismo engaño, como llenar una temporal con `INSERT … SELECT … ORDER BY`
+  y leerla sin ORDER BY.
+- **Unicidad del conjunto:** sólo juzga `SELECT @v = …`. Un `UPDATE … FROM` con un JOIN 1:N (que también escribe
+  un valor arbitrario) no se juzga. Las fuentes sin metadatos (vistas, tablas derivadas, funciones, variables de
+  tabla y temporales) cuentan como fijas: es un falso negativo posible a cambio de no inventar. Sólo fijan las
+  igualdades `columna = expresión` unidas con AND; un `IN (@x)` o una función sobre la llave no fijan nada.
+- **División entera:** no tipa columnas de vistas, tablas derivadas, temporales ni variables de tabla, ni el
+  resultado de funciones del usuario o tipos de alias. `AVG(<entero>)` sin una división (que en PostgreSQL da
+  `numeric` y en SQL Server trunca) no se reporta: el arreglo pedido era la `/`.
+- Siguen los límites de la v3: las columnas calculadas cuentan como dato en `espacios_finales`, e IF EXISTS no
+  distingue una variable de tabla de una tabla.
+
 ## Historial: corrida de `detectores-v3` sobre los controles públicos
 
 Corridas una vez el 24-nov-2026, con el árbol limpio en el tag `detectores-v3`, sobre los mismos respaldos
