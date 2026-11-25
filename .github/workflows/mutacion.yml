@@ -1,0 +1,49 @@
+# Mutación del DOMINIO con Stryker.NET como compuerta (umbral de ruptura 80). En cada PR sólo lo cambiado respecto a
+# la rama base (--since); cada noche, el dominio completo. Los mutantes equivalentes (textos de mensajes de error) se
+# excluyen por método en stryker-config.json, no bajando el umbral.
+name: mutacion
+
+on:
+  pull_request:
+  schedule:
+    - cron: '41 7 * * *'   # cada noche: el dominio completo
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stryker:
+    name: mutación del dominio (Stryker, ruptura en 80)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_NOLOGO: 'true'
+      DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0          # --since compara contra la rama base: hace falta su historia
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+          cache: true             # caché de NuGet con llave del hash de los packages.lock.json
+          cache-dependency-path: '**/packages.lock.json'
+      - run: dotnet tool restore    # Stryker fijo en .config/dotnet-tools.json
+      - run: dotnet restore Decant.slnx --locked-mode
+      - name: sólo lo cambiado en el PR
+        if: github.event_name == 'pull_request'
+        working-directory: tests/Decant.Domain.Tests
+        env:
+          RAMA_BASE: ${{ github.base_ref }}
+        run: dotnet stryker -f ../../stryker-config.json --since:"origin/$RAMA_BASE"
+      - name: el dominio completo
+        if: github.event_name != 'pull_request'
+        working-directory: tests/Decant.Domain.Tests
+        run: dotnet stryker -f ../../stryker-config.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutacion
+          path: tests/Decant.Domain.Tests/StrykerOutput/*/reports/
+          if-no-files-found: ignore

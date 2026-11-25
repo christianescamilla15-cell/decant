@@ -15,3 +15,11 @@ updates:
     groups:                       # menores y parches juntos: un PR por semana; las mayores van solas
       acciones-menores:
         update-types: [minor, patch]
+  - package-ecosystem: nuget
+    directory: /
+    schedule: { interval: weekly }
+    cooldown: { default-days: 7 }   # no proponer versiones con menos de una semana publicadas
+    groups:                       # menores y parches juntos: un PR por semana; las mayores van solas
+      nuget-menores:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5

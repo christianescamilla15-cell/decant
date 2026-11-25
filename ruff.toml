@@ -11,4 +11,4 @@ ignore = [
 ]
 
 [lint.isort]
-known-first-party = ["legado", "radiografia"]
+known-first-party = ["legado", "radiografia", "paridad", "universo"]

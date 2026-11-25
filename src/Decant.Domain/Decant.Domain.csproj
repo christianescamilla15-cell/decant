@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Dominio: SÓLO la biblioteca base (BCL). Sin paquetes y sin referencias a otros proyectos. -->
+  <PropertyGroup>
+    <RootNamespace>Decant.Domain</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Decant.Domain.Tests" />
+  </ItemGroup>
+</Project>

@@ -52,7 +52,11 @@ PARTICION: dict[str, dict[str, dict[str, str]]] = {
         },
     },
     'dbo.orden_pago': {
-        'llave_interna': {'id': 'identidad (cambia en cada re-registro: T9)'},
+        'llave_interna': {
+            'id': 'identidad (cambia en cada re-registro: T9)',
+            'operacion_id': 'referencia a operacion.id: el vínculo con la operación entra con la orden '
+                            '(parámetro de sp_registrar_orden); como llave interna no se compara directo',
+        },
         'entrada': {
             'uetr': 'interfaz de órdenes; LLAVE NATURAL del documento',
             'referencia_mt103': 'interfaz de órdenes (:20: de nuestro MT103)',
@@ -69,7 +73,6 @@ PARTICION: dict[str, dict[str, dict[str, str]]] = {
             'codigo_proposito': 'interfaz de órdenes (pacs.008 Purp/Cd); ningún módulo la lee (T6)',
         },
         'resultado': {
-            'operacion_id': 'id interno de la operación que originó la orden',
             'folio': 'consumible OP (sp_registrar_orden); el re-registro lo conserva',
             'estatus': 'máquina de estados: alta y re-registro (sp_registrar_orden), liquidación '
                        '(sp_registrar_liquidacion), conciliación y vencimiento con GETDATE() (sp_conciliar: T8)',

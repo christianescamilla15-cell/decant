@@ -1,4 +1,5 @@
-# CI de Decant (S1): pruebas por regla, el ciclo completo del legado contra SQL Server real y el control público.
+# CI de Decant: pruebas por regla, el ciclo completo del legado contra SQL Server real, el control público (S1), el
+# TO-BE en .NET 10 con sus pruebas por capa y la paridad del TO-BE contra el legado del ciclo (S2).
 # Un job «skipped» por depender de otro en rojo NO es verde: en la rama protegida todos son requeridos.
 name: ci
 
@@ -113,3 +114,165 @@ jobs:
         with:
           name: control-wideworldimporters
           path: control-ci/
+
+  tobe:
+    name: TO-BE .NET (compilación, dominio, aplicación y arquitectura)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_NOLOGO: 'true'
+      DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+          cache: true             # caché de NuGet con llave del hash de los packages.lock.json
+          cache-dependency-path: '**/packages.lock.json'
+      # Candados de NuGet en modo bloqueado: lo que compila el CI es exactamente lo versionado.
+      - run: dotnet restore Decant.slnx --locked-mode
+      # Las advertencias son errores (Directory.Build.props).
+      - run: dotnet build Decant.slnx -c Release --no-restore
+      - name: pruebas de dominio (casos reales), aplicación (dobles a mano) y arquitectura
+        run: |
+          for p in Domain Application; do
+            dotnet test "tests/Decant.$p.Tests" -c Release --no-build --results-directory resultados \
+              --logger "trx;LogFileName=$p.trx" --collect "XPlat Code Coverage"
+          done
+          # Arquitectura SIN cobertura: lee el IL de los ensamblados y coverlet los instrumenta (agrega tipos
+          # Coverlet.* y la referencia a netstandard), lo que daría falsos positivos.
+          dotnet test tests/Decant.Architecture.Tests -c Release --no-build --results-directory resultados \
+            --logger "trx;LogFileName=Architecture.trx"
+      - name: probar que corrieron pruebas en cada proyecto
+        run: python3 herramientas_ci/contar_trx.py resultados/Domain.trx resultados/Application.trx resultados/Architecture.trx
+      - name: configuración por ambiente (banderas y destinos, sin secretos)
+        run: dotnet src/Decant.Cli/bin/Release/net10.0/decant.dll configuracion
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: tobe-pruebas
+          path: resultados/
+
+  tobe-integracion:
+    name: TO-BE .NET (integración con PostgreSQL real por Testcontainers)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_NOLOGO: 'true'
+      DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+          cache: true             # caché de NuGet con llave del hash de los packages.lock.json
+          cache-dependency-path: '**/packages.lock.json'
+      - run: dotnet restore Decant.slnx --locked-mode
+      - run: dotnet build Decant.slnx -c Release --no-restore
+      # Cada proyecto levanta su PostgreSQL (imagen fija por digest) con Testcontainers.
+      - name: infraestructura (EF Core, COPY, consultas) y API (WebApplicationFactory)
+        run: |
+          for p in Infrastructure Api; do
+            dotnet test "tests/Decant.$p.Tests" -c Release --no-build --results-directory resultados \
+              --logger "trx;LogFileName=$p.trx"
+          done
+      - name: probar que corrieron pruebas en cada proyecto
+        run: python3 herramientas_ci/contar_trx.py resultados/Infrastructure.trx resultados/Api.trx
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: tobe-integracion
+          path: resultados/
+
+  paridad:
+    name: paridad (verificar la migración y medir el motor contra el legado del ciclo)
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      DOTNET_NOLOGO: 'true'
+      DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+      DECANT_PG_PUERTO: '15450'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+          cache: true             # caché de NuGet con llave del hash de los packages.lock.json
+          cache-dependency-path: '**/packages.lock.json'
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: dotnet restore Decant.slnx --locked-mode
+      - run: dotnet build Decant.slnx -c Release --no-restore
+      - name: contraseñas por corrida (sa del legado y PostgreSQL del TO-BE)
+        run: |
+          clave="Dc1-$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"
+          echo "::add-mask::$clave"
+          echo "DECANT_SA_PASSWORD=$clave" >> "$GITHUB_ENV"
+          pg="$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"
+          echo "::add-mask::$pg"
+          echo "DECANT_PG_PASSWORD=$pg" >> "$GITHUB_ENV"
+      # El legado del ciclo: el mismo de S1 (generar, cargar, respaldar, vivo). Queda arriba con el delta del día:
+      # la paridad lo usa para auditar el avance de producción.
+      - name: ciclo completo del legado
+        run: ./ciclo.sh
+      # Imagen fija por digest y con tope de memoria; la espera es explícita (puerto y una consulta), no un retraso.
+      # Tope medido: con 1 GB el pico (memory.peak, incluye caché de páginas) tocó el tope y las cinco cargas
+      # tardaron ~50 s cada una; 2 GB deja holgura sin acercarse a los 16 GB del runner.
+      - name: PostgreSQL del TO-BE (imagen fija por digest)
+        run: |
+          docker run -d --name decant-pg --memory 2g -e POSTGRES_USER=decant \
+            -e POSTGRES_PASSWORD="$DECANT_PG_PASSWORD" -p "127.0.0.1:$DECANT_PG_PUERTO:5432" \
+            postgres:16-alpine@sha256:f2f98726820d0342055351c6e9d36e705f5bfffb3dd53ff556325114b08afb6d
+          for _ in $(seq 1 60); do
+            if docker exec decant-pg pg_isready -h 127.0.0.1 -U decant -q &&
+               docker exec decant-pg psql -h 127.0.0.1 -U decant -tAc 'SELECT 1' | grep -qx 1; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs decant-pg
+          exit 1
+      - name: los dos ejercicios, la paridad de reporte y los gemelos (un comando)
+        run: |
+          manifiestos=(respaldos/respaldo_*.json)
+          # /usr/bin/time -v deja la memoria pico (RSS) del proceso más grande que lanzó la paridad
+          medir=()
+          if [ -x /usr/bin/time ]; then medir=(/usr/bin/time -v -o memoria-paridad.txt); fi
+          "${medir[@]}" python -m paridad --manifiesto "${manifiestos[-1]}"
+      - name: pruebas sobre el informe de paridad (T4 por el binding de la pantalla, entre otras)
+        run: pytest -q -m paridad --junitxml=reporte-paridad.xml
+      - run: python3 herramientas/verificar_reportes.py pytest reporte-paridad.xml
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: paridad
+          path: |
+            paridad/informe/
+            paridad/datos/*/corte.json
+            paridad/datos/*/*/manifiesto.json
+            reporte-paridad.xml
+      # Memoria pico de cada contenedor (cgroup v2: memory.peak) contra su tope, y la del proceso de la paridad.
+      - name: memoria pico
+        if: always()
+        run: |
+          for c in $(docker ps -q --filter name=decant); do
+            id=$(docker inspect -f '{{.Id}}' "$c"); nombre=$(docker inspect -f '{{.Name}}' "$c")
+            tope=$(docker inspect -f '{{.HostConfig.Memory}}' "$c")
+            pico=/sys/fs/cgroup/system.slice/docker-$id.scope/memory.peak
+            if [ -r "$pico" ]; then
+              echo "$nombre: pico $(( $(cat "$pico") / 1048576 )) MiB · tope $(( tope / 1048576 )) MiB"
+            else
+              echo "$nombre: memory.peak no disponible · tope $(( tope / 1048576 )) MiB"
+            fi
+          done
+          grep -E 'Maximum resident set size|Elapsed' memoria-paridad.txt || true
+          free -m
+      - name: apagar el legado, PostgreSQL y cualquier restauración que haya quedado
+        if: always()
+        run: |
+          docker compose -f legado/docker-compose.yml down -v
+          docker rm -f -v decant-pg || true   # -v: también su volumen anónimo de datos
+          docker ps -aq --filter name=decant-radiografia- | xargs -r docker rm -f
