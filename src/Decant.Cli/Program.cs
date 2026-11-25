@@ -8,11 +8,8 @@ using Decant.Application.Consultas;
 using Decant.Application.Motor;
 using Decant.Domain.Comun;
 using Decant.Infrastructure;
-using Decant.Infrastructure.Persistencia;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
 
 namespace Decant.Cli;
 
@@ -93,22 +90,14 @@ public static class Program
         string? oraculo = null)
     {
         var baseDeDatos = Requerida(o, "base");
-        var conexion = new NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("DECANT_PG")
-            ?? throw new ArgumentException("falta la variable DECANT_PG (conexión a PostgreSQL sin la base)"))
-        {
-            Database = baseDeDatos,
-            CommandTimeout = 600,
-        };
-        return new ServiceCollection().AgregarDecant(conexion.ConnectionString, universo, oraculo)
-            .BuildServiceProvider();
+        var conexion = Servicios.ConexionDeLote(Environment.GetEnvironmentVariable("DECANT_PG")
+            ?? throw new ArgumentException("falta la variable DECANT_PG (conexión a PostgreSQL sin la base)"),
+            baseDeDatos);
+        return new ServiceCollection().AgregarDecant(conexion, universo, oraculo).BuildServiceProvider();
     }
 
     /// <summary>Crea la base si no existe y aplica las migraciones: el esquema se compara después de cada carga.</summary>
-    private static async Task Esquema(IServiceProvider servicios)
-    {
-        await using var alcance = servicios.CreateAsyncScope();
-        await alcance.ServiceProvider.GetRequiredService<DecantDbContext>().Database.MigrateAsync();
-    }
+    private static Task Esquema(IServiceProvider servicios) => servicios.AplicarMigracionesAsync();
 
     private static async Task<int> Migrar(Dictionary<string, string?> o)
     {
@@ -191,24 +180,14 @@ public static class Program
                 .AddJsonFile($"appsettings.{ambiente}.json", optional: false)
                 .Build();
             var leida = ConfiguracionPorAmbiente.Leer(configuracion, ambiente);
-            var b = leida.Banderas;
-            Console.WriteLine($"[{ambiente}]");
-            Console.WriteLine($"  banderas: vencer automático={Si(b.VencerAutomatico)} · conciliar automático=" +
-                $"{Si(b.ConciliarAutomatico)} · avisar al corresponsal={Si(b.NotificarCorresponsal)}");
-            Console.WriteLine($"  sólo marca: {(b.VencerAutomatico && b.ConciliarAutomatico ? "ninguna acción" :
-                string.Join(", ", new[] { b.VencerAutomatico ? null : "vencimiento",
-                    b.ConciliarAutomatico ? null : "conciliación" }.OfType<string>()))}");
-            Console.WriteLine($"  destinos: corresponsal={leida.Destinos.Corresponsal} · correo de operaciones=" +
-                leida.Destinos.CorreoDeOperaciones);
-            foreach (var error in leida.Validar())
+            foreach (var linea in ConfiguracionPorAmbiente.Describir(leida))
             {
-                Console.WriteLine($"  ERROR: {error}");
-                errores++;
+                Console.WriteLine(linea);
             }
+
+            errores += leida.Validar().Count;
         }
 
         return errores == 0 ? 0 : 1;
     }
-
-    private static string Si(bool valor) => valor ? "sí" : "no";
 }

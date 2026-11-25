@@ -6,6 +6,7 @@ using Decant.Infrastructure.Persistencia;
 using Decant.Infrastructure.Reloj;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Decant.Infrastructure;
 
@@ -42,5 +43,18 @@ public static class Servicios
         }
 
         return servicios;
+    }
+
+    /// <summary>La conexión de un lote: la del ambiente (sin base) con el nombre de la base y un tiempo de comando
+    /// largo. Así ningún tipo de Npgsql sale de la infraestructura.</summary>
+    public static string ConexionDeLote(string conexionSinBase, string baseDeDatos) =>
+        new NpgsqlConnectionStringBuilder(conexionSinBase) { Database = baseDeDatos, CommandTimeout = 600 }
+            .ConnectionString;
+
+    /// <summary>Crea la base si no existe y aplica las migraciones pendientes (sin exponer el DbContext).</summary>
+    public static async Task AplicarMigracionesAsync(this IServiceProvider servicios, CancellationToken ct = default)
+    {
+        await using var alcance = servicios.CreateAsyncScope();
+        await alcance.ServiceProvider.GetRequiredService<DecantDbContext>().Database.MigrateAsync(ct);
     }
 }

@@ -9,14 +9,18 @@ builder.Services.AddSingleton(ConfiguracionPorAmbiente.Leer(builder.Configuratio
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+// Contrato de errores: TODO error sale como application/problem+json con su código y un título, sin detalles
+// internos (ni la excepción ni la conexión). Sin autenticación en el alcance de la demo: docs/adr/0012.
 app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 app.MapGet("/salud", () => Results.Text("ok"));
 
 app.MapGet("/api/operaciones/{id:long}", async (long id, IMediador mediador, CancellationToken ct) =>
     await mediador.EnviarAsync(new ConsultarDetalle(id), ct) is { } detalle
         ? Results.Ok(Presentacion.DeDetalle(detalle))
-        : Results.NotFound());
+        : Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "La operación no existe",
+            detail: $"No hay operación con id {id}."));
 
 app.MapGet("/api/operaciones", async (DateOnly fecha, int? maximo, IMediador mediador, CancellationToken ct) =>
 {

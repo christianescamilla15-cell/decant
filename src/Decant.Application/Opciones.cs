@@ -36,6 +36,11 @@ public sealed record ConfiguracionDeAmbiente(string Ambiente, Banderas Banderas,
             errores.Add("Produccion: el aviso al corresponsal no se enciende sin contrato ni humo (S4)");
         }
 
+        if (string.IsNullOrWhiteSpace(Destinos.Corresponsal))
+        {
+            errores.Add($"{Ambiente}: falta el destino del corresponsal");
+        }
+
         if (string.IsNullOrWhiteSpace(Destinos.CorreoDeOperaciones))
         {
             errores.Add($"{Ambiente}: falta el correo de operaciones");

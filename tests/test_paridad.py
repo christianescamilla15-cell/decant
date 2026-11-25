@@ -431,3 +431,43 @@ def test_el_punto_ciego_cuenta_las_celdas_de_la_hora_repetida(tmp_path):
                                                              'tablas': {'dbo.partida_solicitada': {'max_id': 1}}},
                          None, {})
     assert r['punto_ciego']['celdas_en_hora_repetida'] == 2   # 01:30 del 30-oct (CDMX) y del 6-nov (NY)
+
+
+def _raiz_falsa(tmp_path: Path) -> Path:
+    from paridad import tobe
+    for fuente in tobe.FUENTES_DE_LAS_CARGAS:
+        ruta = tmp_path / fuente
+        if '.' in ruta.name:
+            ruta.parent.mkdir(parents=True, exist_ok=True)
+            ruta.write_text('uno', encoding='utf-8')
+        else:
+            ruta.mkdir(parents=True, exist_ok=True)
+            (ruta / 'a.cs').write_text('uno', encoding='utf-8')
+    (tmp_path / 'respaldo.json').write_text('{}', encoding='utf-8')
+    return tmp_path
+
+
+def test_la_llave_de_las_cargas_cambia_con_el_codigo_y_no_con_lo_compilado(tmp_path):
+    from paridad import tobe
+    raiz = _raiz_falsa(tmp_path)
+    manifiesto = raiz / 'respaldo.json'
+    llave = tobe.llave_de_cargas(manifiesto, raiz)
+    (raiz / 'src' / 'bin').mkdir()
+    (raiz / 'src' / 'bin' / 'decant.dll').write_bytes(b'compilado')
+    assert tobe.llave_de_cargas(manifiesto, raiz) == llave            # bin/obj no son código
+    (raiz / 'src' / 'a.cs').write_text('dos', encoding='utf-8')
+    assert tobe.llave_de_cargas(manifiesto, raiz) != llave            # un cambio en el TO-BE sí
+    (raiz / 'src' / 'a.cs').write_text('uno', encoding='utf-8')
+    manifiesto.write_text('{"otro": 1}', encoding='utf-8')
+    assert tobe.llave_de_cargas(manifiesto, raiz) != llave            # otro respaldo también
+
+
+def test_reusar_cargas_exige_la_llave_del_mismo_codigo(tmp_path):
+    from paridad import tobe
+    with pytest.raises(SystemExit, match='sin llave'):
+        tobe.verificar_reuso(tmp_path, 'a' * 64)
+    tobe.guardar_llave(tmp_path, 'b' * 64)
+    with pytest.raises(SystemExit, match='otra versión del código'):
+        tobe.verificar_reuso(tmp_path, 'a' * 64)
+    tobe.verificar_reuso(tmp_path, 'b' * 64)
+

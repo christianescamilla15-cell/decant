@@ -59,12 +59,15 @@ def correr(args) -> dict:
     with restaurar(args.manifiesto) as r:
         paso('restaurar el respaldo en un contenedor limpio', t)
         t = time.perf_counter()
+        llave = tobe.llave_de_cargas(args.manifiesto)
         if args.reusar_cargas:                       # sólo para iterar en local: el CI siempre extrae y carga
+            tobe.verificar_reuso(args.datos, llave)  # y sólo si las hizo este mismo código
             corte = json.loads((args.datos / 'corte.json').read_text(encoding='utf-8'))
             paquetes = {n: json.loads((args.datos / n / 'manifiesto.json').read_text(encoding='utf-8'))
                         for n in ('universo', 'oraculo')}
         else:
             paquetes = extraer.escribir_paquetes(r, args.interfaces, args.datos)
+            (args.datos / tobe.LLAVE_DE_CARGAS).unlink(missing_ok=True)  # se reescribe al terminar las cargas
             corte = paquetes['corte']
         resultado['corte'] = corte
         resultado['paquetes'] = {n: {a: x['filas'] for a, x in paquetes[n]['tablas'].items()}
@@ -99,6 +102,8 @@ def correr(args) -> dict:
                 resultado['esquema']['control_negativo_t6'] = esquema.control_negativo_t6(esquema_legado,
                                                                                           esquema_tobe)
             paso(f'cargar {base} y comparar su esquema', t)
+        if not args.reusar_cargas:
+            tobe.guardar_llave(args.datos, llave)
 
         t = time.perf_counter()
         with r.conectar() as cl, tobe.conectar(BASES['migracion'][0]) as ct:
