@@ -37,9 +37,9 @@ def trampas_a_ciegas(r: dict) -> list[dict]:
             medido = fila.get('parches_medidos_en_origen', {}).get(clave)
             controles = [x for x in fila.get('controles_negativos', []) if x['parche'] == clave]
             visto = 'sí' if aplicado and aplicado == medido else 'no'
-            evidencia = (f'byte a byte, {fila.get("tabla")}: sin su parche, {aplicado:,} celdas de `referencia` '
+            evidencia = (f'byte a byte, {fila.get("tabla")}: sin su parche, {_n(aplicado)} celdas de `referencia` '
                          f'difieren del TO-BE (que guarda la referencia del buzón). El parche es exacto (ventana, '
-                         f'ancho 35, sólo espacios) y su conteo, medido en el ORIGEN por otro camino, da {medido:,}; '
+                         f'ancho 35, sólo espacios) y su conteo, medido en el ORIGEN por otro camino, da {_n(medido)}; '
                          f'{sum(x["falla"] for x in controles)} de {len(controles)} defectos distintos inyectados '
                          f'en la columna fallan como deben. El parche se escribió con el catálogo YA revelado '
                          f'(ADR 0007). La '

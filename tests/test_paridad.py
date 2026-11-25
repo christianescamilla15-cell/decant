@@ -73,6 +73,26 @@ _REF = 'FICT220667399219'
 _EN_VENTANA = {'fecha_hora': datetime(2022, 9, 1, 9, 30)}
 
 
+def test_todas_las_listas_de_parches_del_codigo_son_validas():
+    """Regresión (primera corrida de la retro): motor.py seguía con ('char',) sin ancho y la paridad completa cayó
+    a los 15 minutos. Cada lista de parches del código se valida aquí, en el job de pruebas normal."""
+    from paridad import gemelos
+    listas = [p for _, _, p in migracion.COL_OPERACION + migracion.COL_ORDEN + migracion.COL_PARTIDA_CORRESPONSAL
+              + migracion.COL_PARTIDA_CLIENTE]
+    listas += [p for _, p in motor.PARTIDA_CLIENTE + motor.PARTIDA_CORRESPONSAL]
+    listas += [r for _, r in list(gemelos.CAMPOS.values()) + list(gemelos.PARTIDA.values()) if isinstance(r, tuple)]
+    listas += [c.parches for t in mapeo.MAPEO.values() for c in t.columnas.values()]
+    invalidos = [p for lista in listas for p in lista if not mapeo.parche_valido(p)]
+    assert invalidos == [] and len(listas) > 40
+    assert not mapeo.parche_valido('char') and mapeo.parche_valido('char:3')
+
+
+def test_r06_pasa_la_fecha_de_la_partida_a_ciega1_t3():
+    """Sin la fecha de su renglón, ciega1_T3 no aplica y R06 marcaría 48 mil referencias como defecto."""
+    columnas = dict(motor.PARTIDA_CORRESPONSAL)
+    assert mapeo.aplicar(columnas['referencia'], _REF.ljust(35), fila=_EN_VENTANA) == _REF
+
+
 def test_ciega1_t3_quita_el_relleno_de_ancho_fijo_dentro_de_la_ventana():
     assert mapeo.aplicar(('ciega1_T3',), _REF.ljust(35), fila=_EN_VENTANA) == _REF
 

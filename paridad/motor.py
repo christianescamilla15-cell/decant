@@ -49,9 +49,9 @@ L_HORAS = ('SELECT p.id, p.uetr, p.fecha_envio, p.horas_liquidacion, '
            '(SELECT MAX(s.fecha_hora) FROM dbo.partida_solicitada s WHERE s.orden_id = p.id) '
            'FROM dbo.orden_pago p WHERE p.horas_liquidacion IS NOT NULL')
 
-PARTIDA_CLIENTE = (('concepto', ()), ('moneda', ('char',)), ('monto', ()), ('fecha_hora', ('T5_cdmx_llegada',)),
+PARTIDA_CLIENTE = (('concepto', ()), ('moneda', ('char:3',)), ('monto', ()), ('fecha_hora', ('T5_cdmx_llegada',)),
                    ('referencia', ()))
-PARTIDA_CORRESPONSAL = (('concepto', ()), ('moneda', ('char',)), ('monto', ()), ('fecha_hora', ('T5_ny',)),
+PARTIDA_CORRESPONSAL = (('concepto', ()), ('moneda', ('char:3',)), ('monto', ()), ('fecha_hora', ('T5_ny',)),
                         ('referencia', ('ciega1_T3',)))
 
 
@@ -155,7 +155,9 @@ def medir(cursor_legado, cursor_tobe, universo: Path, corte_utc) -> dict:
         for fila in _filas(cursor_legado, consulta_l):
             llave = (fila[0].rstrip(), fila[1])
             piso = pisos[fila[7]][1] if len(fila) > 7 else None      # la partida del cliente es de SU registro
-            esperado = '|'.join(texto(aplicar(p, v, piso)) or '∅' for (_, p), v in zip(columnas, fila[2:7]))
+            contexto = {'fecha_hora': fila[5]}                         # la ventana de ciega1_T3 es la de la partida
+            esperado = '|'.join(texto(aplicar(p, v, piso, contexto)) or '∅'
+                                for (_, p), v in zip(columnas, fila[2:7]))
             t = tobe.get(llave)
             obtenido = '|'.join(texto(v) or '∅' for v in t[2:]) if t else None
             r[regla].caso(f'{llave[0]}/{llave[1]}', esperado, obtenido)

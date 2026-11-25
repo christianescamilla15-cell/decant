@@ -53,6 +53,12 @@ def _nombre(parche: str) -> tuple[str, int | None]:
     return nombre, int(ancho) if ancho else None
 
 
+def parche_valido(parche: str) -> bool:
+    """¿El parche existe y trae lo que necesita? (char exige su ancho)."""
+    nombre, ancho = _nombre(parche)
+    return nombre in PARCHES and (nombre != 'char' or (ancho is not None and ancho > 0))
+
+
 def instante_no_antes_de(hora_local: datetime | None, zona, piso: datetime | None) -> datetime | None:
     """Hora local → instante; en la hora repetida, la primera ocurrencia que no quede antes de `piso`."""
     if hora_local is None:
@@ -249,6 +255,6 @@ def validar() -> list[str]:
             if c.destino is None and not (c.motivo or mapeo.motivo):
                 errores.append(f'{tabla}.{columna}: no se migra y no dice por qué')
             for p in c.parches:
-                if _nombre(p)[0] not in PARCHES:
-                    errores.append(f'{tabla}.{columna}: parche desconocido {p}')
+                if not parche_valido(p):
+                    errores.append(f'{tabla}.{columna}: parche desconocido o sin su ancho: {p}')
     return errores
