@@ -24,3 +24,29 @@ Nota de operación: la corrida dejó vivo un contenedor de restauración de la r
 quitó a mano. Es un defecto del ciclo, no de la medición, y queda anotado para corregirse.
 
 El cruce contra el catálogo sellado se agrega DEBAJO de esta sección cuando se revele, sin editar lo de arriba.
+
+---
+
+## Cruce con el catálogo revelado (agregado después; lo de arriba no se editó)
+
+Catálogo: `legado/TRAMPAS_CIEGAS_3.md`, copiado byte a byte; sha256 verificado = `04a31108…054e` (coincide con el sellado).
+Medición: `python -m radiografia.medicion --trampas legado/TRAMPAS_CIEGAS_3.md` → **0 de 3 (0 %)**
+(detalle en `radiografia/informe/ciega3/medicion.md`). Esta vez las tres hacen daño YA (ninguna latente):
+
+| Id | Trampa | Tipo | Daño medido |
+|---|---|---|---|
+| T1 | `UPDATE o … FROM orden_pago p JOIN operacion o` con relación 1:N | límite documentado de v4 («UPDATE … FROM») | 100,299 de 104,773 operaciones quedan con el estado de una fila REEMPLAZADA |
+| T2 | `GETDATE()` dentro del texto que ejecuta `sp_executesql` | límite documentado de v4 («SQL dinámico») | 139 órdenes con el reloj de hoy frente a 1 con el del respaldo |
+| T3 | `SET @id = @@IDENTITY` tras insertar en una tabla cuyo trigger inserta en otra con identidad propia | clase NUEVA | devuelve el id de la bitácora (685,277) en vez del de la orden (270,617) |
+
+**Lectura.** Tercera ronda, tercer 0/3. Total a ciegas: **0 de 9**, frente a 8 de 9 propias y 0 falsos positivos de alta
+señal en los controles públicos. La conclusión ya no es «falta un detector»: un analizador léxico de patrones encuentra
+lo que su autor ya sabe nombrar y documentar un límite no lo cubre. Por eso Decant no apuesta la paridad a la
+radiografía: la radiografía orienta, y lo que decide es la paridad medida contra el oráculo (semana 2), que no
+necesita saber qué trampa hay para encontrar su efecto (las tres de esta ronda cambian datos o salidas que la
+paridad SÍ compara).
+
+**Si hay detectores-v5 (cada uno pediría otra ronda):** unicidad del conjunto aplicada al destino de `UPDATE … FROM`
+(control: por PK no se marca); literales concatenados que llegan a `sp_executesql`/`EXEC(…)` tratados como código para
+los detectores léxicos, y lo no resoluble como inventario `sql_dinamico`; `@@IDENTITY` tras INSERT a tabla con trigger
+AFTER INSERT que inserta en otra con identidad = defecto (control: `SCOPE_IDENTITY()` no se marca).
