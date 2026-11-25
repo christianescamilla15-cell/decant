@@ -8,8 +8,9 @@ back-office de divisas y pagos internacionales del *Banco Ficticio del Norte* (B
 programas reales de modernización; aquí se aplica de punta a punta sobre un legado inventado, con la evidencia en
 el repositorio.
 
-> **Estado: semana 1 de 4** — el legado ejecutable, su versión «viva» y la radiografía con su control público.
-> El TO-BE (.NET 10 + PostgreSQL), la paridad y el corte llegan en las semanas siguientes.
+> **Estado: semana 2 de 4** — al legado ejecutable, su versión «viva» y la radiografía (S1) se suman el TO-BE en
+> .NET 10 + PostgreSQL y la paridad medida contra el legado: «verificar la migración», «medir el motor», paridad de
+> reporte con arbitraje y gemelos. El corte ensayable llega en S3.
 
 ## Qué hay
 
@@ -21,7 +22,42 @@ el repositorio.
 | [`legado/VOLUMEN.md`](legado/VOLUMEN.md) | El volumen que hace falta para que el control negativo no salga en 0 % y el piso de la paridad, medidos en inversiones, y los tiempos del ciclo. |
 | [`universo/`](universo) | Lo que ENTRA al replay: la partición por columna (entrada o resultado), la lectura de los archivos de interfaz con sus llaves reales (buzón del corresponsal y archivo de sucursales) y las noches del job. |
 | [`radiografia/`](radiografia) | La radiografía (Python): restaura el respaldo en un contenedor limpio, lo cuadra contra lo que el legado publicaba, mide el corte, inventaría y detecta por patrón genérico. Los detectores están congelados en el tag `detectores-v3`. [`informe/`](radiografia/informe) es su salida sobre el legado, con el veredicto medido de cada hallazgo, y [`CONTROL.md`](radiografia/CONTROL.md) sus dos controles públicos. |
-| [`docs/adr/`](docs/adr) | Las decisiones de la semana 1. |
+| [`src/`](src) | El TO-BE en .NET 10: `Decant.Domain` (sólo BCL: reglas puras, `IClock`, `Resultado<T>`), `Decant.Application` (casos de uso, puertos, mediador propio, banderas como records), `Decant.Infrastructure` (EF Core + Npgsql, migraciones, COPY binario) y dos hosts con la misma composición: `Decant.Api` (Minimal API) y `Decant.Cli` (lotes). |
+| [`tests/Decant.*`](tests) | Pruebas por capa: dominio con casos reales del respaldo, aplicación con dobles a mano, infraestructura y API contra PostgreSQL real (Testcontainers) y arquitectura (NetArchTest + Mono.Cecil). |
+| [`paridad/`](paridad) | La paridad en Python: universo y oráculo en archivos y funciones distintos, los dos ejercicios con nombre, la paridad de reporte con arbitraje y los gemelos. [`informe/`](paridad/informe) es su salida sobre el legado del ciclo. |
+| [`docs/`](docs) | [Arquitectura C4](docs/arquitectura/README.md), [reglas → prueba → origen](docs/reglas.md) y las [decisiones](docs/adr) de S1 (0001–0004) y S2 (0005–0011). |
+
+## Resultados de la semana 2 ([informe completo](paridad/informe/paridad.md))
+
+Un comando, `python -m paridad`, restaura el respaldo en un contenedor limpio, mide el corte (29-dic-2023 03:44:36,
+la última escritura), extrae universo y oráculo por columna, carga el TO-BE cinco veces y escribe el informe.
+
+- **«Verificar la migración»** (carga histórica): las 7 tablas byte a byte, 13.7 millones de celdas y 138 MB después
+  de los parches documentados, **0 faltan, 0 sobran, 0 distintas**. Los parches se cuentan: 107,265 CLABE «NA» y
+  128,220 BIC «NA» a NULL, 53,702 tipos de cambio en 0 a NULL, 48,013 referencias con relleno (las de la ronda 1 a
+  ciegas) y cada hora local a su instante. Las 119,897 filas REEMPLAZADA son copias exactas del documento y sus
+  395,618 partidas se reconstruyen. El **esquema** se compara columna por columna después de cada una de las 5 cargas,
+  y su control negativo (un TO-BE sin `codigo_proposito`, T6) falla nombrándola. El **cuadre por lado** («Σ partes =
+  total del encabezado») da 0 violaciones en el legado (con los lados que pinta la pantalla) y en el TO-BE; con los
+  lados según el NOMBRE de la tabla da 446,151.
+- **«Medir el motor»** (replay sólo del universo, reloj de cada noche del job): 10 de 11 reglas al **100 %**; las
+  horas de liquidación al **71.28 %**, con las 41,414 diferencias auditadas como discrepancia del legado (T5: el legado
+  resta una hora fija) y la misma cifra que da la verdad del generador. La paridad encontró **un defecto nuestro**:
+  5 folios OP en otro orden en la hora que se repite el 31-oct-2021. Se corrigió con su regla (orden de llegada) y su
+  prueba. Con las acciones del job en **«sólo marca»**, las 110,424 marcas de vencimiento y las 144,183 de
+  conciliación coinciden 100 % con la bitácora del legado, noche por noche.
+- **Paridad de reporte**: el reporte del TO-BE en sombra (todo el universo) contra el que el legado publicó al
+  respaldar, por llave natural: 0 defectos nuestros, 181 renglones de **avance de producción** (confirmaciones
+  posteriores al corte, auditadas en el legado vivo por identidad) y 14,984 celdas por una **regla real del legado**
+  (publica la hora local sin zona; el TO-BE publica la misma hora con su desfase). Orden: **0 inversiones de
+  contrato**; los empates se juzgan contra el piso de la misma corrida (el propio legado invierte entre 7 % y 25 % de
+  sus empates de una corrida a otra).
+- **Gemelos** (pantalla de detalle del legado contra el JSON de la API) en 3 casos estratificados, y **T4** probado por
+  el binding de la pantalla: el TO-BE publica en `liquidadoPorElCorresponsal` lo que la rejilla «Liquidado por el
+  corresponsal» pinta, que vive en la tabla `partida_solicitada`.
+- **Trampas de las rondas a ciegas, medido tal cual:** la verificación de la migración vio 1 de 6 (los espacios
+  finales); 2 son latentes y 3 viven en salidas que la paridad de S2 no compara. La paridad sólo ve el efecto en lo
+  que compara ([tabla](paridad/informe/paridad.md#trampas-de-las-rondas-a-ciegas-la-paridad-vio-su-efecto)).
 
 ## Resultados de la semana 1
 
@@ -97,7 +133,7 @@ Procedimiento (ronda 2):
 
 ## Cómo ejecutar
 
-Requiere Docker y Python 3.12.
+Requiere Docker, Python 3.12 y, para el TO-BE, el SDK de .NET 10.
 
 ```
 python3 -m venv .venv && . .venv/bin/activate
@@ -108,7 +144,20 @@ pytest -m integracion                            # contra el legado que dejó ar
 docker compose -f legado/docker-compose.yml down -v
 ```
 
-Paso a paso:
+TO-BE y paridad (requieren .NET 10 SDK y el legado que dejó `./ciclo.sh` arriba):
+
+```
+dotnet build Decant.slnx -c Release
+dotnet test Decant.slnx                          # dominio, aplicación, arquitectura, infraestructura y API
+export DECANT_PG_PASSWORD='otra-clave' DECANT_PG_PUERTO=15450
+docker run -d --name decant-pg -e POSTGRES_USER=decant -e POSTGRES_PASSWORD="$DECANT_PG_PASSWORD" \
+  -p 127.0.0.1:15450:5432 postgres:16-alpine
+python -m paridad --manifiesto respaldos/respaldo_2023-12-29.json   # → paridad/informe/paridad.md
+pytest -m paridad                                # T4 y las demás pruebas sobre el informe
+dotnet src/Decant.Cli/bin/Release/net10.0/decant.dll configuracion   # banderas y destinos por ambiente
+```
+
+Paso a paso del legado:
 
 ```
 docker compose -f legado/docker-compose.yml up -d --wait
@@ -126,13 +175,15 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
 
 ## Pruebas
 
-- `pytest`: 114 pruebas sin base. Cubren:
+- `pytest`: 143 pruebas sin base. Cubren:
   - el determinismo del generador (huella fija) y la existencia de cada trampa en los datos;
   - el universo: partición por columna, llaves reales del buzón, liquidaciones descartadas y nombres sanos en el
     archivo de sucursales;
   - el orden por inversiones;
   - cada detector con casos positivos y negativos, incluidas regresiones de los controles;
-  - la no circularidad (ningún detector lee el catálogo) y el congelamiento de los detectores.
+  - la no circularidad (ningún detector lee el catálogo) y el congelamiento de los detectores;
+  - la paridad: universo y oráculo atados a la partición, mapeo y parches, esquema con su control de T6, arbitraje,
+    cuadre por lado y el binding de la pantalla.
 - `pytest -m integracion`: 16 pruebas contra SQL Server real. Comprueban:
   - que el generador calcula lo mismo que los procedimientos del legado;
   - el criterio de salida contra el manifiesto;
@@ -144,6 +195,16 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - las liquidaciones del buzón;
   - lo que pierde el delta por la pantalla;
   - los espacios finales contados en el motor y la medición separada por catálogo.
+
+- `dotnet test Decant.slnx`: 100 pruebas del TO-BE.
+  - `Decant.Domain.Tests` (55): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
+    ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón) e invariantes.
+  - `Decant.Application.Tests` (16): el replay, la carga histórica y el reproceso con dobles escritos a mano.
+  - `Decant.Infrastructure.Tests` (12) y `Decant.Api.Tests` (10): EF Core, COPY y la API completa contra PostgreSQL
+    real con Testcontainers.
+  - `Decant.Architecture.Tests` (7): capas, el replay sin acceso al oráculo y nadie usa `DateTime.Now` salvo
+    `SystemClock` (recorriendo el IL).
+- `pytest -m paridad`: 6 pruebas sobre el informe de paridad, entre ellas la de T4 por el binding de la pantalla.
 
 ## Seguridad
 
