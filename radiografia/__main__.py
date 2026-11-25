@@ -74,10 +74,12 @@ def radiografiar(archivos: list[dict], base: str, manifiesto: dict | None, conse
             for fk in fks:
                 padres_de.setdefault(fk['hija'], set()).add(fk['padre'])
             codigo = modulos + pasos
-            hallazgos = patrones.analizar_codigo(codigo, padres_de)
             por_tabla: dict[str, list[str]] = {}
             for c in columnas:
                 por_tabla.setdefault(f"{c['esquema']}.{c['tabla']}".lower(), []).append(c['columna'])
+            unicas = inventario.llaves_unicas(cursor)
+            hallazgos = patrones.analizar_codigo(codigo, padres_de, unicas,
+                                                 {t: {c.lower() for c in cols} for t, cols in por_tabla.items()})
             hallazgos += patrones.columnas_sin_lectura(codigo, por_tabla)
             tiempos['patrones_codigo'] = round(time.perf_counter() - t, 1)
 
@@ -87,6 +89,7 @@ def radiografiar(archivos: list[dict], base: str, manifiesto: dict | None, conse
                 columnas_por_tabla.setdefault(f"{c['esquema']}.{c['tabla']}".lower(), []).append(c)
             hallazgos += datos.centinelas(cursor, columnas)
             hallazgos += datos.mojibake(cursor, columnas)
+            hallazgos += datos.espacios_finales(cursor, columnas, columnas_por_tabla)
             historicas = frozenset(f"{x['esquema']}.{x['tabla']}".lower() for x in tablas
                                    if x['temporal'] == 'HISTORY_TABLE')
             hallazgos += datos.llaves_duplicadas(cursor, columnas, columnas_por_tabla, historicas)

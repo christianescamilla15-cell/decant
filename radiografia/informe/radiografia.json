@@ -1,15 +1,15 @@
 {
  "base": "BFN_DIVISAS",
- "generado_utc": "2026-11-25T02:25:02+00:00",
+ "generado_utc": "2026-11-25T03:07:15+00:00",
  "respaldo": {
   "base": "BFN_DIVISAS",
   "fecha_negocio": "2023-12-29",
-  "tomado_utc": "2026-11-25T02:24:19+00:00",
+  "tomado_utc": "2026-11-25T03:05:03+00:00",
   "tabla_principal": "dbo.operacion",
   "pantalla": {
    "url": "http://127.0.0.1:8080/",
-   "leido_antes_utc": "2026-11-25T02:24:18+00:00",
-   "leido_despues_utc": "2026-11-25T02:24:20+00:00",
+   "leido_antes_utc": "2026-11-25T03:05:02+00:00",
+   "leido_despues_utc": "2026-11-25T03:05:04+00:00",
    "cifras": [
     {
      "etiqueta": "Operaciones registradas",
@@ -83,7 +83,7 @@
     ],
     "archivo": "salida_reporte_del_mes_2023-12-29.jsonl",
     "filas": 7492,
-    "sha256": "458398c70fd21de314b0c9eb81434f12e69dc585c72620fadf8d24549cee6548"
+    "sha256": "2f362be6d93b8be98134c4f0f68311bffff5ccc1323bf9106b5557833c2831ad"
    },
    {
     "nombre": "lista_del_dia_anterior",
@@ -108,19 +108,19 @@
    "base": "BFN_DIVISAS",
    "restaurada_como": "BFN_DIVISAS",
    "archivo": "bfn_divisas_2023-12-29.bak",
-   "sha256": "14efe2329db31f81edcdf1533bc4ad49e7180a5453c5581ef3ede4fa1e88eb98",
+   "sha256": "9c061d7f998940c55d90e6ab73e085743089f694d4212589ae2b9010cce4ec9f",
    "sha256_ok": true,
    "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
-   "segundos": 3.0
+   "segundos": 2.8
   },
   {
    "base": "msdb",
    "restaurada_como": "legado_msdb",
    "archivo": "msdb_2023-12-29.bak",
-   "sha256": "456494f64944c9ac89bcf209bee9e6b6d445ac76ed21a42a8c75e1cd2ba887e3",
+   "sha256": "19dc302450de7883085e864ab3ddea36aaf0ee6db039b0b32034b2ef7ab3750c",
    "sha256_ok": true,
    "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
-   "segundos": 0.8
+   "segundos": 0.5
   }
  ],
  "msdb": "legado_msdb",
@@ -275,9 +275,9 @@
     "pares_contrato": 26515033,
     "inversiones_contrato": 0,
     "pares_empatados": 1546253,
-    "inversiones_empatados": 384445,
-    "pct_empatados_invertidos": 24.86,
-    "pct_posiciones_distintas": 65.8,
+    "inversiones_empatados": 40410,
+    "pct_empatados_invertidos": 2.61,
+    "pct_posiciones_distintas": 5.6,
     "reproducible": true,
     "cumple": true
    },
@@ -517,6 +517,11 @@
     "lineas": 19
    },
    {
+    "nombre": "dbo.sp_ordenes_por_vencer",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 15
+   },
+   {
     "nombre": "dbo.sp_registrar_liquidacion",
     "tipo": "PROCEDIMIENTO",
     "lineas": 26
@@ -535,6 +540,11 @@
     "nombre": "dbo.sp_reporte_ordenes",
     "tipo": "PROCEDIMIENTO",
     "lineas": 13
+   },
+   {
+    "nombre": "dbo.sp_reporte_posicion",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 39
    },
    {
     "nombre": "dbo.tr_orden_pago_bitacora",
@@ -723,6 +733,50 @@
    "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero",
    "fragmento": "SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,",
    "asigna_variable": false
+  },
+  {
+   "categoria": "reloj_en_regla",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "el reloj del servidor entra por la variable @limite (viene de @hoy) y decide un resultado: reprocesar otro día da otra respuesta",
+   "fragmento": "CASE WHEN fecha_envio < DATEADD(day, -1, @limite) THEN 'VENCE HOY' ELSE 'VENCE MANANA' END AS aviso",
+   "forma": "por_variable"
+  },
+  {
+   "categoria": "reloj_en_regla",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "el reloj del servidor entra por la variable @limite (viene de @hoy) y decide un resultado: reprocesar otro día da otra respuesta",
+   "fragmento": "WHERE estatus = 'ENVIADA' AND fecha_envio < @limite",
+   "forma": "por_variable"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 8,
+   "detalle": "número en duro -2 (1 vez/veces)",
+   "fragmento": "SET @limite = DATEADD(day, -2, @hoy);",
+   "clase": "número",
+   "valor": "-2",
+   "lineas": [
+    8
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_ordenes_por_vencer",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "código en duro 'ENVIADA' (1 vez/veces)",
+   "fragmento": "WHERE estatus = 'ENVIADA' AND fecha_envio < @limite",
+   "clase": "código",
+   "valor": "'ENVIADA'",
+   "lineas": [
+    13
+   ]
   },
   {
    "categoria": "top_sin_order_by",
@@ -1037,6 +1091,55 @@
    ]
   },
   {
+   "categoria": "top_sin_order_by",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 24,
+   "detalle": "asigna @tc_cierre desde dbo.operacion sin TOP ni agregado y sin filtro único (el WHERE iguala moneda; llaves únicas de la tabla: id): la variable se queda con la última fila que entregue el plan",
+   "fragmento": "SELECT @tc_cierre = tipo_cambio",
+   "asigna_variable": true,
+   "forma": "asignacion_multifila"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 12,
+   "detalle": "código en duro 'C' (1 vez/veces)",
+   "fragmento": "SELECT moneda, SUM(CASE WHEN tipo = 'C' THEN monto_divisa ELSE 0 END),",
+   "clase": "código",
+   "valor": "'C'",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "código en duro 'V' (1 vez/veces)",
+   "fragmento": "SUM(CASE WHEN tipo = 'V' THEN monto_divisa ELSE 0 END)",
+   "clase": "código",
+   "valor": "'V'",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dbo.sp_reporte_posicion",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 35,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "ROUND((p.compras - p.ventas) * p.tc_cierre, 2) AS posicion_mxn",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    35
+   ]
+  },
+  {
    "categoria": "inner_join_hija",
    "objeto": "dbo.vw_reporte_ordenes",
    "tipo_objeto": "VISTA",
@@ -1150,6 +1253,23 @@
    ]
   },
   {
+   "categoria": "espacios_finales",
+   "objeto": "dbo.partida_solicitada.referencia",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "48,013 de 244,869 valores con espacios al final (19.6%), medidos con DATALENGTH en el motor: SQL Server los ignora al comparar (=, DISTINCT, GROUP BY) y LEN no los cuenta; PostgreSQL sí los distingue; ventana en fecha_hora: 2022-07-04 08:00:15 → 2023-01-27 17:54:05 (la tabla va de 2021-01-01 08:11:34 a 2023-12-28 17:58:52); concentrados en esa ventana",
+   "filas": 48013,
+   "total": 244869,
+   "ventana": {
+    "columna": "fecha_hora",
+    "desde": "2022-07-04 08:00:15",
+    "hasta": "2023-01-27 17:54:05",
+    "tabla_desde": "2021-01-01 08:11:34",
+    "tabla_hasta": "2023-12-28 17:58:52"
+   }
+  },
+  {
    "categoria": "re_registro",
    "objeto": "dbo.orden_pago.folio",
    "tipo_objeto": "COLUMNA",
@@ -1195,10 +1315,10 @@
   }
  ],
  "resumen": {
-  "top_sin_order_by": 5,
-  "reloj_en_regla": 1,
+  "top_sin_order_by": 6,
+  "reloj_en_regla": 3,
   "desfase_horario_fijo": 1,
-  "literal_magico": 30,
+  "literal_magico": 35,
   "if_exists_sin_else": 1,
   "round_trunca": 1,
   "inner_join_hija": 1,
@@ -1206,16 +1326,17 @@
   "columna_sin_lectura": 4,
   "centinela": 3,
   "mojibake": 1,
+  "espacios_finales": 1,
   "re_registro": 3,
   "llave_candidata_con_duplicados": 1
  },
  "tiempos": {
   "arranque_contenedor": 6.3,
-  "restauracion": 5.1,
-  "inventario": 0.9,
-  "patrones_codigo": 0.0,
-  "patrones_datos": 14.4,
-  "criterio_salida": 1.3,
-  "total": 28.3
+  "restauracion": 4.5,
+  "inventario": 1.2,
+  "patrones_codigo": 0.1,
+  "patrones_datos": 17.2,
+  "criterio_salida": 1.5,
+  "total": 31.3
  }
 }

@@ -6,18 +6,20 @@ from collections import Counter
 from pathlib import Path
 
 ORDEN_CATEGORIAS = ('top_sin_order_by', 'inner_join_hija', 'reloj_en_regla', 'if_exists_sin_else',
-                    'if_exists_guarda', 'desfase_horario_fijo', 'round_trunca', 'centinela', 'mojibake', 're_registro',
+                    'if_exists_guarda', 'desfase_horario_fijo', 'round_trunca', 'centinela', 'mojibake',
+                    'espacios_finales', 're_registro',
                     'llave_candidata_con_duplicados', 'columna_sin_lectura', 'tabla_sin_lectura', 'literal_magico')
 TITULOS = {
-    'top_sin_order_by': 'TOP sin ORDER BY',
+    'top_sin_order_by': 'Selección no determinista: TOP sin ORDER BY o asignación desde varias filas',
     'inner_join_hija': 'INNER JOIN a una tabla hija',
-    'reloj_en_regla': 'Reloj del servidor (GETDATE y similares) dentro de una regla',
+    'reloj_en_regla': 'Reloj del servidor (GETDATE y similares) en una regla, directo o por una variable',
     'if_exists_sin_else': 'IF EXISTS sin ELSE que escribe datos (camino silencioso)',
     'if_exists_guarda': 'IF EXISTS sin ELSE con cuerpo de guarda o DDL (informativo)',
     'desfase_horario_fijo': 'Conversión de zona con desfase fijo',
     'round_trunca': 'ROUND con tercer argumento: trunca en vez de redondear',
     'centinela': 'Centinelas en vez de NULL (por distribución de valores)',
     'mojibake': 'Texto con mojibake (UTF-8 leído como latin-1)',
+    'espacios_finales': 'Espacios finales que SQL Server ignora al comparar y PostgreSQL no',
     're_registro': 'Re-registro: el mismo documento con otra llave interna',
     'llave_candidata_con_duplicados': 'Llave candidata con duplicados (no parece re-registro)',
     'columna_sin_lectura': 'Columnas que ningún módulo lee',

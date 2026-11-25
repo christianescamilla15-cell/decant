@@ -158,3 +158,20 @@ def test_la_lista_de_la_pantalla_entrega_los_ids_de_sus_ligas(monkeypatch):
                           (['id', 'folio'], [(7, 'FX-7'), (8, 'FX-8')])])
     monkeypatch.setattr(app, 'conectar', lambda: ConexionFalsa(cursor))
     assert extraer_pantalla.leer_lista(app.lista(None).decode('utf-8')) == [7, 8]
+
+
+def test_la_verificacion_del_cargador_ya_no_absuelve_espacios_finales():
+    # regresión de la siembra a ciegas: _normalizar hacía rstrip() en los dos lados y escondía la pérdida
+    from legado.generador.cargar import _como_lo_guarda, _normalizar
+    assert _normalizar('FICT123   ') != _normalizar('FICT123')
+    assert _como_lo_guarda('FICT123   ', ('varchar', 35)) == 'FICT123   '      # varchar: exacto
+    assert _como_lo_guarda('NA', ('char', 11)) == 'NA' + ' ' * 9                 # char(n) rellena por tipo
+    assert _como_lo_guarda('USD', ('nchar', 6)) == 'USD'                         # nchar: max_length en bytes
+
+
+def test_el_cargador_solo_acepta_identificadores_de_la_lista_blanca():
+    from legado.generador.cargar import _validar
+    _validar('partida_solicitada', 'referencia')
+    for tabla, columna in (('partida_solicitada', 'referencia]; DROP TABLE x;--'), ('sys.objects', None)):
+        with pytest.raises(ValueError):
+            _validar(tabla, columna)

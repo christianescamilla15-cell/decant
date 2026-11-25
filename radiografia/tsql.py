@@ -145,6 +145,11 @@ def fin_de_consulta(fs: list[Ficha], inicio: int) -> int:
     return len(fs)
 
 
+def sentencia_actual(fs: list[Ficha], i: int) -> str | None:
+    """Palabra que abrió la sentencia de la ficha i (UPDATE, SELECT…), sin contar el SET de un UPDATE."""
+    return _sentencia_actual(fs, i)
+
+
 def _sentencia_actual(fs: list[Ficha], i: int) -> str | None:
     nivel = fs[i].nivel
     for j in range(i - 1, -1, -1):

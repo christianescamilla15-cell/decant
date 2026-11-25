@@ -3,29 +3,80 @@
 Una radiografía que sólo se prueba sobre el legado que uno mismo sembró puede «detectar» lo que su autor ya sabía.
 El control la corre, sin cambiar nada, sobre bases que no escribimos y que se tienen por limpias.
 
-Hay dos controles con papeles distintos:
+## Estado de los controles con `detectores-v3`
 
-1. **WideWorldImporters es de ENTRENAMIENTO.** Los arreglos de la v1 de los detectores se hicieron mirando sus
-   falsos positivos, así que su resultado ya no prueba que los detectores generalicen.
-2. **AdventureWorks es el control APARTADO.** Se corrió UNA sola vez, después de congelar los detectores, y se
-   publica tal cual salió. La validación del detector de D1 (`round_trunca`, agregado después de la v1) sólo cuenta
-   contra él.
+- **Ninguno de los dos controles públicos es ya un control de generalización.**
+  - WideWorldImporters es de ENTRENAMIENTO desde la v1.
+  - AdventureWorks fue el control APARTADO de la v2. Los detectores v3 se escribieron después de ver la siembra a
+    ciegas, no AdventureWorks, pero su resultado de la v2 ya es conocido: re-correrlo sólo mide los falsos
+    positivos NUEVOS que meten los detectores v3. Eso se publica abajo, tal cual.
+- **El control real de la v3 es una NUEVA siembra a ciegas** (ronda 2, procedimiento en el README). La ronda 1
+  (`CONTROL_CIEGO.md`) dio 0 de 3 con la v2. Detectar ahora sus 3 trampas no cuenta como control: el catálogo es
+  conocido y los arreglos de la v3 salieron de él.
 
-## Detectores congelados: `detectores-v2`
+## Detectores congelados vigentes: `detectores-v3`
 
-Los detectores son tres archivos. Se congelaron en el tag `detectores-v2` con estos sha256, y la prueba
-`test_los_detectores_estan_congelados_en_detectores_v2` falla si cualquiera cambia:
+Los detectores son tres archivos. Se congelaron en el tag `detectores-v3` con estos sha256, y la prueba
+`test_los_detectores_estan_congelados` falla si cualquiera cambia:
 
 ```
-8e29395ee20f056a02e1858abb3812dd0a05747a6d0c531ada5881e34e86ff6b  radiografia/tsql.py
-70f4415556b3386b31264bbe8a28eededb35c548b351b9f0157fddf0d8788b3e  radiografia/patrones.py
-ab60df538a88a6423e1cb734abc7c5e33d620425e580f33d18573b01fc29a5a9  radiografia/datos.py
+f79f123a08aa370e2a9dd10053f03f36c8b089b06e4616843ddd4e908465f2bd  radiografia/tsql.py
+071d6b38652fa72e5508601cc0ea45efffd8f3a7fe1830635d5409d75ee16bbe  radiografia/patrones.py
+43aa47868fb8f6c919b4d8df3cd63d084511dd3426529fc8d03e54277fd9256d  radiografia/datos.py
 ```
 
-Cambiar un detector después de esto exige un tag nuevo (`detectores-v3`), su sha256 aquí y un control apartado
-NUEVO: el de AdventureWorks ya no serviría para validarlo.
+Qué cambió de la v2 a la v3. Son los tres arreglos genéricos que propuso quien sembró a ciegas, y ninguno depende
+de los nombres de sus trampas:
 
-## Control apartado: AdventureWorks (una sola corrida, tal cual)
+1. **Selección no determinista también sin TOP:** `SELECT @v = col FROM t …` sin agregado y sin un filtro que
+   cubra una llave ÚNICA real de `t`. Las llaves son la PK y los índices únicos sin filtro, leídos del esquema
+   restaurado. La categoría conserva su clave `top_sin_order_by`. Control dentro del propio legado: la asignación
+   por PK de `sp_registrar_orden` no se marca, y una prueba lo exige.
+2. **Reloj por variable:** dentro de cada módulo, las variables asignadas desde el reloj (directo o desde otra
+   variable con reloj) se siguen hasta un WHERE, CASE, JOIN … ON o el SET de un UPDATE. Categoría
+   `reloj_en_regla`.
+3. **Espacios finales:** `DATALENGTH(c) > DATALENGTH(RTRIM(c))` por columna varchar o nvarchar, medido en el
+   motor, con la ventana de fechas de las filas afectadas. Categoría nueva, `espacios_finales`. Se compara contra
+   `DATALENGTH(RTRIM(c))` y no contra `LEN(c)` porque `DATALENGTH` cuenta BYTES: en nvarchar «> LEN» marcaría
+   todas las filas.
+
+Historial de congelamientos:
+
+| Tag | Archivo | sha256 |
+|---|---|---|
+| `detectores-v2` | `radiografia/tsql.py` | `8e29395ee20f056a02e1858abb3812dd0a05747a6d0c531ada5881e34e86ff6b` |
+| `detectores-v2` | `radiografia/patrones.py` | `70f4415556b3386b31264bbe8a28eededb35c548b351b9f0157fddf0d8788b3e` |
+| `detectores-v2` | `radiografia/datos.py` | `ab60df538a88a6423e1cb734abc7c5e33d620425e580f33d18573b01fc29a5a9` |
+
+## Corrida de `detectores-v3` sobre los controles públicos
+
+Corridas una vez el 24-nov-2026, con el árbol limpio en el tag `detectores-v3`, sobre los mismos respaldos
+oficiales (sha256 verificados). Los informes completos, sin editar, están en
+[`control/v3/wideworldimporters/`](control/v3/wideworldimporters/radiografia.md) y
+[`control/v3/adventureworks/`](control/v3/adventureworks/radiografia.md). Los de la v2 se conservan donde estaban.
+
+**Lo que cambió respecto a la v2:** ningún hallazgo de la v2 desapareció. Los nuevos son exactamente estos 14. Se
+clasificaron leyendo el código y los datos en una restauración aparte, de sólo lectura, sin volver a correr los
+detectores.
+
+| Control | Hallazgos v2 → v3 | Nuevos | Patrón real | Falso positivo | Lectura |
+|---|---:|---:|---:|---:|---|
+| WideWorldImporters | 262 → 273 | 11 `espacios_finales` | 11 | 0 | Los 11 valores terminan de verdad en espacio, por ejemplo `'Isabell '` y `'David Novacek '`. En datos capturados: `People.PreferredName` (8), `People.FullName`, `Customers.CustomerName`, `PackageTypes.PackageTypeName` y sus copias `_Archive`. Tres son columnas CALCULADAS: `People.SearchName` y `StockItems.SearchDetails` son `concat(…, N' ', …)` y rellenan por diseño cuando el segundo término es NULL (199 de 227 artículos); `Invoices.ConfirmedReceivedBy` sale de un JSON con el nombre ya relleno (87 facturas). **Límite:** el detector no omite columnas calculadas, que no se migran como dato. |
+| AdventureWorks | 170 → 173 | 3 `top_sin_order_by` (asignación desde varias filas) | 3 | 0 | `ufnGetProductListPrice`, `ufnGetProductDealerPrice` y `ufnGetProductStandardCost` asignan el precio o el costo desde un historial filtrado por `@OrderDate BETWEEN StartDate AND EndDate`: ninguna llave única garantiza una sola fila. Hoy es latente (0 periodos traslapados en los dos historiales). **Pero el detector lo marca por la razón EQUIVOCADA:** dice «sin WHERE» porque el filtro va en el `JOIN … ON` y sólo lee el WHERE. Si leyera el ON, juzgaría sólo la tabla del FROM (`Product`, única por `ProductID`) y NO lo marcaría: un falso negativo escondido detrás de un acierto. |
+
+**Lectura:**
+
+1. Los 3 arreglos no metieron ningún falso positivo en sentido estricto: la forma existe en los 14 hallazgos nuevos.
+2. Sí aparecieron dos límites nuevos, que no se corrigen bajo este congelamiento:
+   - las columnas calculadas cuentan como dato;
+   - la asignación desde varias filas no lee el `ON`, y con un JOIN sólo juzga la tabla del FROM.
+3. Reloj por variable: 0 hallazgos en los dos controles. Sin casos positivos fuera del legado, no hay sensibilidad
+   medida, sólo especificidad.
+4. Nada de esto valida la v3. Su control real es la siembra a ciegas ronda 2.
+
+---
+
+# Historial: control apartado de la v2 sobre AdventureWorks (una sola corrida, tal cual)
 
 - **Fuente:** `AdventureWorks2022.bak` del release `adventureworks` del repositorio `microsoft/sql-server-samples`
   en GitHub. sha256 `d17567adb1521f972e1dc183a7216cea869c4580b5d75632425bcadbaf82ce5e`, 209,838,080 bytes.

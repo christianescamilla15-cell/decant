@@ -8,7 +8,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from radiografia.tsql import RELOJ, Ficha, apertura, cierre, fichas, fin_de_consulta, inicia_sentencia, nombre_objeto
+from radiografia.tsql import (
+    RELOJ,
+    Ficha,
+    apertura,
+    cierre,
+    fichas,
+    fin_de_consulta,
+    inicia_sentencia,
+    nombre_objeto,
+    sentencia_actual,
+)
 
 
 @dataclass
@@ -145,6 +155,12 @@ def reloj_en_regla(m: Modulo) -> list[dict]:
 
 
 def _contexto_reloj(fs: list[Ficha], i: int) -> str:
+    palabra, _k = _palabra_de_contexto(fs, i)
+    return 'regla' if palabra in _REGLA else 'asignacion'
+
+
+def _palabra_de_contexto(fs: list[Ficha], i: int) -> tuple[str, int]:
+    """La cláusula que gobierna la ficha i (WHERE, ON, WHEN, SET…) y su posición; ',' si es un elemento de lista."""
     # salir de las funciones que lo envuelven: DATEADD(day, -3, GETDATE()) cuenta donde está DATEADD
     while True:
         abre = apertura(fs, i)
@@ -165,14 +181,175 @@ def _contexto_reloj(fs: list[Ficha], i: int) -> str:
         if profundidad:
             continue
         if f.tipo == 'op' and f.texto == ',':
-            return 'asignacion'
+            return ',', j
         if f.tipo != 'ident':
             continue
-        if f.mayus in _REGLA:
-            return 'regla'
-        if f.mayus in _ASIGNACION:
-            return 'asignacion'
-    return 'asignacion'
+        if f.mayus in _REGLA or f.mayus in _ASIGNACION:
+            return f.mayus, j
+    return '', -1
+
+
+# ── 3b. Reloj que entra a la regla por una variable ──────────────────────────────────────────────────────────
+
+def _es_reloj(fs: list[Ficha], k: int) -> bool:
+    f = fs[k]
+    return f.tipo == 'ident' and f.mayus in RELOJ and (
+        f.mayus == 'CURRENT_TIMESTAMP' or (k + 1 < len(fs) and fs[k + 1].texto == '('))
+
+
+def _asignaciones_a_variables(fs: list[Ficha]) -> list[tuple[str, list[int]]]:
+    """(variable, índices de su expresión) de cada `SET @v =`, `DECLARE @v tipo =` y `SELECT @v =` del módulo."""
+    resultado = []
+    for i, f in enumerate(fs):
+        if f.es('SET') and i + 2 < len(fs) and fs[i + 1].tipo == 'variable' and fs[i + 2].texto in ('=', '+=', '-='):
+            # dentro del SET de un UPDATE (`SET @n = siguiente, siguiente = …`) la expresión acaba en la coma
+            fin = fin_de_sentencia(fs, i)
+            hasta = next((x for x in range(i + 3, fin) if fs[x].nivel == f.nivel and (
+                fs[x].texto == ',' or fs[x].es('FROM', 'WHERE', 'OUTPUT'))), fin)
+            resultado.append((fs[i + 1].mayus, list(range(i + 3, hasta))))
+            continue
+        if not f.es('DECLARE', 'SELECT'):
+            continue
+        fin = fin_de_sentencia(fs, i) if f.es('DECLARE') else fin_de_consulta(fs, i)
+        k = i + 1
+        while k < fin:
+            if fs[k].tipo == 'variable' and fs[k].nivel == f.nivel and (k == i + 1 or fs[k - 1].texto == ','):
+                igual = next((x for x in range(k + 1, fin) if fs[x].nivel == f.nivel and (
+                    fs[x].texto in ('=', ',') or fs[x].es('FROM'))), None)
+                if igual is not None and fs[igual].texto == '=':
+                    hasta = next((x for x in range(igual + 1, fin) if fs[x].nivel == f.nivel and (
+                        fs[x].texto == ',' or fs[x].es('FROM', 'WHERE'))), fin)
+                    resultado.append((fs[k].mayus, list(range(igual + 1, hasta))))
+                    k = hasta
+                    continue
+            k += 1
+    return resultado
+
+
+def variables_de_reloj(m: Modulo) -> dict[str, str]:
+    """Variables del módulo que llevan el reloj del servidor: asignadas desde GETDATE() y similares, o desde otra
+    variable que ya lo lleva (DATEADD, DATEDIFF, CAST…). Devuelve {variable: de dónde le llega}."""
+    fs = m.fichas
+    asignaciones = _asignaciones_a_variables(fs)
+    llevan: dict[str, str] = {}
+    cambio = True
+    while cambio:
+        cambio = False
+        for variable, expresion in asignaciones:
+            if variable in llevan:
+                continue
+            reloj = next((f'{fs[k].mayus}()' for k in expresion if _es_reloj(fs, k)), None)
+            fuente = reloj or next((fs[k].texto for k in expresion
+                                    if fs[k].tipo == 'variable' and fs[k].mayus in llevan), None)
+            if fuente:
+                llevan[variable] = fuente
+                cambio = True
+    return llevan
+
+
+def reloj_por_variable(m: Modulo) -> list[dict]:
+    """El reloj no aparece en la regla: entra por una variable (`SET @hoy = GETDATE(); … WHERE f < @hoy`)."""
+    llevan = variables_de_reloj(m)
+    if not llevan:
+        return []
+    fs, hallazgos, vistos = m.fichas, [], set()
+    for i, f in enumerate(fs):
+        if f.tipo != 'variable' or f.mayus not in llevan or (f.linea, f.mayus) in vistos:
+            continue
+        if i and i + 1 < len(fs) and fs[i + 1].texto in ('=', '+=', '-=') and (
+                fs[i - 1].es('SET', 'DECLARE', 'SELECT') or fs[i - 1].texto == ','):
+            continue                    # es el destino de una asignación, no un uso
+        palabra, k = _palabra_de_contexto(fs, i)
+        if palabra in _REGLA:
+            efecto = 'decide un resultado'
+        elif palabra == 'SET' and sentencia_actual(fs, k) == 'UPDATE':
+            efecto = 'se escribe en los datos (SET de un UPDATE)'
+        else:
+            continue
+        vistos.add((f.linea, f.mayus))
+        hallazgos.append(_hallazgo('reloj_en_regla', m, f.linea,
+                                   f'el reloj del servidor entra por la variable {f.texto} (viene de '
+                                   f'{llevan[f.mayus]}) y {efecto}: reprocesar otro día da otra respuesta',
+                                   forma='por_variable'))
+    return hallazgos
+
+
+# ── 1b. Asignación desde varias filas (selección no determinista sin TOP) ────────────────────────────────────
+
+_AGREGADOS = frozenset(('MAX', 'MIN', 'SUM', 'COUNT', 'COUNT_BIG', 'AVG', 'STRING_AGG', 'STDEV', 'STDEVP', 'VAR',
+                        'VARP', 'CHECKSUM_AGG', 'GROUPING', 'APPROX_COUNT_DISTINCT'))
+
+
+def asignacion_multifila(m: Modulo, unicas: dict[str, list[set[str]]], columnas: dict[str, set[str]]) -> list[dict]:
+    """`SELECT @v = col FROM t WHERE …` sin TOP, sin agregado y sin un filtro que cubra una llave ÚNICA real de t
+    (PK o índice único sin filtro, leídos del esquema restaurado): la variable se queda con la ÚLTIMA fila que
+    entregue el plan. Es la misma clase que TOP sin ORDER BY (selección no determinista) en otra forma.
+
+    Sólo decide sobre tablas con metadatos: vistas, funciones, variables de tabla y temporales se omiten. Con JOIN
+    juzga la tabla del FROM.
+    """
+    fs, hallazgos = m.fichas, []
+    for i, f in enumerate(fs):
+        if not (f.es('SELECT') and i + 2 < len(fs) and fs[i + 1].tipo == 'variable' and fs[i + 2].texto == '='):
+            continue
+        fin = fin_de_consulta(fs, i)
+        nivel = f.nivel
+        desde = next((k for k in range(i, fin) if fs[k].nivel == nivel and fs[k].es('FROM')), None)
+        if desde is None:
+            continue
+        agrupada = any(fs[k].nivel == nivel and fs[k].es('GROUP') for k in range(desde, fin))
+        agregada = not agrupada and any(
+            fs[k].tipo == 'ident' and fs[k].mayus in _AGREGADOS and fs[k + 1].texto == '('
+            and not _seguido_de_over(fs, k + 1) for k in range(i, desde - 1))
+        if agregada:
+            continue
+        tabla, _sig = nombre_objeto(fs, desde + 1)
+        if tabla is None or tabla.startswith('#'):
+            continue
+        tabla = normalizar(tabla)
+        if tabla not in unicas:
+            continue                    # vista, función o tabla sin metadatos: no se puede decidir
+        donde = next((k for k in range(desde, fin) if fs[k].nivel == nivel and fs[k].es('WHERE')), None)
+        iguales = _columnas_igualadas(fs, donde, fin, columnas.get(tabla, set())) if donde is not None else set()
+        if iguales is not None and any(llave <= iguales for llave in unicas[tabla]):
+            continue
+        variables = [fs[k].texto for k in range(i + 1, desde)
+                     if fs[k].tipo == 'variable' and fs[k].nivel == nivel and fs[k + 1].texto == '=']
+        if donde is None:
+            filtro = 'sin WHERE'
+        elif iguales is None:
+            filtro = 'el WHERE tiene OR'
+        else:
+            filtro = f"el WHERE iguala {', '.join(sorted(iguales)) or 'ninguna columna'}"
+        llaves = '; '.join(', '.join(sorted(x)) for x in unicas[tabla]) or 'ninguna'
+        hallazgos.append(_hallazgo(
+            'top_sin_order_by', m, f.linea,
+            f"asigna {', '.join(variables)} desde {tabla} sin TOP ni agregado y sin filtro único ({filtro}; llaves "
+            f"únicas de la tabla: {llaves}): la variable se queda con la última fila que entregue el plan",
+            asigna_variable=True, forma='asignacion_multifila'))
+    return hallazgos
+
+
+def _seguido_de_over(fs: list[Ficha], abre: int) -> bool:
+    k = cierre(fs, abre) + 1
+    return k < len(fs) and fs[k].es('OVER')
+
+
+def _columnas_igualadas(fs: list[Ficha], donde: int, fin: int, columnas: set[str]) -> set[str] | None:
+    """Columnas de la tabla igualadas en el WHERE (`col = …` o `… = col`). None si hay un OR: ya no garantiza nada."""
+    iguales: set[str] = set()
+    for k in range(donde + 1, fin):
+        if fs[k].es('OR'):
+            return None
+        if fs[k].nivel == fs[donde].nivel and fs[k].es('GROUP', 'ORDER', 'HAVING'):
+            break
+        if fs[k].tipo != 'op' or fs[k].texto != '=':
+            continue
+        for lado in (k - 1, k + 1):
+            if 0 <= lado < len(fs) and fs[lado].tipo == 'ident' and fs[lado].texto.lower() in columnas and not (
+                    lado + 1 < len(fs) and fs[lado + 1].texto in ('(', '.')):
+                iguales.add(fs[lado].texto.lower())
+    return iguales
 
 
 # ── 4. IF EXISTS sin ELSE ────────────────────────────────────────────────────────────────────────────────────
@@ -480,12 +657,16 @@ def columnas_sin_lectura(modulos: list[Modulo], columnas: dict[str, list[str]]) 
     return hallazgos
 
 
-def analizar_codigo(modulos: list[Modulo], padres_de: dict[str, set[str]]) -> list[dict]:
+def analizar_codigo(modulos: list[Modulo], padres_de: dict[str, set[str]],
+                    unicas: dict[str, list[set[str]]] | None = None,
+                    columnas: dict[str, set[str]] | None = None) -> list[dict]:
     hallazgos = []
     for m in modulos:
         hallazgos += top_sin_order_by(m)
+        hallazgos += asignacion_multifila(m, unicas or {}, columnas or {})
         hallazgos += inner_join_hija(m, padres_de)
         hallazgos += reloj_en_regla(m)
+        hallazgos += reloj_por_variable(m)
         hallazgos += if_exists_sin_else(m)
         hallazgos += desfase_horario_fijo(m)
         hallazgos += round_trunca(m)
