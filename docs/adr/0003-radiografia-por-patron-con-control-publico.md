@@ -15,9 +15,26 @@ legado que nadie documentó.
   - en los datos: centinelas por distribución, mojibake y llaves casi únicas que se repiten con el mismo documento.
 - El catálogo de trampas (`legado/TRAMPAS.md`) vive aparte. Sólo `radiografia/medicion.py` lo lee, al final y como
   medición. Una prueba exige que ningún otro módulo de la radiografía lo mencione ni importe el legado.
-- El respaldo se restaura en un contenedor LIMPIO y se verifica su sha256 contra el manifiesto. El criterio de
-  salida es `COUNT(*)` de la tabla principal = la cifra que publicó la pantalla al tomar el respaldo. El corte
+- El respaldo se restaura en un contenedor LIMPIO y se verifica su sha256 contra el manifiesto. El corte
   (MAX(id), fechas) se mide de la fuente.
+- **Criterio de salida NO tautológico** (revisión del 24-nov): el restaurado se compara contra lo que el legado
+  decía de sí mismo al tomar el respaldo, no contra sí mismo.
+  - COUNT y MAX(id) de CADA tabla y los contadores de folio del manifiesto deben cuadrar.
+  - Cada cifra de la pantalla se INTERPRETA: la radiografía prueba COUNT(*) y COUNT(DISTINCT columna) hasta
+    averiguar qué cuenta. «Órdenes de pago» cuenta documentos (uetr distintos), no filas: 119,897 filas son
+    re-registros.
+  - Las salidas que el legado publicó en ese instante se re-corren y se miden por inversiones: contrato en 0 y piso
+    de los empates.
+- **Veredicto medido** de cada hallazgo fuera del catálogo (`radiografia/veredictos.py`): una consulta sobre el
+  respaldo restaurado decide si es latente, defecto real, inventario o señal de respaldo. Es revisión humana
+  específica del legado; ningún detector la usa.
+- **Detectores congelados y control apartado.** WideWorldImporters ya es de ENTRENAMIENTO: los arreglos de la v1
+  se hicieron mirando sus falsos positivos. Los detectores (`tsql.py`, `patrones.py`, `datos.py`) se congelan en
+  el tag `detectores-v2` con su sha256 en `CONTROL.md`, y una prueba falla si cambian. Después, y una sola vez, se
+  corre AdventureWorks y se publica tal cual salió. La validación del detector de D1 (`round_trunca`, agregado
+  después de la v1) sólo cuenta contra ese control.
+- **Control a ciegas (pendiente):** otra sesión siembra trampas en una rama sin que este autor las conozca y
+  publica sólo el sha256 de su catálogo. El procedimiento está en el README.
 - **Control:** la misma radiografía, sin cambios, corre sobre WideWorldImporters (respaldo oficial, sha256 fijado),
   y `radiografia/CONTROL.md` publica todo lo que encuentra ahí, falsos positivos incluidos. Un arreglo a un detector
   sólo se acepta si es genérico, tiene su prueba de regresión y no baja la detección en el legado. La versión 1 de

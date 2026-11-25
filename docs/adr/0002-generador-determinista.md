@@ -23,6 +23,9 @@ comparándose contra una suposición.
   mensual cambia de orden entre corridas.
 - Período: 2021-2023, para cruzar los cambios de horario de México anteriores a oct-2022 con un corresponsal en
   Nueva York.
+- El generador deja también los ARCHIVOS DE INTERFAZ que recibió el legado: el buzón del corresponsal y el
+  archivo de sucursales (ADR 0004). Además prepara S3: un reenvío tardío de sucursal fechado hacia atrás y los
+  documentos que el TO-BE capturará después del congelamiento.
 
 ## Alternativas descartadas
 - **Faker sin semilla o datos aleatorios por corrida:** no reproducibles.
@@ -33,5 +36,8 @@ comparándose contra una suposición.
 
 ## Consecuencias
 - Cambiar el generador cambia la huella. Se actualiza a propósito y se dice en el commit.
+- Simular el código del legado no basta para que los datos tengan sentido. Leer el buzón en su formato real destapó
+  4 abonos negativos (gastos del corresponsal mayores que órdenes de pocos dólares), que ya estaban en los datos de
+  la semana 1. Se corrigieron con su prueba de regresión.
 - `random` y `math` de Python deben dar lo mismo en el CI que en local (mismo Python y glibc de Ubuntu 24.04). Si
   la huella fijada falla sólo en el CI, ése es el primer sospechoso.
