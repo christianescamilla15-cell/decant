@@ -58,11 +58,11 @@ def test_lotes_se_separan_por_go_como_en_sqlcmd():
 
 
 def test_la_pantalla_publica_el_total_y_escapa_lo_que_viene_de_la_base(monkeypatch):
-    cursor = CursorFalso([(['total_operaciones'], [(412130,)]),
+    cursor = CursorFalso([(['total_operaciones', 'total_ordenes'], [(412130, 150724)]),
                           (['id', 'folio', 'cliente'], [(7, 'FX-000000007', '<script>alert(1)</script>')])])
     monkeypatch.setattr(app, 'conectar', lambda: ConexionFalsa(cursor))
     pagina = app.lista(None).decode('utf-8')
-    assert 'data-total-operaciones="412130"' in pagina
+    assert 'data-total-operaciones="412130"' in pagina and 'data-total-ordenes="150724"' in pagina
     assert '&lt;script&gt;' in pagina and '<script>' not in pagina
     assert '<a href="/operacion/7">FX-000000007</a>' in pagina
     assert cursor.ejecutado[0][0].startswith('EXEC dbo.sp_lista_operaciones')
@@ -111,7 +111,8 @@ def test_bcp_cuenta_signos_de_interrogacion_y_sustituciones_silenciosas():
 
 class _Pantalla(BaseHTTPRequestHandler):
     def do_GET(self):          # noqa: N802
-        cuerpo = b'<p class="total" data-total-operaciones="412130">Operaciones registradas: 412,130</p>'
+        cuerpo = (b'<p class="total" data-total-operaciones="412130">Operaciones registradas: 412,130</p>'
+                  b'<p class="total" data-total-ordenes="150724">\xc3\x93rdenes de pago: 150,724</p>')
         self.send_response(200)
         self.send_header('Content-Length', str(len(cuerpo)))
         self.end_headers()
@@ -126,7 +127,8 @@ def test_el_respaldo_lee_la_cifra_que_publica_la_pantalla():
     hilo = threading.Thread(target=servidor.serve_forever, daemon=True)
     hilo.start()
     try:
-        assert respaldo.cifra_pantalla(f'http://127.0.0.1:{servidor.server_port}/') == 412130
+        assert respaldo.cifras_pantalla(f'http://127.0.0.1:{servidor.server_port}/') == {
+            'Operaciones registradas': 412130, 'Órdenes de pago': 150724}
     finally:
         servidor.shutdown()
 
@@ -134,3 +136,25 @@ def test_el_respaldo_lee_la_cifra_que_publica_la_pantalla():
 def test_el_respaldo_no_acepta_otra_cosa_que_http():
     with pytest.raises(SystemExit):
         respaldo.cifra_pantalla('file:///etc/passwd')
+
+
+def test_el_delta_por_la_pantalla_no_trae_la_columna_que_la_pantalla_no_imprime(monkeypatch):
+    """C12: lo que lee la pantalla es lo que S3 tendría si extrajera por ella y no por la base."""
+    from legado import extraer_pantalla
+    encabezado = ['id', 'folio', 'cliente', 'folio_orden', 'uetr', 'monto_orden', 'estatus_orden']
+    columnas = ['renglon', 'concepto', 'moneda', 'monto', 'fecha_hora', 'referencia']
+    cursor = CursorFalso([(encabezado, [(9, 'FX-9', 'ANA', 'OP-1', 'u-1', 100, 'CONCILIADA')]),
+                          (columnas, [(1, 'ABONO', 'USD', 99, None, 'FICT1')]),
+                          (columnas, [(1, 'PRINCIPAL', 'USD', 100, None, 'OP-1')])])
+    monkeypatch.setattr(app, 'conectar', lambda: ConexionFalsa(cursor))
+    leido = extraer_pantalla.leer_detalle(app.detalle(9).decode('utf-8'))
+    assert leido['encabezado']['uetr'] == 'u-1' and 'codigo_proposito' not in leido['encabezado']
+    assert leido['rejillas']['rejilla-liquidado'][0]['Concepto'] == 'ABONO'
+
+
+def test_la_lista_de_la_pantalla_entrega_los_ids_de_sus_ligas(monkeypatch):
+    from legado import extraer_pantalla
+    cursor = CursorFalso([(['total_operaciones', 'total_ordenes'], [(3, 1)]),
+                          (['id', 'folio'], [(7, 'FX-7'), (8, 'FX-8')])])
+    monkeypatch.setattr(app, 'conectar', lambda: ConexionFalsa(cursor))
+    assert extraer_pantalla.leer_lista(app.lista(None).decode('utf-8')) == [7, 8]

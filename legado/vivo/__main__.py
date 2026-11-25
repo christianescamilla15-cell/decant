@@ -47,7 +47,38 @@ def foto(cursor) -> dict:
             (tabla,))
         filas, maximo = cursor.fetchone()
         resultado[tabla] = {'filas': filas, 'max_id': maximo}
+    cursor.execute('SELECT serie, siguiente FROM dbo.folio ORDER BY serie')
+    resultado['folios'] = {serie.strip(): siguiente for serie, siguiente in cursor.fetchall()}
     return resultado
+
+
+def choques(cursor, delta: dict, inicio: dict, congelamiento: dict) -> dict:
+    """Lo que S3 tendrá que arbitrar: altas fechadas hacia atrás, documentos que también capturará el TO-BE y folios
+    OP que el legado siguió usando después del congelamiento."""
+    cursor.execute('SELECT id, folio, fecha_operacion, canal, sucursal FROM dbo.operacion '
+                   'WHERE id > %s AND fecha_operacion < %s ORDER BY id',
+                   (inicio['operacion']['max_id'], delta['fecha_negocio']))
+    hacia_atras = [{'id': i, 'folio': f, 'fecha_operacion': str(fo), 'canal': c, 'sucursal': s}
+                   for i, f, fo, c, s in cursor.fetchall()]
+    cursor.execute('SELECT id, uetr, folio, fecha_registro FROM dbo.orden_pago WHERE id > %s ORDER BY id',
+                   (congelamiento['orden_pago']['max_id'],))
+    tras_congelar = [{'id': i, 'uetr': u, 'folio': f, 'fecha_registro': str(fr)} for i, u, f, fr in cursor.fetchall()]
+    tambien_tobe = set(delta.get('choques', {}).get('tobe_tambien_captura', []))
+    return {
+        'altas_fechadas_hacia_atras': {
+            'regla': 'ids mayores al MAX(id) del respaldo con fecha de negocio ANTERIOR al corte: un delta por fecha '
+                     'las pierde; uno por id o por bitácora, no',
+            'filas': hacia_atras},
+        'documentos_tambien_en_tobe': {
+            'regla': 'el legado los registró después del congelamiento y el TO-BE también los capturará (mismo '
+                     'uetr): migrarlos duplica (huérfano) y no migrarlos sólo es seguro si el TO-BE los tiene',
+            'filas': [f for f in tras_congelar if f['uetr'] in tambien_tobe]},
+        'folios_op_tras_congelamiento': {
+            'regla': f"el TO-BE numera desde OP {congelamiento['folios']['OP']} (el siguiente al congelamiento); el "
+                     'legado siguió usando estos folios: colisión',
+            'siguiente_al_congelamiento': congelamiento['folios']['OP'],
+            'folios': sorted({f['folio'] for f in tras_congelar})},
+    }
 
 
 def ejecutar(paso: dict, cursor, ids_operacion: dict[str, int]) -> int | None:
@@ -102,9 +133,10 @@ def inyectar(ruta: Path) -> dict:
         if congelamiento is None:
             congelamiento = foto(cursor)
         final = foto(cursor)
+        para_s3 = choques(cursor, delta, inicio, congelamiento)
     registro = {'fecha_negocio': delta['fecha_negocio'], 'congelamiento_utc': delta['congelamiento_utc'],
                 'llamadas': conteo, 're_registros': reregistros, 'al_respaldo': inicio,
-                'al_congelamiento': congelamiento, 'al_terminar': final}
+                'al_congelamiento': congelamiento, 'al_terminar': final, 'choques': para_s3}
     destino = ruta.with_name(f"vivo_{delta['fecha_negocio']}.json")
     destino.write_text(json.dumps(registro, indent=2) + '\n', encoding='utf-8')
     registro['ruta'] = str(destino)
@@ -129,6 +161,10 @@ def main(argv: list[str] | None = None) -> int:
     for tabla in TABLAS:
         a, c, f = r['al_respaldo'][tabla], r['al_congelamiento'][tabla], r['al_terminar'][tabla]
         print(f"  {tabla:20s} respaldo {a['filas']:>9,} · congelamiento {c['filas']:>9,} · final {f['filas']:>9,}")
+    c = r['choques']
+    print(f"  para S3: {len(c['altas_fechadas_hacia_atras']['filas'])} altas fechadas hacia atrás · "
+          f"{len(c['documentos_tambien_en_tobe']['filas'])} documentos que también capturará el TO-BE · "
+          f"{len(c['folios_op_tras_congelamiento']['folios'])} folios OP usados tras el congelamiento")
     print(f"registro: {r['ruta']}")
     return 0
 

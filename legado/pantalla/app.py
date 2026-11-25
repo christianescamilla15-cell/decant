@@ -69,6 +69,7 @@ def lista(fecha: date | None) -> bytes:
         cursor.execute('EXEC dbo.sp_lista_operaciones @fecha = %s', (fecha,))
         total, filas = _conjuntos(cursor)
     n = total[0]['total_operaciones']
+    ordenes = total[0]['total_ordenes']
 
     def celda(fila: dict, columna: str) -> str:
         if columna == 'folio':
@@ -77,6 +78,7 @@ def lista(fecha: date | None) -> bytes:
 
     tabla = _tabla(filas, COLUMNAS_LISTA, celda=celda)
     cuerpo = (f'<p class="total" data-total-operaciones="{int(n)}">Operaciones registradas: {int(n):,}</p>'
+              f'<p class="total" data-total-ordenes="{int(ordenes)}">Órdenes de pago: {int(ordenes):,}</p>'
               f'<p>{len(filas)} operaciones del día</p>{tabla}')
     return _pagina('Operaciones', cuerpo)
 

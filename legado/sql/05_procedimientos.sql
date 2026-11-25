@@ -139,7 +139,7 @@ BEGIN
     WHERE estatus = 'ENVIADA' AND fecha_envio < DATEADD(day, -3, GETDATE());
 END
 GO
--- Pantalla: lista de operaciones del día y total del encabezado.
+-- Pantalla: lista de operaciones del día y totales del encabezado (operaciones y órdenes de pago).
 CREATE OR ALTER PROCEDURE dbo.sp_lista_operaciones
     @fecha   date = NULL,
     @maximo  int = 200
@@ -149,7 +149,9 @@ BEGIN
     IF @fecha IS NULL
         SELECT @fecha = CAST(MAX(fecha_operacion) AS date) FROM dbo.operacion;
 
-    SELECT COUNT(*) AS total_operaciones FROM dbo.operacion;
+    SELECT COUNT(*) AS total_operaciones,
+           (SELECT COUNT(DISTINCT uetr) FROM dbo.orden_pago) AS total_ordenes
+    FROM dbo.operacion;
 
     SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,
            o.monto_divisa, o.tipo_cambio, o.monto_mxn, o.estatus
