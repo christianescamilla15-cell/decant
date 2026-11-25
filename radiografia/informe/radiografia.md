@@ -1,12 +1,12 @@
 # Radiografía de `BFN_DIVISAS`
 
-Generada 2026-11-25T03:07:15+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
+Generada 2026-11-25T04:12:38+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
 
 ## Restauración
 
 | Base restaurada | Archivo | sha256 contra el manifiesto | Verificación | Segundos |
 |---|---|---|---|---:|
-| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.8 |
+| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.3 |
 | `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.5 |
 
 ## Criterio de salida
@@ -39,7 +39,7 @@ El orden se mide por inversiones con llave natural. Los pares con distinta llave
 
 | Salida | Renglones (comunes) | Mismo contenido | Pares contrato | Inversiones contrato | Pares empatados | Empatados invertidos | % posiciones distintas |
 |---|---:|---|---:|---:|---:|---:|---:|
-| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 40,410 (2.61 %) | 5.6 |
+| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 159,980 (10.35 %) | 25.8 |
 | lista_del_dia_anterior (`dbo.sp_lista_operaciones`) | 200 (183) | no: sin ORDER BY, otra instancia devuelve otras filas | 0 | 0 | 16,653 | 372 (2.23 %) | 69.0 |
 
 ## Corte medido en la fuente
@@ -59,7 +59,7 @@ Tabla principal `dbo.operacion`: MAX(id) = **412125** (IDENT_CURRENT 412125).
 
 ## Inventario
 
-7 tablas · 2,506,073 filas · 12 módulos · 1 triggers · 1 pasos de job.
+7 tablas · 2,506,073 filas · 16 módulos · 1 triggers · 1 pasos de job.
 
 | Tabla | Filas |
 |---|---:|
@@ -71,7 +71,7 @@ Tabla principal `dbo.operacion`: MAX(id) = **412125** (IDENT_CURRENT 412125).
 | `dbo.moneda` | 11 |
 | `dbo.folio` | 2 |
 
-Módulos: 1 job, 9 procedimiento, 1 trigger, 1 vista.
+Módulos: 1 job, 12 procedimiento, 1 trigger, 2 vista.
 
 Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
@@ -83,13 +83,14 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
 | Patrón | Hallazgos |
 |---|---:|
-| Selección no determinista: TOP sin ORDER BY o asignación desde varias filas | 6 |
+| Selección no determinista: TOP sin ORDER BY, asignación desde varias filas u ORDER BY que no ordena (vista o tabla derivada) | 8 |
 | INNER JOIN a una tabla hija | 1 |
 | Reloj del servidor (GETDATE y similares) en una regla, directo o por una variable | 3 |
 | IF EXISTS sin ELSE que escribe datos (camino silencioso) | 1 |
 | IF EXISTS sin ELSE con cuerpo de guarda o DDL (informativo) | 0 |
 | Conversión de zona con desfase fijo | 1 |
 | ROUND con tercer argumento: trunca en vez de redondear | 1 |
+| División entera: entero entre entero (el cociente se trunca) | 2 |
 | Centinelas en vez de NULL (por distribución de valores) | 3 |
 | Texto con mojibake (UTF-8 leído como latin-1) | 1 |
 | Espacios finales que SQL Server ignora al comparar y PostgreSQL no | 1 |
@@ -97,18 +98,20 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | Llave candidata con duplicados (no parece re-registro) | 1 |
 | Columnas que ningún módulo lee | 4 |
 | Tablas que ningún módulo lee | 1 |
-| Literales mágicos (números y códigos en duro) | 35 |
+| Literales mágicos (números y códigos en duro) | 39 |
 
-### Selección no determinista: TOP sin ORDER BY o asignación desde varias filas (6)
+### Selección no determinista: TOP sin ORDER BY, asignación desde varias filas u ORDER BY que no ordena (vista o tabla derivada) (8)
 
 | Objeto | Línea | Detalle | Fragmento |
 |---|---:|---|---|
 | `dbo.sp_conciliar` | 7 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero | `SELECT TOP (5000) id INTO #lote FROM dbo.orden_pago WHERE estatus = 'LIQUIDADA';` |
+| `dbo.sp_constancia_operacion` | 11 | asigna @folio_orden, @uetr, @estatus_orden, @fecha_envio sin TOP ni agregado desde un conjunto que puede traer varias filas: dbo.orden_pago (p) entra por un LEFT JOIN que iguala operacion_id, sin cubrir ninguna llave única suya (id). La variable se queda con la última fila que entregue el plan | `SELECT @folio = o.folio, @cliente = o.cliente, @moneda = o.moneda, @monto_divisa = o.monto_divisa,` |
 | `dbo.sp_detalle_operacion` | 8 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @orden = id FROM dbo.orden_pago WHERE operacion_id = @operacion_id AND estatus <> 'REEMPLAZADA';` |
 | `dbo.sp_lista_operaciones` | 15 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero | `SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,` |
 | `dbo.sp_registrar_liquidacion` | 15 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @id = id, @moneda = moneda FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';` |
 | `dbo.sp_registrar_orden` | 23 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @anterior = id, @folio = folio FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';` |
-| `dbo.sp_reporte_posicion` | 24 | asigna @tc_cierre desde dbo.operacion sin TOP ni agregado y sin filtro único (el WHERE iguala moneda; llaves únicas de la tabla: id): la variable se queda con la última fila que entregue el plan | `SELECT @tc_cierre = tipo_cambio` |
+| `dbo.sp_reporte_posicion` | 24 | asigna @tc_cierre sin TOP ni agregado desde un conjunto que puede traer varias filas: dbo.operacion: el filtro iguala moneda (llaves únicas: id). La variable se queda con la última fila que entregue el plan | `SELECT @tc_cierre = tipo_cambio` |
+| `dbo.vw_liquidaciones_recientes` | 4 | TOP 100 PERCENT con ORDER BY en una vista: el optimizador descarta ese TOP y su ORDER BY, así que el orden que promete no existe; quien la lea sin ORDER BY recibe las filas en el orden que entregue el plan | `SELECT TOP 100 PERCENT p.folio, p.uetr, p.bic_corresponsal, p.moneda, s.monto, s.fecha_hora, s.referencia` |
 
 ### INNER JOIN a una tabla hija (1)
 
@@ -141,6 +144,13 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | Objeto | Línea | Detalle | Fragmento |
 |---|---:|---|---|
 | `dbo.sp_registrar_orden` | 43 | ROUND(…, …, 1) trunca en vez de redondear: con montos, un centavo de diferencia contra cualquier cálculo que redondee | `SET @comision = ROUND(@monto_mxn * 0.0025, 2, 1);` |
+
+### División entera: entero entre entero (el cociente se trunca) (2)
+
+| Objeto | Línea | Detalle | Fragmento |
+|---|---:|---|---|
+| `dbo.sp_tablero_corresponsales` | 10 | SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*): entero entre entero, el cociente se trunca | `SUM(CASE WHEN p.estatus = 'CONCILIADA' THEN 1 ELSE 0 END) * 100 / COUNT(*) AS pct_conciliadas,` |
+| `dbo.sp_tablero_corresponsales` | 11 | AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60: entero entre entero, el cociente se trunca; además AVG de un entero devuelve entero en SQL Server, y en PostgreSQL avg(integer) devuelve numeric: el mismo SQL da otro resultado | `AVG(DATEDIFF(minute, o.fecha_operacion, p.fecha_envio)) / 60 AS horas_promedio_envio` |
 
 ### Centinelas en vez de NULL (por distribución de valores) (3)
 
@@ -191,7 +201,7 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 |---|---:|---|---|
 | `dbo.bitacora` |  | ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación) |  |
 
-### Literales mágicos (números y códigos en duro) (35)
+### Literales mágicos (números y códigos en duro) (39)
 
 | Objeto | Literales distintos | Ejemplos |
 |---|---:|---|
@@ -200,11 +210,13 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | `dbo.sp_registrar_operacion` | 6 | `'FX'`, `'V'`, `1.0035`, `0.9965`, `9`, `2` |
 | `dbo.sp_registrar_liquidacion` | 3 | `'ENVIADA'`, `2`, `'LIQUIDADA'` |
 | `dbo.sp_reporte_posicion` | 3 | `'C'`, `'V'`, `2` |
+| `dbo.sp_tablero_corresponsales` | 3 | `'CONCILIADA'`, `60`, `'REEMPLAZADA'` |
 | `dbo.sp_ordenes_por_vencer` | 2 | `-2`, `'ENVIADA'` |
 | `dbo.sp_detalle_operacion` | 1 | `'REEMPLAZADA'` |
+| `dbo.vw_liquidaciones_recientes` | 1 | `'ABONO'` |
 | `dbo.vw_reporte_ordenes` | 1 | `'REEMPLAZADA'` |
 
 ## Tiempos
 
-arranque_contenedor: 6.3 s · restauracion: 4.5 s · inventario: 1.2 s · patrones_codigo: 0.1 s · patrones_datos: 17.2 s · criterio_salida: 1.5 s · total: 31.3 s
+arranque_contenedor: 6.2 s · restauracion: 3.9 s · inventario: 1.0 s · patrones_codigo: 0.1 s · patrones_datos: 14.7 s · criterio_salida: 1.3 s · total: 27.6 s
 

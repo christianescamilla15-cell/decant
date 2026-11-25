@@ -314,6 +314,49 @@
    ],
    "archivo": "legado/TRAMPAS_CIEGAS.md",
    "nota": "Catálogo CONOCIDO: el autor de los detectores ya lo leyó, y los detectores de esta versión se escribieron después de verlo. Detectar estas trampas ahora NO cuenta como control; el control real de esta versión es una siembra a ciegas nueva."
+  },
+  {
+   "trampas": 3,
+   "detectadas": 3,
+   "pct_deteccion": 100.0,
+   "parciales": 0,
+   "filas": [
+    {
+     "id": "T1",
+     "nombre": "Vista con `TOP 100 PERCENT … ORDER BY`: el orden que promete no existe",
+     "senales": [
+      "top_sin_order_by → dbo.vw_liquidaciones_recientes"
+     ],
+     "encontradas": [
+      "top_sin_order_by → dbo.vw_liquidaciones_recientes"
+     ],
+     "estado": "detectada"
+    },
+    {
+     "id": "T2",
+     "nombre": "Asignación que parece única por la PK pero el JOIN la multiplica",
+     "senales": [
+      "top_sin_order_by → dbo.sp_constancia_operacion"
+     ],
+     "encontradas": [
+      "top_sin_order_by → dbo.sp_constancia_operacion"
+     ],
+     "estado": "detectada"
+    },
+    {
+     "id": "T3",
+     "nombre": "División entera y `AVG` de enteros (SQL Server trunca; PostgreSQL no en `avg`)",
+     "senales": [
+      "division_entera → dbo.sp_tablero_corresponsales"
+     ],
+     "encontradas": [
+      "division_entera → dbo.sp_tablero_corresponsales"
+     ],
+     "estado": "detectada"
+    }
+   ],
+   "archivo": "legado/TRAMPAS_CIEGAS_2.md",
+   "nota": "Catálogo CONOCIDO: el autor de los detectores ya lo leyó, y los detectores de esta versión se escribieron después de verlo. Detectar estas trampas ahora NO cuenta como control; el control real de esta versión es una siembra a ciegas nueva."
   }
  ],
  "hallazgos_sin_trampa": [
