@@ -67,7 +67,7 @@ python -m radiografia.medicion              # % de detección contra legado/TRAM
 
 ## Pruebas
 
-- `pytest`: 74 pruebas sin base. Cubren el determinismo del generador (huella fija), el volumen medido, la existencia
+- `pytest`: 73 pruebas sin base. Cubren el determinismo del generador (huella fija), el volumen medido, la existencia
   de cada trampa en los datos, cada detector con casos positivos y negativos (incluidas regresiones del control
   público) y la no circularidad: ningún detector lee el catálogo de trampas.
 - `pytest -m integracion`: 9 pruebas contra SQL Server real. Comprueban que el generador calcula lo mismo que los
