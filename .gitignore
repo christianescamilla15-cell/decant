@@ -39,3 +39,4 @@ obj/
 TestResults/
 resultados/
 *.trx
+StrykerOutput/

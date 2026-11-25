@@ -42,16 +42,15 @@ public sealed record ConfirmacionDelCorresponsal(
 }
 
 /// <summary>Lectura del buzón del corresponsal en su formato real.</summary>
-public static partial class Mt910
+public static class Mt910
 {
-    [GeneratedRegex(@"\{121:([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\}")]
-    private static partial Regex BloqueUetr();
+    // Expresiones compiladas en campos (no [GeneratedRegex]): Stryker.NET no corre generadores de código al mutar.
+    private static readonly Regex Uetr = new(
+        @"\{121:([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\}", RegexOptions.Compiled);
 
-    [GeneratedRegex(@"^:(\d{2}[A-Z]?):(.*)$", RegexOptions.Multiline)]
-    private static partial Regex Campo();
+    private static readonly Regex Campos = new(@"^:(\d{2}[A-Z]?):(.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
 
-    [GeneratedRegex(@"^([A-Z]{3})(\d+,\d*)$")]
-    private static partial Regex MontoSwift();
+    private static readonly Regex Swift = new(@"^([A-Z]{3})(\d+,\d*)$", RegexOptions.Compiled);
 
     /// <summary>Un archivo del buzón trae varios mensajes separados por <c>$</c> al inicio de renglón (RJE).</summary>
     public static IEnumerable<string> Separar(string buzon) =>
@@ -59,14 +58,14 @@ public static partial class Mt910
 
     public static Resultado<ConfirmacionDelCorresponsal> Leer(string mensaje)
     {
-        var uetr = BloqueUetr().Match(mensaje);
+        var uetr = Uetr.Match(mensaje);
         if (!uetr.Success)
         {
             return new Error("sin_uetr", "mensaje sin UETR en el bloque 3");
         }
 
         var campos = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (Match m in Campo().Matches(mensaje))
+        foreach (Match m in Campos.Matches(mensaje))
         {
             campos[m.Groups[1].Value] = m.Groups[2].Value.Trim();
         }
@@ -122,7 +121,7 @@ public static partial class Mt910
 
     private static Resultado<(string Moneda, decimal Monto)> Monto(string texto)
     {
-        var m = MontoSwift().Match(texto.Trim());
+        var m = Swift.Match(texto.Trim());
         if (!m.Success)
         {
             return new Error("monto_swift_invalido", $"monto SWIFT inválido: «{texto}»");

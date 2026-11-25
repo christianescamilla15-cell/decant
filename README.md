@@ -196,9 +196,11 @@ python -m radiografia.medicion --trampas legado/TRAMPAS.md --trampas legado/TRAM
   - lo que pierde el delta por la pantalla;
   - los espacios finales contados en el motor y la medición separada por catálogo.
 
-- `dotnet test Decant.slnx`: 100 pruebas del TO-BE.
-  - `Decant.Domain.Tests` (55): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
-    ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón) e invariantes.
+- `dotnet test Decant.slnx`: 120 pruebas del TO-BE.
+  - `Decant.Domain.Tests` (75): cada regla con casos reales del respaldo (operaciones, comisiones, horas en las tres
+    ventanas de horario, una vencida la noche del cambio de horario, mensajes reales del buzón), bordes e invariantes.
+    Mutación del dominio con Stryker.NET: **83.78 %** (155 de 185 mutantes; los que sobreviven son textos de
+    mensajes de error y mutantes equivalentes, como `Sum` contra `Max` sobre el único principal).
   - `Decant.Application.Tests` (16): el replay, la carga histórica y el reproceso con dobles escritos a mano.
   - `Decant.Infrastructure.Tests` (12) y `Decant.Api.Tests` (10): EF Core, COPY y la API completa contra PostgreSQL
     real con Testcontainers.
