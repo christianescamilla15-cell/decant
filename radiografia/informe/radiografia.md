@@ -1,44 +1,73 @@
 # Radiografía de `BFN_DIVISAS`
 
-Generada 2026-11-25T01:23:25+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
+Generada 2026-11-25T02:07:33+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
 
 ## Restauración
 
 | Base restaurada | Archivo | sha256 contra el manifiesto | Verificación | Segundos |
 |---|---|---|---|---:|
-| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.3 |
-| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.7 |
+| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.4 |
+| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.6 |
 
 ## Criterio de salida
 
-`COUNT(*)` de `dbo.operacion` en el respaldo = **412,130** · la pantalla del legado publicaba **412,130** al tomarlo → CUMPLE.
+**CUMPLE.** El restaurado se compara contra lo que el legado decía de sí mismo al tomar el respaldo (el manifiesto), no contra sí mismo.
+
+### Cifras de la pantalla: qué cuenta cada una
+
+| Cifra | Valor | Tabla | COUNT(*) | Interpretaciones que dan la cifra | Lectura |
+|---|---:|---|---:|---|---|
+| Operaciones registradas | 412,125 | `dbo.operacion` | 412,125 | `COUNT(*)`, `COUNT(DISTINCT id)`, `COUNT(DISTINCT folio)` | la pantalla cuenta filas |
+| Órdenes de pago | 150,719 | `dbo.orden_pago` | 270,616 | `COUNT(DISTINCT operacion_id)`, `COUNT(DISTINCT folio)`, `COUNT(DISTINCT uetr)`, `COUNT(DISTINCT referencia_mt103)` | la pantalla NO cuenta filas (270,616): cuenta valores distintos; 119,897 filas repiten la llave |
+
+### Cuadre de cada tabla y contador contra el manifiesto
+
+| Objeto | Manifiesto | Restaurado | Cuadra |
+|---|---|---|---|
+| `dbo.bitacora` | {'filas': 685276, 'max_id': 685276} | {'filas': 685276, 'max_id': 685276} | sí |
+| `dbo.folio` | {'filas': 2, 'max_id': None} | {'filas': 2, 'max_id': None} | sí |
+| `dbo.moneda` | {'filas': 11, 'max_id': None} | {'filas': 11, 'max_id': None} | sí |
+| `dbo.operacion` | {'filas': 412125, 'max_id': 412125} | {'filas': 412125, 'max_id': 412125} | sí |
+| `dbo.orden_pago` | {'filas': 270616, 'max_id': 270616} | {'filas': 270616, 'max_id': 270616} | sí |
+| `dbo.partida_liquidada` | {'filas': 893174, 'max_id': 893174} | {'filas': 893174, 'max_id': 893174} | sí |
+| `dbo.partida_solicitada` | {'filas': 244869, 'max_id': 244869} | {'filas': 244869, 'max_id': 244869} | sí |
+| `dbo.folio.siguiente` | {'FX': 412126, 'OP': 150720} | {'FX': 412126, 'OP': 150720} | sí |
+
+### Salidas publicadas: re-corrida sobre el restaurado contra la captura del respaldo
+
+El orden se mide por inversiones con llave natural. Los pares con distinta llave de orden son contrato (0 inversiones). Los pares empatados son libres, y su desorden es el piso de la paridad.
+
+| Salida | Renglones (comunes) | Mismo contenido | Pares contrato | Inversiones contrato | Pares empatados | Empatados invertidos | % posiciones distintas |
+|---|---:|---|---:|---:|---:|---:|---:|
+| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 338,760 (21.91 %) | 60.2 |
+| lista_del_dia_anterior (`dbo.sp_lista_operaciones`) | 200 (183) | no: sin ORDER BY, otra instancia devuelve otras filas | 0 | 0 | 16,653 | 372 (2.23 %) | 69.0 |
 
 ## Corte medido en la fuente
 
-Tabla principal `dbo.operacion`: MAX(id) = **412130** (IDENT_CURRENT 412130).
+Tabla principal `dbo.operacion`: MAX(id) = **412125** (IDENT_CURRENT 412125).
 - `fecha_operacion`: 2021-01-01 00:09:00 → **2023-12-29 03:34:00**
 
 | Tabla | MAX(id) | IDENT_CURRENT | Fecha más reciente |
 |---|---:|---:|---|
-| `dbo.bitacora` | 685273 | 685273 | fecha 2023-12-29 03:44:36 |
+| `dbo.bitacora` | 685276 | 685276 | fecha 2023-12-29 03:44:36 |
 | `dbo.folio` | — | — | actualizado 2023-12-29 03:44:36 |
 | `dbo.moneda` | — | — |  |
-| `dbo.operacion` | 412130 | 412130 | fecha_operacion 2023-12-29 03:34:00 |
-| `dbo.orden_pago` | 270621 | 270621 | fecha_registro 2023-12-29 03:44:36, fecha_envio 2023-12-29 03:45:38, fecha_valor 2023-12-29 |
-| `dbo.partida_liquidada` | 893190 | 893190 | fecha_hora 2023-12-29 03:44:36 |
-| `dbo.partida_solicitada` | 244862 | 244862 | fecha_hora 2023-12-28 17:51:08 |
+| `dbo.operacion` | 412125 | 412125 | fecha_operacion 2023-12-29 03:34:00 |
+| `dbo.orden_pago` | 270616 | 270616 | fecha_registro 2023-12-29 03:44:36, fecha_envio 2023-12-29 03:45:38, fecha_valor 2023-12-29 |
+| `dbo.partida_liquidada` | 893174 | 893174 | fecha_hora 2023-12-29 03:44:36 |
+| `dbo.partida_solicitada` | 244869 | 244869 | fecha_hora 2023-12-28 17:58:52 |
 
 ## Inventario
 
-7 tablas · 2,506,089 filas · 10 módulos · 1 triggers · 1 pasos de job.
+7 tablas · 2,506,073 filas · 10 módulos · 1 triggers · 1 pasos de job.
 
 | Tabla | Filas |
 |---|---:|
-| `dbo.partida_liquidada` | 893,190 |
-| `dbo.bitacora` | 685,273 |
-| `dbo.operacion` | 412,130 |
-| `dbo.orden_pago` | 270,621 |
-| `dbo.partida_solicitada` | 244,862 |
+| `dbo.partida_liquidada` | 893,174 |
+| `dbo.bitacora` | 685,276 |
+| `dbo.operacion` | 412,125 |
+| `dbo.orden_pago` | 270,616 |
+| `dbo.partida_solicitada` | 244,869 |
 | `dbo.moneda` | 11 |
 | `dbo.folio` | 2 |
 
@@ -60,6 +89,7 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 | IF EXISTS sin ELSE que escribe datos (camino silencioso) | 1 |
 | IF EXISTS sin ELSE con cuerpo de guarda o DDL (informativo) | 0 |
 | Conversión de zona con desfase fijo | 1 |
+| ROUND con tercer argumento: trunca en vez de redondear | 1 |
 | Centinelas en vez de NULL (por distribución de valores) | 3 |
 | Texto con mojibake (UTF-8 leído como latin-1) | 1 |
 | Re-registro: el mismo documento con otra llave interna | 3 |
@@ -74,7 +104,7 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 |---|---:|---|---|
 | `dbo.sp_conciliar` | 7 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero | `SELECT TOP (5000) id INTO #lote FROM dbo.orden_pago WHERE estatus = 'LIQUIDADA';` |
 | `dbo.sp_detalle_operacion` | 8 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @orden = id FROM dbo.orden_pago WHERE operacion_id = @operacion_id AND estatus <> 'REEMPLAZADA';` |
-| `dbo.sp_lista_operaciones` | 13 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero | `SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,` |
+| `dbo.sp_lista_operaciones` | 15 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero | `SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,` |
 | `dbo.sp_registrar_liquidacion` | 15 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @id = id, @moneda = moneda FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';` |
 | `dbo.sp_registrar_orden` | 23 | SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario) | `SELECT TOP 1 @anterior = id, @folio = folio FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';` |
 
@@ -102,13 +132,19 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 |---|---:|---|---|
 | `dbo.sp_conciliar` | 10 | DATEADD(hour, -1, …): convierte zonas con un desfase fijo; con horario de verano el desfase cambia según la fecha | `SET horas_liquidacion = DATEDIFF(minute, o.fecha_envio, DATEADD(hour, -1, l.ultima)) / 60.0,` |
 
+### ROUND con tercer argumento: trunca en vez de redondear (1)
+
+| Objeto | Línea | Detalle | Fragmento |
+|---|---:|---|---|
+| `dbo.sp_registrar_orden` | 43 | ROUND(…, …, 1) trunca en vez de redondear: con montos, un centavo de diferencia contra cualquier cálculo que redondee | `SET @comision = ROUND(@monto_mxn * 0.0025, 2, 1);` |
+
 ### Centinelas en vez de NULL (por distribución de valores) (3)
 
 | Objeto | Línea | Detalle | Fragmento |
 |---|---:|---|---|
 | `dbo.operacion.cuenta_clabe` |  | 107,265 filas (26.0%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL |  |
 | `dbo.operacion.tipo_cambio_referencia` |  | 53,702 filas (13.0%) con Decimal('0.000000'): 0.000000 queda fuera del rango del resto de la columna (0.113984 … 71.214699); la columna no usa NULL |  |
-| `dbo.orden_pago.bic_intermediario` |  | 230,306 filas (85.1%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL |  |
+| `dbo.orden_pago.bic_intermediario` |  | 230,297 filas (85.1%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL |  |
 
 ### Texto con mojibake (UTF-8 leído como latin-1) (1)
 
@@ -120,15 +156,15 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
 | Objeto | Línea | Detalle | Fragmento |
 |---|---:|---|---|
-| `dbo.orden_pago.folio` |  | 119,897 filas repiten un valor (150,724 distintos en 270,621); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente |  |
-| `dbo.orden_pago.uetr` |  | 119,897 filas repiten un valor (150,724 distintos en 270,621); las filas repetidas comparten el 82% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente |  |
-| `dbo.orden_pago.referencia_mt103` |  | 119,897 filas repiten un valor (150,724 distintos en 270,621); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente |  |
+| `dbo.orden_pago.folio` |  | 119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente |  |
+| `dbo.orden_pago.uetr` |  | 119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 82% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente |  |
+| `dbo.orden_pago.referencia_mt103` |  | 119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente |  |
 
 ### Llave candidata con duplicados (no parece re-registro) (1)
 
 | Objeto | Línea | Detalle | Fragmento |
 |---|---:|---|---|
-| `dbo.partida_solicitada.referencia` |  | 100,683 filas repiten un valor (144,179 distintos en 244,862); las filas repetidas comparten el 50% de sus columnas (dos filas cualesquiera, el 24%); en 40 de 40 grupos la fila de id mayor es la de fecha_hora más reciente |  |
+| `dbo.partida_solicitada.referencia` |  | 100,686 filas repiten un valor (144,183 distintos en 244,869); las filas repetidas comparten el 50% de sus columnas (dos filas cualesquiera, el 24%); en 40 de 40 grupos la fila de id mayor es la de fecha_hora más reciente |  |
 
 ### Columnas que ningún módulo lee (4)
 
@@ -158,5 +194,5 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
 ## Tiempos
 
-arranque_contenedor: 4.2 s · restauracion: 4.2 s · inventario: 1.0 s · patrones_codigo: 0.0 s · patrones_datos: 14.1 s · total: 23.9 s
+arranque_contenedor: 10.9 s · restauracion: 4.3 s · inventario: 1.2 s · patrones_codigo: 0.0 s · patrones_datos: 27.2 s · criterio_salida: 4.2 s · total: 48.1 s
 

@@ -1,6 +1,6 @@
 {
  "base": "WideWorldImporters",
- "generado_utc": "2026-11-25T01:24:58+00:00",
+ "generado_utc": "2026-11-25T02:12:44+00:00",
  "respaldo": {},
  "restauracion": [
   {
@@ -10,7 +10,7 @@
    "sha256": "e842bad6ce02f74f166947e559dab1b476edd7eaae3da2ab9e3f522f1dd87124",
    "sha256_ok": null,
    "verificacion": "legible (VERIFYONLY; el respaldo no trae CHECKSUM)",
-   "segundos": 6.9
+   "segundos": 8.3
   }
  ],
  "msdb": null,
@@ -4512,11 +4512,11 @@
   "llave_candidata_con_duplicados": 9
  },
  "tiempos": {
-  "arranque_contenedor": 6.4,
-  "restauracion": 8.2,
-  "inventario": 2.8,
+  "arranque_contenedor": 6.3,
+  "restauracion": 10.1,
+  "inventario": 6.0,
   "patrones_codigo": 0.1,
-  "patrones_datos": 29.9,
-  "total": 47.9
+  "patrones_datos": 42.1,
+  "total": 65.0
  }
 }

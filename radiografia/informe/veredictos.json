@@ -1,0 +1,144 @@
+[
+ {
+  "categoria": "top_sin_order_by",
+  "objeto": "dbo.sp_registrar_orden",
+  "clase": "latente",
+  "medicion": {
+   "uetr_con_mas_de_una_ENVIADA": 0,
+   "indices_unicos_sobre_uetr": 0,
+   "altas_seguidas_de_REEMPLAZADA_segun_la_bitacora": 119897
+  },
+  "veredicto": "Latente: hoy ningún uetr tiene dos filas ENVIADA (0), pero ningún índice único lo garantiza (0). La invariante la sostiene el re-registro: sp_registrar_orden da de alta la fila nueva y DESPUÉS marca REEMPLAZADA la anterior. La bitácora muestra 119,897 veces esa ventana con dos ENVIADA; una liquidación concurrente tomaría cualquiera de las dos."
+ },
+ {
+  "categoria": "top_sin_order_by",
+  "objeto": "dbo.sp_registrar_liquidacion",
+  "clase": "latente",
+  "medicion": {
+   "uetr_con_mas_de_una_ENVIADA": 0,
+   "indices_unicos_sobre_uetr": 0,
+   "altas_seguidas_de_REEMPLAZADA_segun_la_bitacora": 119897
+  },
+  "veredicto": "Latente: hoy ningún uetr tiene dos filas ENVIADA (0), pero ningún índice único lo garantiza (0). La invariante la sostiene el re-registro: sp_registrar_orden da de alta la fila nueva y DESPUÉS marca REEMPLAZADA la anterior. La bitácora muestra 119,897 veces esa ventana con dos ENVIADA; una liquidación concurrente tomaría cualquiera de las dos."
+ },
+ {
+  "categoria": "top_sin_order_by",
+  "objeto": "dbo.sp_detalle_operacion",
+  "clase": "latente",
+  "medicion": {
+   "operaciones_con_mas_de_una_orden_vigente": 0,
+   "indices_unicos_sobre_operacion_id": 0
+  },
+  "veredicto": "Latente: 0 operaciones tienen más de una orden vigente y no hay índice único (0). La invariante la sostiene el re-registro, no la base."
+ },
+ {
+  "categoria": "top_sin_order_by",
+  "objeto": "dbo.sp_conciliar",
+  "clase": "latente",
+  "medicion": {
+   "noches": 1090,
+   "maximo_liquidadas_por_noche": 393,
+   "noche_pico": "2023-12-18 23:30:00",
+   "limite_del_lote": 5000,
+   "liquidadas_al_respaldo": 0
+  },
+  "veredicto": "Latente: en 1,090 noches el máximo de órdenes LIQUIDADA conciliadas fue 393 (2023-12-18), contra un lote de 5,000 (12.7 veces de margen). Si el volumen lo pasa, el resto espera a la noche siguiente y el TOP sin ORDER BY decide cuáles."
+ },
+ {
+  "categoria": "columna_sin_lectura",
+  "objeto": "dbo.moneda.activa",
+  "clase": "defecto real",
+  "medicion": {
+   "operaciones_en_monedas_inactivas": [
+    {
+     "moneda": "HRK",
+     "operaciones": 5155,
+     "primera": "2021-01-01 01:28:00",
+     "ultima": "2022-12-31 22:34:00"
+    }
+   ],
+   "columnas_de_fecha_en_moneda": 0,
+   "id_asignado_a_una_operacion_nueva_en_moneda_inactiva": 412126
+  },
+  "veredicto": "DEFECTO REAL no sembrado: ningún procedimiento consulta moneda.activa. Con la moneda HRK dada de baja, sp_registrar_operacion aceptó una operación nueva (id 412126, revertida). El catálogo no guarda la fecha de baja (0 columnas de fecha), así que la base no puede distinguir las operaciones de antes y de después de la baja. Si no hay violaciones, es porque las sucursales dejaron de operarla, no porque el sistema lo impida."
+ },
+ {
+  "categoria": "columna_sin_lectura",
+  "objeto": "dbo.moneda.numerico",
+  "clase": "inventario",
+  "medicion": {
+   "codigos_numericos_validos": 11,
+   "monedas": 11
+  },
+  "veredicto": "Inventario: el código numérico ISO 4217 (11 de 11 válidos) no lo lee nadie. Se migra tal cual; no es defecto."
+ },
+ {
+  "categoria": "columna_sin_lectura",
+  "objeto": "dbo.folio.actualizado",
+  "clase": "inventario",
+  "medicion": {
+   "folios": [
+    {
+     "serie": "FX",
+     "siguiente": 412126,
+     "actualizado": "2023-12-29 03:34:00"
+    },
+    {
+     "serie": "OP",
+     "siguiente": 150720,
+     "actualizado": "2023-12-29 03:44:36"
+    }
+   ]
+  },
+  "veredicto": "Inventario: sello GETDATE() del último consumo; nadie lo lee. No sirve como corte (el corte se mide con MAX(id)) y el contador que importa para S3 es «siguiente»."
+ },
+ {
+  "categoria": "llave_candidata_con_duplicados",
+  "objeto": "dbo.partida_solicitada.referencia",
+  "clase": "explicado",
+  "medicion": {
+   "referencias_repetidas": 100686,
+   "repetidas_en_mas_de_una_orden": 0,
+   "renglones_maximos_por_referencia": 2
+  },
+  "veredicto": "No es llave: es la referencia del MENSAJE del corresponsal, compartida por sus renglones (abono y gastos). 100,686 referencias repetidas, 0 en más de una orden, y como máximo 2 renglones cada una. El detector acertó en no llamarlo re-registro."
+ },
+ {
+  "categoria": "re_registro",
+  "objeto": "dbo.orden_pago.folio",
+  "clase": "señal de respaldo de T9",
+  "medicion": {
+   "distintos_uetr": 150719,
+   "distintos_folio": 150719,
+   "distintos_referencia": 150719,
+   "distintas_tripletas": 150719
+  },
+  "veredicto": "Señal de respaldo de T9, no ruido: uetr, folio y referencia MT103 parten las filas en los MISMOS 150,719 documentos (misma partición). Cualquiera de las tres sirve de llave natural; uetr es la del estándar."
+ },
+ {
+  "categoria": "re_registro",
+  "objeto": "dbo.orden_pago.referencia_mt103",
+  "clase": "señal de respaldo de T9",
+  "medicion": {
+   "distintos_uetr": 150719,
+   "distintos_folio": 150719,
+   "distintos_referencia": 150719,
+   "distintas_tripletas": 150719
+  },
+  "veredicto": "Señal de respaldo de T9, no ruido: uetr, folio y referencia MT103 parten las filas en los MISMOS 150,719 documentos (misma partición). Cualquiera de las tres sirve de llave natural; uetr es la del estándar."
+ },
+ {
+  "categoria": "tabla_sin_lectura",
+  "objeto": "dbo.bitacora",
+  "clase": "retención y universo",
+  "medicion": {
+   "filas_por_usuario": {
+    "svc_agente": 150580,
+    "svc_interfaz": 390513,
+    "svc_swift": 144183
+   },
+   "noches_del_job": 1090
+  },
+  "veredicto": "Retención: no se migra como tabla viva. Además es FUENTE del replay: sus sellos svc_agente dan las 1,090 noches del job (el reloj que se inyecta en lugar de GETDATE(), T8) y el orden entre cada llegada y el vencimiento (D3)."
+ }
+]

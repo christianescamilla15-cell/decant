@@ -1,44 +1,311 @@
 {
  "base": "BFN_DIVISAS",
- "generado_utc": "2026-11-25T01:23:25+00:00",
+ "generado_utc": "2026-11-25T02:07:33+00:00",
  "respaldo": {
   "base": "BFN_DIVISAS",
   "fecha_negocio": "2023-12-29",
-  "tomado_utc": "2026-11-25T01:22:54+00:00",
+  "tomado_utc": "2026-11-25T02:03:46+00:00",
   "tabla_principal": "dbo.operacion",
   "pantalla": {
    "url": "http://127.0.0.1:8080/",
-   "total_operaciones": 412130,
-   "leido_antes_utc": "2026-11-25T01:22:53+00:00",
-   "leido_despues_utc": "2026-11-25T01:22:54+00:00"
-  }
+   "leido_antes_utc": "2026-11-25T02:03:29+00:00",
+   "leido_despues_utc": "2026-11-25T02:03:48+00:00",
+   "cifras": [
+    {
+     "etiqueta": "Operaciones registradas",
+     "atributo": "data-total-operaciones",
+     "tabla": "dbo.operacion",
+     "valor": 412125
+    },
+    {
+     "etiqueta": "Órdenes de pago",
+     "atributo": "data-total-ordenes",
+     "tabla": "dbo.orden_pago",
+     "valor": 150719
+    }
+   ]
+  },
+  "tablas": {
+   "dbo.bitacora": {
+    "filas": 685276,
+    "max_id": 685276
+   },
+   "dbo.folio": {
+    "filas": 2,
+    "max_id": null
+   },
+   "dbo.moneda": {
+    "filas": 11,
+    "max_id": null
+   },
+   "dbo.operacion": {
+    "filas": 412125,
+    "max_id": 412125
+   },
+   "dbo.orden_pago": {
+    "filas": 270616,
+    "max_id": 270616
+   },
+   "dbo.partida_liquidada": {
+    "filas": 893174,
+    "max_id": 893174
+   },
+   "dbo.partida_solicitada": {
+    "filas": 244869,
+    "max_id": 244869
+   }
+  },
+  "contadores": {
+   "dbo.folio": {
+    "llave": "serie",
+    "valor": "siguiente",
+    "filas": {
+     "FX": 412126,
+     "OP": 150720
+    }
+   }
+  },
+  "salidas": [
+   {
+    "nombre": "reporte_del_mes",
+    "procedimiento": "dbo.sp_reporte_ordenes",
+    "parametros": [
+     "2023-12-01",
+     "2023-12-29"
+    ],
+    "conjunto": 0,
+    "llave_natural": [
+     "folio",
+     "concepto"
+    ],
+    "llave_orden": [
+     "fecha_valor"
+    ],
+    "archivo": "salida_reporte_del_mes_2023-12-29.jsonl",
+    "filas": 7492,
+    "sha256": "27d7aea4ea4d68472f67ee9fe9790b2385103a2f8e857270850ccafe3bb6c09a"
+   },
+   {
+    "nombre": "lista_del_dia_anterior",
+    "procedimiento": "dbo.sp_lista_operaciones",
+    "parametros": [
+     "2023-12-28",
+     200
+    ],
+    "conjunto": 1,
+    "llave_natural": [
+     "folio"
+    ],
+    "llave_orden": [],
+    "archivo": "salida_lista_del_dia_anterior_2023-12-29.jsonl",
+    "filas": 200,
+    "sha256": "54e3c33467cfaaa535f384d81bf2d85029bc856300808f74a22b6e606e91fadd"
+   }
+  ]
  },
  "restauracion": [
   {
    "base": "BFN_DIVISAS",
    "restaurada_como": "BFN_DIVISAS",
    "archivo": "bfn_divisas_2023-12-29.bak",
-   "sha256": "4919bc7475f179261673d3bf7f52159357c91016a9c092afebc0df61a768e0ee",
+   "sha256": "24b5fb15cfec2937e73659574639b347310ecd01e7e8a4e39a3734b7272700e0",
    "sha256_ok": true,
    "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
-   "segundos": 2.3
+   "segundos": 2.4
   },
   {
    "base": "msdb",
    "restaurada_como": "legado_msdb",
    "archivo": "msdb_2023-12-29.bak",
-   "sha256": "5327ca47f17e5306b823973a2ab76a8790dfcaadd0d4d0f9bd8679b996df3b17",
+   "sha256": "7eceef9500541b856aa0f5f978657382a9429bef83723165b26e56474ffe6249",
    "sha256_ok": true,
    "verificacion": "íntegro (VERIFYONLY con CHECKSUM)",
-   "segundos": 0.7
+   "segundos": 0.6
   }
  ],
  "msdb": "legado_msdb",
  "criterio_salida": {
   "aplica": true,
-  "tabla": "dbo.operacion",
-  "filas": 412130,
-  "pantalla": 412130,
+  "cifras": [
+   {
+    "tabla": "dbo.operacion",
+    "valor": 412125,
+    "filas": 412125,
+    "interpretaciones": [
+     "COUNT(*)",
+     "COUNT(DISTINCT id)",
+     "COUNT(DISTINCT folio)"
+    ],
+    "lectura": "la pantalla cuenta filas",
+    "cumple": true,
+    "etiqueta": "Operaciones registradas"
+   },
+   {
+    "tabla": "dbo.orden_pago",
+    "valor": 150719,
+    "filas": 270616,
+    "interpretaciones": [
+     "COUNT(DISTINCT operacion_id)",
+     "COUNT(DISTINCT folio)",
+     "COUNT(DISTINCT uetr)",
+     "COUNT(DISTINCT referencia_mt103)"
+    ],
+    "lectura": "la pantalla NO cuenta filas (270,616): cuenta valores distintos; 119,897 filas repiten la llave",
+    "cumple": true,
+    "etiqueta": "Órdenes de pago"
+   }
+  ],
+  "tablas": [
+   {
+    "objeto": "dbo.bitacora",
+    "manifiesto": {
+     "filas": 685276,
+     "max_id": 685276
+    },
+    "restaurado": {
+     "filas": 685276,
+     "max_id": 685276
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.folio",
+    "manifiesto": {
+     "filas": 2,
+     "max_id": null
+    },
+    "restaurado": {
+     "filas": 2,
+     "max_id": null
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.moneda",
+    "manifiesto": {
+     "filas": 11,
+     "max_id": null
+    },
+    "restaurado": {
+     "filas": 11,
+     "max_id": null
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.operacion",
+    "manifiesto": {
+     "filas": 412125,
+     "max_id": 412125
+    },
+    "restaurado": {
+     "filas": 412125,
+     "max_id": 412125
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.orden_pago",
+    "manifiesto": {
+     "filas": 270616,
+     "max_id": 270616
+    },
+    "restaurado": {
+     "filas": 270616,
+     "max_id": 270616
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.partida_liquidada",
+    "manifiesto": {
+     "filas": 893174,
+     "max_id": 893174
+    },
+    "restaurado": {
+     "filas": 893174,
+     "max_id": 893174
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.partida_solicitada",
+    "manifiesto": {
+     "filas": 244869,
+     "max_id": 244869
+    },
+    "restaurado": {
+     "filas": 244869,
+     "max_id": 244869
+    },
+    "cuadra": true
+   },
+   {
+    "objeto": "dbo.folio.siguiente",
+    "manifiesto": {
+     "FX": 412126,
+     "OP": 150720
+    },
+    "restaurado": {
+     "FX": 412126,
+     "OP": 150720
+    },
+    "cuadra": true
+   }
+  ],
+  "salidas": [
+   {
+    "nombre": "reporte_del_mes",
+    "procedimiento": "dbo.sp_reporte_ordenes",
+    "parametros": [
+     "2023-12-01",
+     "2023-12-29"
+    ],
+    "llave_natural": [
+     "folio",
+     "concepto"
+    ],
+    "llave_orden": [
+     "fecha_valor"
+    ],
+    "renglones": 7492,
+    "renglones_otra_toma": 7492,
+    "renglones_comunes": 7492,
+    "mismo_contenido": true,
+    "pares_contrato": 26515033,
+    "inversiones_contrato": 0,
+    "pares_empatados": 1546253,
+    "inversiones_empatados": 338760,
+    "pct_empatados_invertidos": 21.91,
+    "pct_posiciones_distintas": 60.2,
+    "reproducible": true,
+    "cumple": true
+   },
+   {
+    "nombre": "lista_del_dia_anterior",
+    "procedimiento": "dbo.sp_lista_operaciones",
+    "parametros": [
+     "2023-12-28",
+     200
+    ],
+    "llave_natural": [
+     "folio"
+    ],
+    "llave_orden": [],
+    "renglones": 200,
+    "renglones_otra_toma": 200,
+    "renglones_comunes": 183,
+    "mismo_contenido": false,
+    "pares_contrato": 0,
+    "inversiones_contrato": 0,
+    "pares_empatados": 16653,
+    "inversiones_empatados": 372,
+    "pct_empatados_invertidos": 2.23,
+    "pct_posiciones_distintas": 69.0,
+    "reproducible": false,
+    "cumple": true
+   }
+  ],
   "cumple": true
  },
  "corte": {
@@ -47,8 +314,8 @@
    "tabla": "dbo.operacion",
    "identidad": {
     "columna": "id",
-    "max": 412130,
-    "ident_current": 412130
+    "max": 412125,
+    "ident_current": 412125
    },
    "fechas": {
     "fecha_operacion": {
@@ -62,8 +329,8 @@
     "tabla": "dbo.bitacora",
     "identidad": {
      "columna": "id",
-     "max": 685273,
-     "ident_current": 685273
+     "max": 685276,
+     "ident_current": 685276
     },
     "fechas": {
      "fecha": {
@@ -91,8 +358,8 @@
     "tabla": "dbo.operacion",
     "identidad": {
      "columna": "id",
-     "max": 412130,
-     "ident_current": 412130
+     "max": 412125,
+     "ident_current": 412125
     },
     "fechas": {
      "fecha_operacion": {
@@ -105,8 +372,8 @@
     "tabla": "dbo.orden_pago",
     "identidad": {
      "columna": "id",
-     "max": 270621,
-     "ident_current": 270621
+     "max": 270616,
+     "ident_current": 270616
     },
     "fechas": {
      "fecha_registro": {
@@ -127,8 +394,8 @@
     "tabla": "dbo.partida_liquidada",
     "identidad": {
      "columna": "id",
-     "max": 893190,
-     "ident_current": 893190
+     "max": 893174,
+     "ident_current": 893174
     },
     "fechas": {
      "fecha_hora": {
@@ -141,13 +408,13 @@
     "tabla": "dbo.partida_solicitada",
     "identidad": {
      "columna": "id",
-     "max": 244862,
-     "ident_current": 244862
+     "max": 244869,
+     "ident_current": 244869
     },
     "fechas": {
      "fecha_hora": {
       "min": "2021-01-01 08:11:34",
-      "max": "2023-12-28 17:51:08"
+      "max": "2023-12-28 17:58:52"
      }
     }
    }
@@ -158,7 +425,7 @@
    {
     "esquema": "dbo",
     "tabla": "bitacora",
-    "filas": 685273,
+    "filas": 685276,
     "temporal": "NON_TEMPORAL_TABLE",
     "en_memoria": false
    },
@@ -179,28 +446,28 @@
    {
     "esquema": "dbo",
     "tabla": "operacion",
-    "filas": 412130,
+    "filas": 412125,
     "temporal": "NON_TEMPORAL_TABLE",
     "en_memoria": false
    },
    {
     "esquema": "dbo",
     "tabla": "orden_pago",
-    "filas": 270621,
+    "filas": 270616,
     "temporal": "NON_TEMPORAL_TABLE",
     "en_memoria": false
    },
    {
     "esquema": "dbo",
     "tabla": "partida_liquidada",
-    "filas": 893190,
+    "filas": 893174,
     "temporal": "NON_TEMPORAL_TABLE",
     "en_memoria": false
    },
    {
     "esquema": "dbo",
     "tabla": "partida_solicitada",
-    "filas": 244862,
+    "filas": 244869,
     "temporal": "NON_TEMPORAL_TABLE",
     "en_memoria": false
    }
@@ -247,7 +514,7 @@
    {
     "nombre": "dbo.sp_lista_operaciones",
     "tipo": "PROCEDIMIENTO",
-    "lineas": 17
+    "lineas": 19
    },
    {
     "nombre": "dbo.sp_registrar_liquidacion",
@@ -452,7 +719,7 @@
    "categoria": "top_sin_order_by",
    "objeto": "dbo.sp_lista_operaciones",
    "tipo_objeto": "PROCEDIMIENTO",
-   "linea": 13,
+   "linea": 15,
    "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero",
    "fragmento": "SELECT TOP (@maximo) o.id, o.folio, o.fecha_operacion, o.sucursal, o.canal, o.cliente, o.tipo, o.moneda,",
    "asigna_variable": false
@@ -601,6 +868,14 @@
    "detalle": "SELECT TOP sin ORDER BY: devuelve las filas que el plan entregue primero; asigna a variables (si el filtro no es único, el valor es arbitrario)",
    "fragmento": "SELECT TOP 1 @anterior = id, @folio = folio FROM dbo.orden_pago WHERE uetr = @uetr AND estatus = 'ENVIADA';",
    "asigna_variable": true
+  },
+  {
+   "categoria": "round_trunca",
+   "objeto": "dbo.sp_registrar_orden",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 43,
+   "detalle": "ROUND(…, …, 1) trunca en vez de redondear: con montos, un centavo de diferencia contra cualquier cálculo que redondee",
+   "fragmento": "SET @comision = ROUND(@monto_mxn * 0.0025, 2, 1);"
   },
   {
    "categoria": "literal_magico",
@@ -833,7 +1108,7 @@
    "detalle": "107,265 filas (26.0%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL",
    "valor": "NA",
    "filas": 107265,
-   "total": 412130,
+   "total": 412125,
    "usa_null": false
   },
   {
@@ -845,7 +1120,7 @@
    "detalle": "53,702 filas (13.0%) con Decimal('0.000000'): 0.000000 queda fuera del rango del resto de la columna (0.113984 … 71.214699); la columna no usa NULL",
    "valor": "0.000000",
    "filas": 53702,
-   "total": 412130,
+   "total": 412125,
    "usa_null": false
   },
   {
@@ -854,10 +1129,10 @@
    "tipo_objeto": "COLUMNA",
    "linea": null,
    "fragmento": "",
-   "detalle": "230,306 filas (85.1%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL",
+   "detalle": "230,297 filas (85.1%) con 'NA': valor de relleno típico ('NA'); la columna no usa NULL",
    "valor": "NA",
-   "filas": 230306,
-   "total": 270621,
+   "filas": 230297,
+   "total": 270616,
    "usa_null": false
   },
   {
@@ -880,7 +1155,7 @@
    "tipo_objeto": "COLUMNA",
    "linea": null,
    "fragmento": "",
-   "detalle": "119,897 filas repiten un valor (150,724 distintos en 270,621); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
+   "detalle": "119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
    "similitud": 0.814,
    "similitud_base": 0.196,
    "repetidas": 119897
@@ -891,7 +1166,7 @@
    "tipo_objeto": "COLUMNA",
    "linea": null,
    "fragmento": "",
-   "detalle": "119,897 filas repiten un valor (150,724 distintos en 270,621); las filas repetidas comparten el 82% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
+   "detalle": "119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 82% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
    "similitud": 0.817,
    "similitud_base": 0.196,
    "repetidas": 119897
@@ -902,7 +1177,7 @@
    "tipo_objeto": "COLUMNA",
    "linea": null,
    "fragmento": "",
-   "detalle": "119,897 filas repiten un valor (150,724 distintos en 270,621); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
+   "detalle": "119,897 filas repiten un valor (150,719 distintos en 270,616); las filas repetidas comparten el 81% de sus columnas (dos filas cualesquiera, el 20%): el MISMO documento dado de alta con otra llave interna; en 40 de 40 grupos la fila de id mayor es la de fecha_registro más reciente",
    "similitud": 0.814,
    "similitud_base": 0.196,
    "repetidas": 119897
@@ -913,10 +1188,10 @@
    "tipo_objeto": "COLUMNA",
    "linea": null,
    "fragmento": "",
-   "detalle": "100,683 filas repiten un valor (144,179 distintos en 244,862); las filas repetidas comparten el 50% de sus columnas (dos filas cualesquiera, el 24%); en 40 de 40 grupos la fila de id mayor es la de fecha_hora más reciente",
+   "detalle": "100,686 filas repiten un valor (144,183 distintos en 244,869); las filas repetidas comparten el 50% de sus columnas (dos filas cualesquiera, el 24%); en 40 de 40 grupos la fila de id mayor es la de fecha_hora más reciente",
    "similitud": 0.5,
    "similitud_base": 0.236,
-   "repetidas": 100683
+   "repetidas": 100686
   }
  ],
  "resumen": {
@@ -925,6 +1200,7 @@
   "desfase_horario_fijo": 1,
   "literal_magico": 30,
   "if_exists_sin_else": 1,
+  "round_trunca": 1,
   "inner_join_hija": 1,
   "tabla_sin_lectura": 1,
   "columna_sin_lectura": 4,
@@ -934,11 +1210,12 @@
   "llave_candidata_con_duplicados": 1
  },
  "tiempos": {
-  "arranque_contenedor": 4.2,
-  "restauracion": 4.2,
-  "inventario": 1.0,
+  "arranque_contenedor": 10.9,
+  "restauracion": 4.3,
+  "inventario": 1.2,
   "patrones_codigo": 0.0,
-  "patrones_datos": 14.1,
-  "total": 23.9
+  "patrones_datos": 27.2,
+  "criterio_salida": 4.2,
+  "total": 48.1
  }
 }

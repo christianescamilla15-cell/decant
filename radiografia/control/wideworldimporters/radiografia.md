@@ -1,16 +1,16 @@
 # Radiografía de `WideWorldImporters`
 
-Generada 2026-11-25T01:24:58+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
+Generada 2026-11-25T02:12:44+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
 
 ## Restauración
 
 | Base restaurada | Archivo | sha256 contra el manifiesto | Verificación | Segundos |
 |---|---|---|---|---:|
-| `WideWorldImporters` | `WideWorldImporters-Full.bak` | sin manifiesto | legible (VERIFYONLY; el respaldo no trae CHECKSUM) | 6.9 |
+| `WideWorldImporters` | `WideWorldImporters-Full.bak` | sin manifiesto | legible (VERIFYONLY; el respaldo no trae CHECKSUM) | 8.3 |
 
 ## Criterio de salida
 
-No aplica: no hay manifiesto con la cifra de una pantalla (base de muestra).
+No aplica: no hay manifiesto con lo que publicaba el legado (base de muestra).
 
 ## Corte medido en la fuente
 
@@ -135,6 +135,7 @@ Jobs: no se restauró msdb, así que no se pueden inventariar (viven ahí, no en
 | IF EXISTS sin ELSE que escribe datos (camino silencioso) | 0 |
 | IF EXISTS sin ELSE con cuerpo de guarda o DDL (informativo) | 65 |
 | Conversión de zona con desfase fijo | 0 |
+| ROUND con tercer argumento: trunca en vez de redondear | 0 |
 | Centinelas en vez de NULL (por distribución de valores) | 7 |
 | Texto con mojibake (UTF-8 leído como latin-1) | 5 |
 | Re-registro: el mismo documento con otra llave interna | 0 |
@@ -389,5 +390,5 @@ Jobs: no se restauró msdb, así que no se pueden inventariar (viven ahí, no en
 
 ## Tiempos
 
-arranque_contenedor: 6.4 s · restauracion: 8.2 s · inventario: 2.8 s · patrones_codigo: 0.1 s · patrones_datos: 29.9 s · total: 47.9 s
+arranque_contenedor: 6.3 s · restauracion: 10.1 s · inventario: 6.0 s · patrones_codigo: 0.1 s · patrones_datos: 42.1 s · total: 65.0 s
 
