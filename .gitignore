@@ -19,6 +19,7 @@ sbom.spdx.json
 # ── Datos generados (se reproducen con la semilla; no se versionan) ───────
 legado/datos/
 respaldos/
+paridad/datos/
 muestras/
 *.bak
 
@@ -31,3 +32,10 @@ muestras/
 .idea/
 *.swp
 .DS_Store
+
+# ── .NET ──────────────────────────────────────────────────────────────────
+bin/
+obj/
+TestResults/
+resultados/
+*.trx

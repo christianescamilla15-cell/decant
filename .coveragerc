@@ -1,5 +1,5 @@
 [run]
-source = legado, radiografia
+source = legado, radiografia, paridad, universo
 
 [report]
 skip_empty = true
