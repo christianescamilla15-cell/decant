@@ -1,13 +1,13 @@
 # Radiografía de `BFN_DIVISAS`
 
-Generada 2026-11-25T02:07:33+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
+Generada 2026-11-25T02:25:02+00:00 (UTC) por `python -m radiografia`. Todo lo que sigue se midió sobre el respaldo restaurado en un contenedor limpio.
 
 ## Restauración
 
 | Base restaurada | Archivo | sha256 contra el manifiesto | Verificación | Segundos |
 |---|---|---|---|---:|
-| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 2.4 |
-| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.6 |
+| `BFN_DIVISAS` | `bfn_divisas_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 3.0 |
+| `legado_msdb` | `msdb_2023-12-29.bak` | coincide | íntegro (VERIFYONLY con CHECKSUM) | 0.8 |
 
 ## Criterio de salida
 
@@ -39,7 +39,7 @@ El orden se mide por inversiones con llave natural. Los pares con distinta llave
 
 | Salida | Renglones (comunes) | Mismo contenido | Pares contrato | Inversiones contrato | Pares empatados | Empatados invertidos | % posiciones distintas |
 |---|---:|---|---:|---:|---:|---:|---:|
-| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 338,760 (21.91 %) | 60.2 |
+| reporte_del_mes (`dbo.sp_reporte_ordenes`) | 7,492 (7,492) | sí | 26,515,033 | 0 | 1,546,253 | 384,445 (24.86 %) | 65.8 |
 | lista_del_dia_anterior (`dbo.sp_lista_operaciones`) | 200 (183) | no: sin ORDER BY, otra instancia devuelve otras filas | 0 | 0 | 16,653 | 372 (2.23 %) | 69.0 |
 
 ## Corte medido en la fuente
@@ -194,5 +194,5 @@ Triggers: `dbo.tr_orden_pago_bitacora` sobre `dbo.orden_pago`.
 
 ## Tiempos
 
-arranque_contenedor: 10.9 s · restauracion: 4.3 s · inventario: 1.2 s · patrones_codigo: 0.0 s · patrones_datos: 27.2 s · criterio_salida: 4.2 s · total: 48.1 s
+arranque_contenedor: 6.3 s · restauracion: 5.1 s · inventario: 0.9 s · patrones_codigo: 0.0 s · patrones_datos: 14.4 s · criterio_salida: 1.3 s · total: 28.3 s
 

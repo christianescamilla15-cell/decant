@@ -96,10 +96,10 @@ restaurado en un contenedor limpio y la compara (`radiografia/informe/radiografi
 
 | Salida publicada | Renglones (comunes) | Mismo contenido | Inversiones de contrato | Pares empatados invertidos |
 |---|---:|---|---:|---:|
-| Reporte del mes (1–29 dic) | 7,492 (7,492) | sí | 0 de 26,515,033 | 17.9 % y 21.9 % en dos corridas del ciclo |
+| Reporte del mes (1–29 dic) | 7,492 (7,492) | sí | 0 de 26,515,033 | 17.9 %, 21.9 % y 24.9 % en tres corridas del ciclo |
 | Lista del día anterior (`TOP 200` sin `ORDER BY`) | 200 (183) | **no**: otra instancia devuelve 17 filas distintas | — (sin contrato) | 2.2 % de los comunes |
 
-**Piso para S2:** en el reporte, 0 inversiones de contrato y alrededor de 20 % de pares empatados invertidos
+**Piso para S2:** en el reporte, 0 inversiones de contrato y entre 18 % y 25 % de pares empatados invertidos
 entre el propio legado y su respaldo. Varía entre corridas, así que la paridad del TO-BE se juzga contra el piso
 medido en la misma corrida, nunca contra una constante. En la lista, ni el contenido es contrato: se compara como
 conjunto contra el universo del día, no contra las 200 filas que tocó mostrar.
@@ -122,4 +122,23 @@ sucursales, ≈ 45 MB). El respaldo comprimido de `BFN_DIVISAS` pesa 92 MB y el 
 
 ## Tiempos del ciclo completo (`./ciclo.sh`)
 
-TIEMPOS_PENDIENTES
+Medido en un clon limpio (venv nuevo, contenedor del legado recién creado y la imagen ya descargada), laptop de
+12 núcleos:
+
+| Paso | Segundos |
+|---|---:|
+| levantar el legado | 5.8 |
+| esquema | 1.0 |
+| generar (44 s, con 1,562 archivos de interfaz) y cargar y verificar (82 s) | 139.1 |
+| pantalla | 1.0 |
+| respaldo fechado (BFN_DIVISAS + msdb + manifiesto + salidas publicadas) | 2.7 |
+| legado vivo (delta del día, congelamiento y choques de S3) | 11.2 |
+| delta por la pantalla | 1.7 |
+| restaurar en contenedor limpio, radiografiar y cuadrar contra el manifiesto | 28.3 |
+| veredictos medidos (otra restauración limpia) | 12.2 |
+| medir contra el catálogo | 0.0 |
+| daño de `bcp -c` | 2.0 |
+| **Total** | **≈ 205** |
+
+Generar, respaldar, restaurar y radiografiar toman **≈ 170 s**. Las pruebas de integración suman 54 s, el control
+de entrenamiento (WideWorldImporters) 50–65 s y el apartado (AdventureWorks) 26 s.
