@@ -9,7 +9,8 @@ Comparar la salida de un procedimiento que escribe no dice qué dejó en la base
 
 ## Decisión
 - Cada procedimiento que escribe (6 hoy) corre sobre el respaldo restaurado dentro de una transacción que se
-  REVIERTE. Antes de revertir se vuelcan las tablas que tocó.
+  REVIERTE, incluidos los que el ciclo nunca ejecuta («sin ejecución observada», ADR 0014). Antes de revertir se
+  vuelcan las tablas que tocó.
 - El mismo caso de uso corre en el TO-BE y se comparan las tablas afectadas, fila por fila por llave natural.
 - Dos verificaciones fijas:
   - toda escritura con JOIN se prueba con datos 1:N;
