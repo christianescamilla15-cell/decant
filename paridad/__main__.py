@@ -144,6 +144,10 @@ def correr(args) -> dict:
         try:
             resultado['reporte'] = reporte.comparar(publicada, args.datos / 'oraculo' / 'publicadas', ruta_tobe,
                                                     piso, corte, vivo, eventos)
+            # control negativo del comparador: cada mutante del reporte del TO-BE DEBE fallar
+            resultado['reporte']['mutantes'] = reporte.mutantes(
+                publicada, args.datos / 'oraculo' / 'publicadas', ruta_tobe, piso, corte, vivo, eventos,
+                args.datos / 'mutantes')
         finally:
             if vivo is not None:
                 vivo.close()
