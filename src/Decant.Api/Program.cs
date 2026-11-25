@@ -1,4 +1,5 @@
 using Decant.Api;
+using Decant.Api.GraphQL;
 using Decant.Application.Abstracciones;
 using Decant.Application.Consultas;
 using Decant.Infrastructure;
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AgregarDecant(builder.Configuration.GetConnectionString("Decant") ?? string.Empty);
 builder.Services.AddSingleton(ConfiguracionPorAmbiente.Leer(builder.Configuration, builder.Environment.EnvironmentName));
 builder.Services.AddProblemDetails();
+// GraphQL de SÓLO LECTURA junto a REST, sobre los mismos casos de uso (ADR 0017).
+builder.Services.AgregarGraphQL(builder.Configuration);
 
 var app = builder.Build();
 // Contrato de errores: TODO error sale como application/problem+json con su código y un título, sin detalles
@@ -59,6 +62,8 @@ app.MapGet("/api/reportes/ordenes", async (DateOnly desde, DateOnly hasta, IMedi
 app.MapGet("/api/configuracion", (Decant.Application.ConfiguracionDeAmbiente configuracion) =>
     Results.Ok(new { configuracion.Ambiente, configuracion.Banderas, configuracion.Destinos,
         Errores = configuracion.Validar() }));
+
+app.MapearGraphQL();
 
 app.Run();
 
