@@ -25,9 +25,54 @@ ab60df538a88a6423e1cb734abc7c5e33d620425e580f33d18573b01fc29a5a9  radiografia/da
 Cambiar un detector después de esto exige un tag nuevo (`detectores-v3`), su sha256 aquí y un control apartado
 NUEVO: el de AdventureWorks ya no serviría para validarlo.
 
-## Control apartado: AdventureWorks
+## Control apartado: AdventureWorks (una sola corrida, tal cual)
 
-Pendiente de su única corrida.
+- **Fuente:** `AdventureWorks2022.bak` del release `adventureworks` del repositorio `microsoft/sql-server-samples`
+  en GitHub. sha256 `d17567adb1521f972e1dc183a7216cea869c4580b5d75632425bcadbaf82ce5e`, 209,838,080 bytes.
+- **Corrida única:** 24-nov-2026, con el árbol limpio en el commit del tag `detectores-v2`:
+
+  ```
+  python -m radiografia --bak AdventureWorks2022.bak --base AdventureWorks2022 \
+      --salida radiografia/control/adventureworks
+  ```
+
+- **Informe completo, sin editar:** [`control/adventureworks/radiografia.md`](control/adventureworks/radiografia.md).
+- **Qué se analizó:** 71 tablas con 760,837 filas y 51 módulos (10 procedimientos, 20 vistas, 11 funciones y 10
+  triggers). Tiempo: 26 s.
+- **Cómo se clasificó:** leyendo el código y los datos en una restauración aparte, de sólo lectura, sin volver a
+  correr los detectores. Las consultas están en la tabla.
+
+Definición, la misma para los dos controles: un hallazgo es **patrón real** si la forma existe de verdad (por
+ejemplo, un 0 que significa «no aplica» en vez de NULL), sea o no un defecto. Es **falso positivo** si la forma no
+existe (un 0 que es una cantidad legítima).
+
+| Patrón | Hallazgos | Patrón real | Falso positivo | Lectura (y consulta de verificación) |
+|---|---:|---:|---:|---|
+| TOP sin ORDER BY | 0 | 0 | 0 | — |
+| INNER JOIN a una tabla hija | 10 | 10 | 0 | La forma existe en las 10, pero ninguna pierde datos HOY y todas son la intención: precio o costo a una fecha, contacto, descripción, cliente individual. Las vistas de empleados no pierden a nadie (0 empleados sin historial de departamento) y `vSalesPersonSalesByFiscalYears` tampoco (0 vendedores sin pedidos). **0 defectos.** |
+| Reloj del servidor en una regla | 0 | 0 | 0 | Los 10 triggers sellan `ModifiedDate` con `GETDATE()` dentro de un SET: bien clasificados como asignación. |
+| IF EXISTS sin ELSE que escribe | 4 | 0 | 4 | `ufnGetContactInformation`: los 4 escriben sólo en la variable de tabla que regresa la función (`@retContactInformation`), no en datos. **Límite del detector:** no distingue una variable de tabla de una tabla. No se corrige: los detectores están congelados. |
+| Desfase horario fijo | 0 | 0 | 0 | — |
+| **ROUND que trunca (validación de D1)** | **0** | 0 | **0** | Ningún falso positivo. AdventureWorks no tiene un solo `ROUND` que trunque, así que el control mide su ESPECIFICIDAD (no dispara sobre ROUND normales) pero no su sensibilidad fuera del legado. |
+| Centinelas | 14 | 8 | 6 | Reales: `Shelf = 'N/A'` (290) con `Bin = 0` (328); `ReferenceOrderLineID = 0` y `ActualCost = 0` en las 31,002 transacciones de orden de trabajo, en las dos tablas de historial; `ListPrice = 0` y `StandardCost = 0` en 200 de los 209 componentes que no se venden. Falsos: `EmailPromotion` 0 (es un código), `BOMLevel` 0, `DaysToManufacture` 0, `ScrappedQty` 0, `RejectedQty` 0 y `UnitPriceDiscount` 0. Precisión 8/14. |
+| Mojibake | 0 | 0 | 0 | — |
+| Re-registro | 0 | 0 | 0 | — |
+| Llave candidata con duplicados (informativo) | 3 | — | — | Direcciones y descripciones que se repiten de verdad; bien NO llamadas re-registro. |
+| Columnas / tablas que ningún módulo lee | 72 / 38 | — | — | Inventario: la aplicación de AdventureWorks lee las tablas directo. |
+| Literales mágicos (inventario) | 29 en 20 módulos | — | — | — |
+
+**Lo que dice el control apartado:**
+
+1. Los detectores de alta señal (TOP sin ORDER BY, reloj en regla, desfase fijo, ROUND que trunca, mojibake y
+   re-registro) dan **0 falsos positivos** sobre una base que no vieron.
+2. **IF EXISTS que escribe tiene un límite nuevo**, que WideWorldImporters no mostró: 4 falsos positivos por escribir
+   en una variable de tabla. Es justo lo que un control apartado debe encontrar. Queda documentado y no se corrige
+   bajo este congelamiento.
+3. **INNER JOIN a una hija y centinelas siguen siendo de revisión:** la forma es real casi siempre (10/10 y 8/14),
+   pero no distingue defecto de intención.
+4. La validación de `round_trunca` es parcial: especificidad sí (0 falsos positivos), sensibilidad sin casos.
+
+El control apartado NO está en el CI: se corre una vez por congelamiento. El CI repite sólo el de entrenamiento.
 
 ---
 
@@ -65,7 +110,7 @@ Un falso positivo, aquí, es un hallazgo que al leer el código o los datos NO r
 | IF EXISTS sin ELSE de guarda o DDL (informativo) | 65 | 0 | — | 64 `IF NOT EXISTS … CREATE/EXEC` de configuración idempotente y 1 `IF EXISTS … THROW`. |
 | Desfase horario fijo | 0 | 0 | 0 | — |
 | ROUND que trunca (nuevo en v2) | 0 | 0 | 0 | No cuenta como validación: WideWorldImporters es de entrenamiento. |
-| Centinelas | 7 | 0 | 7 | Ceros legítimos: saldo pendiente 0 (pagado), 0 artículos refrigerados; y «0 de impuesto» en los pagos, un 0 en vez de NULL decidido por el diseño. |
+| Centinelas | 7 | 0 | 3 | Con la definición de «patrón real» del control apartado: 4 son reales por diseño (importe sin impuesto e impuesto en 0 en los pagos: un 0 en vez de NULL) y 3 son ceros legítimos (saldo pendiente 0 = pagado, dos tablas; 0 artículos refrigerados). Antes se contaron los 7 como falsos positivos. |
 | **Mojibake** | **5** | **5** | **0** | **Daño REAL en la muestra: «Chávez» guardado como «ChÃ¡vez» en `Application.People` (FullName, SearchName), `Sales.Customers` (dos direcciones) y 213 facturas (`Sales.Invoices.DeliveryInstructions`). No hay ni una «Chávez» bien escrita.** |
 | Re-registro | 0 | 0 | 0 | — |
 | Llave candidata con duplicados (informativo) | 9 | 0 | — | Nombres de ciudad, direcciones y correos que se repiten de verdad. El detector NO los llama re-registro. |
