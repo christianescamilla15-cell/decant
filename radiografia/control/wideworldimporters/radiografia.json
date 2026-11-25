@@ -1,0 +1,4522 @@
+{
+ "base": "WideWorldImporters",
+ "generado_utc": "2026-11-25T01:24:58+00:00",
+ "respaldo": {},
+ "restauracion": [
+  {
+   "base": "WideWorldImporters",
+   "restaurada_como": "WideWorldImporters",
+   "archivo": "WideWorldImporters-Full.bak",
+   "sha256": "e842bad6ce02f74f166947e559dab1b476edd7eaae3da2ab9e3f522f1dd87124",
+   "sha256_ok": null,
+   "verificacion": "legible (VERIFYONLY; el respaldo no trae CHECKSUM)",
+   "segundos": 6.9
+  }
+ ],
+ "msdb": null,
+ "criterio_salida": {
+  "aplica": false
+ },
+ "corte": {
+  "tabla_principal": null,
+  "principal": null,
+  "tablas": [
+   {
+    "tabla": "application.cities",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2015-07-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "application.cities_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2013-07-01 16:00:00",
+      "max": "2015-07-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "application.countries",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2022-10-07 21:11:44.893009"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "application.countries_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-07-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "2013-07-01 16:00:00",
+      "max": "2022-10-07 21:11:44.893009"
+     }
+    }
+   },
+   {
+    "tabla": "application.deliverymethods",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2015-01-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "application.deliverymethods_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2015-01-01 16:00:00",
+      "max": "2015-01-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "application.paymentmethods",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-01-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "application.paymentmethods_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2016-01-01 16:00:00",
+      "max": "2016-01-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "application.people",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-05-31 23:14:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "application.people_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-05-31 23:13:00"
+     },
+     "ValidTo": {
+      "min": "2013-01-01 08:00:00",
+      "max": "2016-05-31 23:14:00"
+     }
+    }
+   },
+   {
+    "tabla": "application.stateprovinces",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2015-07-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "application.stateprovinces_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2015-07-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "2013-01-01 00:01:00",
+      "max": "2015-07-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "application.systemparameters",
+    "identidad": null,
+    "fechas": {
+     "LastEditedWhen": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "application.transactiontypes",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-01-01 16:05:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "application.transactiontypes_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2016-01-01 16:00:00",
+      "max": "2016-01-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "2016-01-01 16:05:00",
+      "max": "2016-01-01 16:05:00"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.purchaseorderlines",
+    "identidad": null,
+    "fechas": {
+     "LastReceiptDate": {
+      "min": "2013-01-02",
+      "max": "2016-05-31"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-02 07:00:00",
+      "max": "2016-05-31 13:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.purchaseorders",
+    "identidad": null,
+    "fechas": {
+     "OrderDate": {
+      "min": "2013-01-01",
+      "max": "2016-05-31"
+     },
+     "ExpectedDeliveryDate": {
+      "min": "2013-01-15",
+      "max": "2016-06-20"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-02 07:00:00",
+      "max": "2016-05-31 13:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.suppliercategories",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2015-01-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.suppliercategories_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2015-01-01 16:00:00",
+      "max": "2015-01-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.suppliers",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:05:00",
+      "max": "2013-01-01 00:05:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.suppliers_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2013-01-01 00:05:00",
+      "max": "2013-01-01 00:05:00"
+     }
+    }
+   },
+   {
+    "tabla": "purchasing.suppliertransactions",
+    "identidad": null,
+    "fechas": {
+     "TransactionDate": {
+      "min": "2013-01-02",
+      "max": "2016-05-31"
+     },
+     "FinalizationDate": {
+      "min": "2013-01-07",
+      "max": "2016-05-30"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-07 09:00:00",
+      "max": "2016-05-31 07:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.buyinggroups",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "sales.buyinggroups_archive",
+    "identidad": null,
+    "fechas": {}
+   },
+   {
+    "tabla": "sales.customercategories",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2014-01-01 16:15:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "sales.customercategories_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2014-01-01 16:00:00",
+      "max": "2014-01-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "2014-01-01 16:15:00",
+      "max": "2014-01-01 16:15:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.customers",
+    "identidad": null,
+    "fechas": {
+     "AccountOpenedDate": {
+      "min": "2013-01-01",
+      "max": "2016-05-07"
+     },
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-05-07 00:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "sales.customers_archive",
+    "identidad": null,
+    "fechas": {
+     "AccountOpenedDate": {
+      "min": "2013-01-01",
+      "max": "2015-06-12"
+     },
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2015-06-12 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2013-07-01 16:00:00",
+      "max": "2015-07-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.customertransactions",
+    "identidad": null,
+    "fechas": {
+     "TransactionDate": {
+      "min": "2013-01-01",
+      "max": "2016-05-31"
+     },
+     "FinalizationDate": {
+      "min": "2013-01-02",
+      "max": "2016-05-31"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-02 11:30:00",
+      "max": "2016-05-31 12:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.invoicelines",
+    "identidad": null,
+    "fechas": {
+     "LastEditedWhen": {
+      "min": "2013-01-01 12:00:00",
+      "max": "2016-05-31 12:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.invoices",
+    "identidad": null,
+    "fechas": {
+     "InvoiceDate": {
+      "min": "2013-01-01",
+      "max": "2016-05-31"
+     },
+     "ConfirmedDeliveryTime": {
+      "min": "2013-01-02 07:05:00",
+      "max": "2016-05-31 13:30:00"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-02 07:00:00",
+      "max": "2016-05-31 12:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.orderlines",
+    "identidad": null,
+    "fechas": {
+     "PickingCompletedWhen": {
+      "min": "2013-01-01 11:00:00",
+      "max": "2016-05-31 11:00:00"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-01 11:00:00",
+      "max": "2016-05-31 12:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.orders",
+    "identidad": null,
+    "fechas": {
+     "OrderDate": {
+      "min": "2013-01-01",
+      "max": "2016-05-31"
+     },
+     "ExpectedDeliveryDate": {
+      "min": "2013-01-02",
+      "max": "2016-06-01"
+     },
+     "PickingCompletedWhen": {
+      "min": "2013-01-01 11:00:00",
+      "max": "2016-05-31 12:00:00"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-01 11:00:00",
+      "max": "2016-05-31 12:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "sales.specialdeals",
+    "identidad": null,
+    "fechas": {
+     "StartDate": {
+      "min": "2016-01-01",
+      "max": "2016-04-01"
+     },
+     "EndDate": {
+      "min": "2016-03-31",
+      "max": "2016-06-30"
+     },
+     "LastEditedWhen": {
+      "min": "2015-12-31 16:00:00",
+      "max": "2015-12-31 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.coldroomtemperatures",
+    "identidad": {
+     "columna": "ColdRoomTemperatureID",
+     "max": 3654740,
+     "ident_current": 3654740
+    },
+    "fechas": {
+     "RecordedWhen": {
+      "min": "2016-05-31 23:59:24",
+      "max": "2016-05-31 23:59:24"
+     },
+     "ValidFrom": {
+      "min": "2016-05-31 23:59:24",
+      "max": "2016-05-31 23:59:24"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.coldroomtemperatures_archive",
+    "identidad": null,
+    "fechas": {
+     "RecordedWhen": {
+      "min": "2015-12-20 00:00:00",
+      "max": "2016-05-31 23:59:00"
+     },
+     "ValidFrom": {
+      "min": "2015-12-20 00:00:00",
+      "max": "2016-05-31 23:59:00"
+     },
+     "ValidTo": {
+      "min": "2015-12-20 00:00:27",
+      "max": "2016-05-31 23:59:24"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.colors",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-01-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.colors_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2016-01-01 16:00:00",
+      "max": "2016-01-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.packagetypes",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.packagetypes_archive",
+    "identidad": null,
+    "fechas": {}
+   },
+   {
+    "tabla": "warehouse.stockgroups",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-01-01 16:00:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.stockgroups_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2013-01-01 00:00:00"
+     },
+     "ValidTo": {
+      "min": "2016-01-01 16:00:00",
+      "max": "2016-01-01 16:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.stockitemholdings",
+    "identidad": null,
+    "fechas": {
+     "LastEditedWhen": {
+      "min": "2016-05-31 07:00:00",
+      "max": "2016-05-31 12:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.stockitems",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2016-05-31 23:00:00",
+      "max": "2016-05-31 23:12:00"
+     },
+     "ValidTo": {
+      "min": "9999-12-31 23:59:59.999999",
+      "max": "9999-12-31 23:59:59.999999"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.stockitems_archive",
+    "identidad": null,
+    "fechas": {
+     "ValidFrom": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-05-31 23:09:00"
+     },
+     "ValidTo": {
+      "min": "2016-05-31 23:00:00",
+      "max": "2016-05-31 23:12:00"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.stockitemstockgroups",
+    "identidad": null,
+    "fechas": {
+     "LastEditedWhen": {
+      "min": "2013-01-01 00:00:00",
+      "max": "2016-01-05 00:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.stockitemtransactions",
+    "identidad": null,
+    "fechas": {
+     "TransactionOccurredWhen": {
+      "min": "2013-01-01 12:00:00",
+      "max": "2016-05-31 12:00:00"
+     },
+     "LastEditedWhen": {
+      "min": "2013-01-01 12:00:00",
+      "max": "2016-05-31 12:00:00"
+     }
+    }
+   },
+   {
+    "tabla": "warehouse.vehicletemperatures",
+    "identidad": {
+     "columna": "VehicleTemperatureID",
+     "max": 65998,
+     "ident_current": 65998
+    },
+    "fechas": {
+     "RecordedWhen": {
+      "min": "2016-01-01 07:00:00",
+      "max": "2016-05-31 15:57:19"
+     }
+    }
+   }
+  ]
+ },
+ "inventario": {
+  "tablas": [
+   {
+    "esquema": "Application",
+    "tabla": "Cities",
+    "filas": 37940,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "Cities_Archive",
+    "filas": 28,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "Countries",
+    "filas": 190,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "Countries_Archive",
+    "filas": 37,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "DeliveryMethods",
+    "filas": 10,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "DeliveryMethods_Archive",
+    "filas": 1,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "PaymentMethods",
+    "filas": 4,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "PaymentMethods_Archive",
+    "filas": 1,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "People",
+    "filas": 1111,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "People_Archive",
+    "filas": 961,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "StateProvinces",
+    "filas": 53,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "StateProvinces_Archive",
+    "filas": 104,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "SystemParameters",
+    "filas": 1,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "TransactionTypes",
+    "filas": 13,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Application",
+    "tabla": "TransactionTypes_Archive",
+    "filas": 1,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "PurchaseOrderLines",
+    "filas": 8367,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "PurchaseOrders",
+    "filas": 2074,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "SupplierCategories",
+    "filas": 9,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "SupplierCategories_Archive",
+    "filas": 1,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "Suppliers",
+    "filas": 13,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "Suppliers_Archive",
+    "filas": 13,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Purchasing",
+    "tabla": "SupplierTransactions",
+    "filas": 2438,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "BuyingGroups",
+    "filas": 2,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "BuyingGroups_Archive",
+    "filas": 0,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "CustomerCategories",
+    "filas": 8,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "CustomerCategories_Archive",
+    "filas": 1,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "Customers",
+    "filas": 663,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "Customers_Archive",
+    "filas": 51,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "CustomerTransactions",
+    "filas": 97147,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "InvoiceLines",
+    "filas": 228265,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "Invoices",
+    "filas": 70510,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "OrderLines",
+    "filas": 231412,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "Orders",
+    "filas": 73595,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Sales",
+    "tabla": "SpecialDeals",
+    "filas": 2,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "ColdRoomTemperatures",
+    "filas": 4,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": true
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "ColdRoomTemperatures_Archive",
+    "filas": 3654736,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "Colors",
+    "filas": 36,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "Colors_Archive",
+    "filas": 1,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "PackageTypes",
+    "filas": 14,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "PackageTypes_Archive",
+    "filas": 0,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "StockGroups",
+    "filas": 10,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "StockGroups_Archive",
+    "filas": 1,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "StockItemHoldings",
+    "filas": 227,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "StockItems",
+    "filas": 227,
+    "temporal": "SYSTEM_VERSIONED_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "StockItems_Archive",
+    "filas": 444,
+    "temporal": "HISTORY_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "StockItemStockGroups",
+    "filas": 442,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "StockItemTransactions",
+    "filas": 236667,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": false
+   },
+   {
+    "esquema": "Warehouse",
+    "tabla": "VehicleTemperatures",
+    "filas": 65998,
+    "temporal": "NON_TEMPORAL_TABLE",
+    "en_memoria": true
+   }
+  ],
+  "columnas": 557,
+  "llaves_foraneas": [
+   {
+    "nombre": "FK_Application_Cities_Application_People",
+    "hija": "application.cities",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Application_Cities_StateProvinceID_Application_StateProvinces",
+    "hija": "application.cities",
+    "padre": "application.stateprovinces"
+   },
+   {
+    "nombre": "FK_Application_Countries_Application_People",
+    "hija": "application.countries",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Application_DeliveryMethods_Application_People",
+    "hija": "application.deliverymethods",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Application_PaymentMethods_Application_People",
+    "hija": "application.paymentmethods",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Application_People_Application_People",
+    "hija": "application.people",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Application_StateProvinces_Application_People",
+    "hija": "application.stateprovinces",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Application_StateProvinces_CountryID_Application_Countries",
+    "hija": "application.stateprovinces",
+    "padre": "application.countries"
+   },
+   {
+    "nombre": "FK_Application_SystemParameters_Application_People",
+    "hija": "application.systemparameters",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Application_SystemParameters_DeliveryCityID_Application_Cities",
+    "hija": "application.systemparameters",
+    "padre": "application.cities"
+   },
+   {
+    "nombre": "FK_Application_SystemParameters_PostalCityID_Application_Cities",
+    "hija": "application.systemparameters",
+    "padre": "application.cities"
+   },
+   {
+    "nombre": "FK_Application_TransactionTypes_Application_People",
+    "hija": "application.transactiontypes",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrderLines_Application_People",
+    "hija": "purchasing.purchaseorderlines",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrderLines_PackageTypeID_Warehouse_PackageTypes",
+    "hija": "purchasing.purchaseorderlines",
+    "padre": "warehouse.packagetypes"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrderLines_PurchaseOrderID_Purchasing_PurchaseOrders",
+    "hija": "purchasing.purchaseorderlines",
+    "padre": "purchasing.purchaseorders"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrderLines_StockItemID_Warehouse_StockItems",
+    "hija": "purchasing.purchaseorderlines",
+    "padre": "warehouse.stockitems"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrders_Application_People",
+    "hija": "purchasing.purchaseorders",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrders_ContactPersonID_Application_People",
+    "hija": "purchasing.purchaseorders",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrders_DeliveryMethodID_Application_DeliveryMethods",
+    "hija": "purchasing.purchaseorders",
+    "padre": "application.deliverymethods"
+   },
+   {
+    "nombre": "FK_Purchasing_PurchaseOrders_SupplierID_Purchasing_Suppliers",
+    "hija": "purchasing.purchaseorders",
+    "padre": "purchasing.suppliers"
+   },
+   {
+    "nombre": "FK_Purchasing_SupplierCategories_Application_People",
+    "hija": "purchasing.suppliercategories",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_Suppliers_AlternateContactPersonID_Application_People",
+    "hija": "purchasing.suppliers",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_Suppliers_Application_People",
+    "hija": "purchasing.suppliers",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_Suppliers_DeliveryCityID_Application_Cities",
+    "hija": "purchasing.suppliers",
+    "padre": "application.cities"
+   },
+   {
+    "nombre": "FK_Purchasing_Suppliers_DeliveryMethodID_Application_DeliveryMethods",
+    "hija": "purchasing.suppliers",
+    "padre": "application.deliverymethods"
+   },
+   {
+    "nombre": "FK_Purchasing_Suppliers_PostalCityID_Application_Cities",
+    "hija": "purchasing.suppliers",
+    "padre": "application.cities"
+   },
+   {
+    "nombre": "FK_Purchasing_Suppliers_PrimaryContactPersonID_Application_People",
+    "hija": "purchasing.suppliers",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_Suppliers_SupplierCategoryID_Purchasing_SupplierCategories",
+    "hija": "purchasing.suppliers",
+    "padre": "purchasing.suppliercategories"
+   },
+   {
+    "nombre": "FK_Purchasing_SupplierTransactions_Application_People",
+    "hija": "purchasing.suppliertransactions",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Purchasing_SupplierTransactions_PaymentMethodID_Application_PaymentMethods",
+    "hija": "purchasing.suppliertransactions",
+    "padre": "application.paymentmethods"
+   },
+   {
+    "nombre": "FK_Purchasing_SupplierTransactions_PurchaseOrderID_Purchasing_PurchaseOrders",
+    "hija": "purchasing.suppliertransactions",
+    "padre": "purchasing.purchaseorders"
+   },
+   {
+    "nombre": "FK_Purchasing_SupplierTransactions_SupplierID_Purchasing_Suppliers",
+    "hija": "purchasing.suppliertransactions",
+    "padre": "purchasing.suppliers"
+   },
+   {
+    "nombre": "FK_Purchasing_SupplierTransactions_TransactionTypeID_Application_TransactionTypes",
+    "hija": "purchasing.suppliertransactions",
+    "padre": "application.transactiontypes"
+   },
+   {
+    "nombre": "FK_Sales_BuyingGroups_Application_People",
+    "hija": "sales.buyinggroups",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_CustomerCategories_Application_People",
+    "hija": "sales.customercategories",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Customers_AlternateContactPersonID_Application_People",
+    "hija": "sales.customers",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Customers_Application_People",
+    "hija": "sales.customers",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Customers_BillToCustomerID_Sales_Customers",
+    "hija": "sales.customers",
+    "padre": "sales.customers"
+   },
+   {
+    "nombre": "FK_Sales_Customers_BuyingGroupID_Sales_BuyingGroups",
+    "hija": "sales.customers",
+    "padre": "sales.buyinggroups"
+   },
+   {
+    "nombre": "FK_Sales_Customers_CustomerCategoryID_Sales_CustomerCategories",
+    "hija": "sales.customers",
+    "padre": "sales.customercategories"
+   },
+   {
+    "nombre": "FK_Sales_Customers_DeliveryCityID_Application_Cities",
+    "hija": "sales.customers",
+    "padre": "application.cities"
+   },
+   {
+    "nombre": "FK_Sales_Customers_DeliveryMethodID_Application_DeliveryMethods",
+    "hija": "sales.customers",
+    "padre": "application.deliverymethods"
+   },
+   {
+    "nombre": "FK_Sales_Customers_PostalCityID_Application_Cities",
+    "hija": "sales.customers",
+    "padre": "application.cities"
+   },
+   {
+    "nombre": "FK_Sales_Customers_PrimaryContactPersonID_Application_People",
+    "hija": "sales.customers",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_CustomerTransactions_Application_People",
+    "hija": "sales.customertransactions",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_CustomerTransactions_CustomerID_Sales_Customers",
+    "hija": "sales.customertransactions",
+    "padre": "sales.customers"
+   },
+   {
+    "nombre": "FK_Sales_CustomerTransactions_InvoiceID_Sales_Invoices",
+    "hija": "sales.customertransactions",
+    "padre": "sales.invoices"
+   },
+   {
+    "nombre": "FK_Sales_CustomerTransactions_PaymentMethodID_Application_PaymentMethods",
+    "hija": "sales.customertransactions",
+    "padre": "application.paymentmethods"
+   },
+   {
+    "nombre": "FK_Sales_CustomerTransactions_TransactionTypeID_Application_TransactionTypes",
+    "hija": "sales.customertransactions",
+    "padre": "application.transactiontypes"
+   },
+   {
+    "nombre": "FK_Sales_InvoiceLines_Application_People",
+    "hija": "sales.invoicelines",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_InvoiceLines_InvoiceID_Sales_Invoices",
+    "hija": "sales.invoicelines",
+    "padre": "sales.invoices"
+   },
+   {
+    "nombre": "FK_Sales_InvoiceLines_PackageTypeID_Warehouse_PackageTypes",
+    "hija": "sales.invoicelines",
+    "padre": "warehouse.packagetypes"
+   },
+   {
+    "nombre": "FK_Sales_InvoiceLines_StockItemID_Warehouse_StockItems",
+    "hija": "sales.invoicelines",
+    "padre": "warehouse.stockitems"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_AccountsPersonID_Application_People",
+    "hija": "sales.invoices",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_Application_People",
+    "hija": "sales.invoices",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_BillToCustomerID_Sales_Customers",
+    "hija": "sales.invoices",
+    "padre": "sales.customers"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_ContactPersonID_Application_People",
+    "hija": "sales.invoices",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_CustomerID_Sales_Customers",
+    "hija": "sales.invoices",
+    "padre": "sales.customers"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_DeliveryMethodID_Application_DeliveryMethods",
+    "hija": "sales.invoices",
+    "padre": "application.deliverymethods"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_OrderID_Sales_Orders",
+    "hija": "sales.invoices",
+    "padre": "sales.orders"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_PackedByPersonID_Application_People",
+    "hija": "sales.invoices",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Invoices_SalespersonPersonID_Application_People",
+    "hija": "sales.invoices",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_OrderLines_Application_People",
+    "hija": "sales.orderlines",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_OrderLines_OrderID_Sales_Orders",
+    "hija": "sales.orderlines",
+    "padre": "sales.orders"
+   },
+   {
+    "nombre": "FK_Sales_OrderLines_PackageTypeID_Warehouse_PackageTypes",
+    "hija": "sales.orderlines",
+    "padre": "warehouse.packagetypes"
+   },
+   {
+    "nombre": "FK_Sales_OrderLines_StockItemID_Warehouse_StockItems",
+    "hija": "sales.orderlines",
+    "padre": "warehouse.stockitems"
+   },
+   {
+    "nombre": "FK_Sales_Orders_Application_People",
+    "hija": "sales.orders",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Orders_BackorderOrderID_Sales_Orders",
+    "hija": "sales.orders",
+    "padre": "sales.orders"
+   },
+   {
+    "nombre": "FK_Sales_Orders_ContactPersonID_Application_People",
+    "hija": "sales.orders",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Orders_CustomerID_Sales_Customers",
+    "hija": "sales.orders",
+    "padre": "sales.customers"
+   },
+   {
+    "nombre": "FK_Sales_Orders_PickedByPersonID_Application_People",
+    "hija": "sales.orders",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_Orders_SalespersonPersonID_Application_People",
+    "hija": "sales.orders",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_SpecialDeals_Application_People",
+    "hija": "sales.specialdeals",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Sales_SpecialDeals_BuyingGroupID_Sales_BuyingGroups",
+    "hija": "sales.specialdeals",
+    "padre": "sales.buyinggroups"
+   },
+   {
+    "nombre": "FK_Sales_SpecialDeals_CustomerCategoryID_Sales_CustomerCategories",
+    "hija": "sales.specialdeals",
+    "padre": "sales.customercategories"
+   },
+   {
+    "nombre": "FK_Sales_SpecialDeals_CustomerID_Sales_Customers",
+    "hija": "sales.specialdeals",
+    "padre": "sales.customers"
+   },
+   {
+    "nombre": "FK_Sales_SpecialDeals_StockGroupID_Warehouse_StockGroups",
+    "hija": "sales.specialdeals",
+    "padre": "warehouse.stockgroups"
+   },
+   {
+    "nombre": "FK_Sales_SpecialDeals_StockItemID_Warehouse_StockItems",
+    "hija": "sales.specialdeals",
+    "padre": "warehouse.stockitems"
+   },
+   {
+    "nombre": "FK_Warehouse_Colors_Application_People",
+    "hija": "warehouse.colors",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Warehouse_PackageTypes_Application_People",
+    "hija": "warehouse.packagetypes",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Warehouse_StockGroups_Application_People",
+    "hija": "warehouse.stockgroups",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemHoldings_Application_People",
+    "hija": "warehouse.stockitemholdings",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "PKFK_Warehouse_StockItemHoldings_StockItemID_Warehouse_StockItems",
+    "hija": "warehouse.stockitemholdings",
+    "padre": "warehouse.stockitems"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItems_Application_People",
+    "hija": "warehouse.stockitems",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItems_ColorID_Warehouse_Colors",
+    "hija": "warehouse.stockitems",
+    "padre": "warehouse.colors"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItems_OuterPackageID_Warehouse_PackageTypes",
+    "hija": "warehouse.stockitems",
+    "padre": "warehouse.packagetypes"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItems_SupplierID_Purchasing_Suppliers",
+    "hija": "warehouse.stockitems",
+    "padre": "purchasing.suppliers"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItems_UnitPackageID_Warehouse_PackageTypes",
+    "hija": "warehouse.stockitems",
+    "padre": "warehouse.packagetypes"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemStockGroups_Application_People",
+    "hija": "warehouse.stockitemstockgroups",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemStockGroups_StockGroupID_Warehouse_StockGroups",
+    "hija": "warehouse.stockitemstockgroups",
+    "padre": "warehouse.stockgroups"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemStockGroups_StockItemID_Warehouse_StockItems",
+    "hija": "warehouse.stockitemstockgroups",
+    "padre": "warehouse.stockitems"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemTransactions_Application_People",
+    "hija": "warehouse.stockitemtransactions",
+    "padre": "application.people"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemTransactions_CustomerID_Sales_Customers",
+    "hija": "warehouse.stockitemtransactions",
+    "padre": "sales.customers"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemTransactions_InvoiceID_Sales_Invoices",
+    "hija": "warehouse.stockitemtransactions",
+    "padre": "sales.invoices"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemTransactions_PurchaseOrderID_Purchasing_PurchaseOrders",
+    "hija": "warehouse.stockitemtransactions",
+    "padre": "purchasing.purchaseorders"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemTransactions_StockItemID_Warehouse_StockItems",
+    "hija": "warehouse.stockitemtransactions",
+    "padre": "warehouse.stockitems"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemTransactions_SupplierID_Purchasing_Suppliers",
+    "hija": "warehouse.stockitemtransactions",
+    "padre": "purchasing.suppliers"
+   },
+   {
+    "nombre": "FK_Warehouse_StockItemTransactions_TransactionTypeID_Application_TransactionTypes",
+    "hija": "warehouse.stockitemtransactions",
+    "padre": "application.transactiontypes"
+   }
+  ],
+  "modulos": [
+   {
+    "nombre": "website.calculatecustomerprice",
+    "tipo": "FUNCION",
+    "lineas": 87
+   },
+   {
+    "nombre": "application.determinecustomeraccess",
+    "tipo": "FUNCION",
+    "lineas": 19
+   },
+   {
+    "nombre": "application.addrolememberifnonexistent",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 36
+   },
+   {
+    "nombre": "application.configuration_applyauditing",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 78
+   },
+   {
+    "nombre": "application.configuration_applycolumnstoreindexing",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 95
+   },
+   {
+    "nombre": "application.configuration_applyfulltextindexing",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 191
+   },
+   {
+    "nombre": "application.configuration_applypartitioning",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 228
+   },
+   {
+    "nombre": "application.configuration_applyrowlevelsecurity",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 56
+   },
+   {
+    "nombre": "application.configuration_configureforenterpriseedition",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 15
+   },
+   {
+    "nombre": "application.configuration_enableinmemory",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 494
+   },
+   {
+    "nombre": "application.configuration_removeauditing",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 52
+   },
+   {
+    "nombre": "application.configuration_removerowlevelsecurity",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 26
+   },
+   {
+    "nombre": "application.createroleifnonexistent",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 26
+   },
+   {
+    "nombre": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 2771
+   },
+   {
+    "nombre": "dataloadsimulation.configuration_removedataloadsimulationprocedures",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 30
+   },
+   {
+    "nombre": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 706
+   },
+   {
+    "nombre": "dataloadsimulation.populatedatatocurrentdate",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 30
+   },
+   {
+    "nombre": "dataloadsimulation.reactivatetemporaltablesafterdataload",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 81
+   },
+   {
+    "nombre": "integration.getcityupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 182
+   },
+   {
+    "nombre": "integration.getcustomerupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 197
+   },
+   {
+    "nombre": "integration.getemployeeupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 87
+   },
+   {
+    "nombre": "integration.getmovementupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 28
+   },
+   {
+    "nombre": "integration.getorderupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 43
+   },
+   {
+    "nombre": "integration.getpaymentmethodupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 79
+   },
+   {
+    "nombre": "integration.getpurchaseupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 35
+   },
+   {
+    "nombre": "integration.getsaleupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 48
+   },
+   {
+    "nombre": "integration.getstockholdingupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 21
+   },
+   {
+    "nombre": "integration.getstockitemupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 113
+   },
+   {
+    "nombre": "integration.getsupplierupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 136
+   },
+   {
+    "nombre": "integration.gettransactiontypeupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 79
+   },
+   {
+    "nombre": "integration.gettransactionupdates",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 59
+   },
+   {
+    "nombre": "sequences.reseedallsequences",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 36
+   },
+   {
+    "nombre": "sequences.reseedsequencebeyondtablevalues",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 35
+   },
+   {
+    "nombre": "website.activatewebsitelogon",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 28
+   },
+   {
+    "nombre": "website.changepassword",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 27
+   },
+   {
+    "nombre": "website.insertcustomerorders",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 65
+   },
+   {
+    "nombre": "website.invoicecustomerorders",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 155
+   },
+   {
+    "nombre": "website.recordcoldroomtemperatures",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 51
+   },
+   {
+    "nombre": "website.recordvehicletemperature",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 60
+   },
+   {
+    "nombre": "website.searchforcustomers",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 25
+   },
+   {
+    "nombre": "website.searchforpeople",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 29
+   },
+   {
+    "nombre": "website.searchforstockitems",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 16
+   },
+   {
+    "nombre": "website.searchforstockitemsbytags",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 16
+   },
+   {
+    "nombre": "website.searchforsuppliers",
+    "tipo": "PROCEDIMIENTO",
+    "lineas": 25
+   },
+   {
+    "nombre": "website.customers",
+    "tipo": "VISTA",
+    "lineas": 31
+   },
+   {
+    "nombre": "website.suppliers",
+    "tipo": "VISTA",
+    "lineas": 27
+   },
+   {
+    "nombre": "website.vehicletemperatures",
+    "tipo": "VISTA",
+    "lineas": 14
+   }
+  ],
+  "triggers": [],
+  "jobs": []
+ },
+ "hallazgos": [
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.calculatecustomerprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 80,
+   "detalle": "número en duro 100.0 (1 vez/veces)",
+   "fragmento": "SET @DiscountedUnitPrice = ROUND(@UnitPrice * @HighestDiscountPercentage / 100.0, 2);",
+   "clase": "número",
+   "valor": "100.0",
+   "lineas": [
+    80
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.calculatecustomerprice",
+   "tipo_objeto": "FUNCION",
+   "linea": 80,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "SET @DiscountedUnitPrice = ROUND(@UnitPrice * @HighestDiscountPercentage / 100.0, 2);",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    80
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.determinecustomeraccess",
+   "tipo_objeto": "FUNCION",
+   "linea": 13,
+   "detalle": "código en duro N'Website' (1 vez/veces)",
+   "fragmento": "OR (ORIGINAL_LOGIN() = N'Website'",
+   "clase": "código",
+   "valor": "N'Website'",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.addrolememberifnonexistent",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.database_role_members AS drm",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.addrolememberifnonexistent",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 14,
+   "detalle": "código en duro N'R' (1 vez/veces)",
+   "fragmento": "AND dpr.type = N'R'",
+   "clase": "código",
+   "valor": "N'R'",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.addrolememberifnonexistent",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 17,
+   "detalle": "código en duro N'S' (1 vez/veces)",
+   "fragmento": "AND dpu.type = N'S'",
+   "clase": "código",
+   "valor": "N'S'",
+   "lineas": [
+    17
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.addrolememberifnonexistent",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 23,
+   "detalle": "código en duro N'ALTER ROLE ' (1 vez/veces)",
+   "fragmento": "DECLARE @SQL nvarchar(max) = N'ALTER ROLE ' + QUOTENAME(@RoleName)",
+   "clase": "código",
+   "valor": "N'ALTER ROLE '",
+   "lineas": [
+    23
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 17,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.server_audits WHERE name = N'WWI_Audit')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 37,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.server_audit_specifications WHERE name = N'WWI_ServerAuditSpecification')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 55,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.database_audit_specifications WHERE name = N'WWI_DatabaseAuditSpecification')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applyauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 17,
+   "detalle": "código en duro N'WWI_Audit' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.server_audits WHERE name = N'WWI_Audit')",
+   "clase": "código",
+   "valor": "N'WWI_Audit'",
+   "lineas": [
+    17
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applyauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 37,
+   "detalle": "código en duro N'WWI_ServerAuditSpecification' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.server_audit_specifications WHERE name = N'WWI_ServerAuditSpecification')",
+   "clase": "código",
+   "valor": "N'WWI_ServerAuditSpecification'",
+   "lineas": [
+    37
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applyauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 55,
+   "detalle": "código en duro N'WWI_DatabaseAuditSpecification' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.database_audit_specifications WHERE name = N'WWI_DatabaseAuditSpecification')",
+   "clase": "código",
+   "valor": "N'WWI_DatabaseAuditSpecification'",
+   "lineas": [
+    55
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applycolumnstoreindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'NCCX_Sales_OrderLines')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applycolumnstoreindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 44,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'NCCX_Sales_InvoiceLines')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applycolumnstoreindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 61,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'CCX_Warehouse_StockItemTransactions')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applycolumnstoreindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "código en duro N'NCCX_Sales_OrderLines' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'NCCX_Sales_OrderLines')",
+   "clase": "código",
+   "valor": "N'NCCX_Sales_OrderLines'",
+   "lineas": [
+    27
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applycolumnstoreindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 44,
+   "detalle": "código en duro N'NCCX_Sales_InvoiceLines' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'NCCX_Sales_InvoiceLines')",
+   "clase": "código",
+   "valor": "N'NCCX_Sales_InvoiceLines'",
+   "lineas": [
+    44
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applycolumnstoreindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 61,
+   "detalle": "código en duro N'CCX_Warehouse_StockItemTransactions' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'CCX_Warehouse_StockItemTransactions')",
+   "clase": "código",
+   "valor": "N'CCX_Warehouse_StockItemTransactions'",
+   "lineas": [
+    61
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyfulltextindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 12,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.fulltext_catalogs WHERE name = N'FTCatalog')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyfulltextindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 18,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.fulltext_indexes AS fti WHERE fti.object_id = OBJECT_ID(N'[Application].People'))",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyfulltextindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 28,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.fulltext_indexes AS fti WHERE fti.object_id = OBJECT_ID(N'Sales.Customers'))",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyfulltextindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 38,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.fulltext_indexes AS fti WHERE fti.object_id = OBJECT_ID(N'Purchasing.Suppliers'))",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applyfulltextindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 49,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.fulltext_indexes AS fti WHERE fti.object_id = OBJECT_ID(N'Warehouse.StockItems'))",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applyfulltextindexing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 12,
+   "detalle": "código en duro N'FTCatalog' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.fulltext_catalogs WHERE name = N'FTCatalog')",
+   "clase": "código",
+   "valor": "N'FTCatalog'",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 18,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.partition_functions WHERE name = N'PF_TransactionDateTime')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.partition_functions WHERE name = N'PF_TransactionDate')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 36,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT * FROM sys.partition_schemes WHERE name = N'PS_TransactionDateTime')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 55,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.partition_schemes WHERE name = N'PS_TransactionDate')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 73,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'CX_Sales_CustomerTransactions')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 148,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'CX_Purchasing_SupplierTransactions')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 18,
+   "detalle": "código en duro N'PF_TransactionDateTime' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.partition_functions WHERE name = N'PF_TransactionDateTime')",
+   "clase": "código",
+   "valor": "N'PF_TransactionDateTime'",
+   "lineas": [
+    18
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "código en duro N'PF_TransactionDate' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.partition_functions WHERE name = N'PF_TransactionDate')",
+   "clase": "código",
+   "valor": "N'PF_TransactionDate'",
+   "lineas": [
+    27
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 36,
+   "detalle": "código en duro N'PS_TransactionDateTime' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT * FROM sys.partition_schemes WHERE name = N'PS_TransactionDateTime')",
+   "clase": "código",
+   "valor": "N'PS_TransactionDateTime'",
+   "lineas": [
+    36
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 40,
+   "detalle": "número en duro 5 (4 vez/veces)",
+   "fragmento": "IF SERVERPROPERTY('EngineEdition') = 5",
+   "clase": "número",
+   "valor": "5",
+   "lineas": [
+    40,
+    46,
+    58,
+    64
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 55,
+   "detalle": "código en duro N'PS_TransactionDate' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.partition_schemes WHERE name = N'PS_TransactionDate')",
+   "clase": "código",
+   "valor": "N'PS_TransactionDate'",
+   "lineas": [
+    55
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 73,
+   "detalle": "código en duro N'CX_Sales_CustomerTransactions' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'CX_Sales_CustomerTransactions')",
+   "clase": "código",
+   "valor": "N'CX_Sales_CustomerTransactions'",
+   "lineas": [
+    73
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applypartitioning",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 148,
+   "detalle": "código en duro N'CX_Purchasing_SupplierTransactions' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'CX_Purchasing_SupplierTransactions')",
+   "clase": "código",
+   "valor": "N'CX_Purchasing_SupplierTransactions'",
+   "lineas": [
+    148
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_applyrowlevelsecurity",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 53,
+   "detalle": "número en duro 51000 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'Unable to apply row level security', 1;",
+   "clase": "número",
+   "valor": "51000",
+   "lineas": [
+    53
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_enableinmemory",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.filegroups WHERE name = N'WWI_InMemory_Data')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_enableinmemory",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 43,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N'ColdRoomTemperatures' AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_enableinmemory",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 98,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N'VehicleTemperatures' AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_enableinmemory",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 16,
+   "detalle": "número en duro 5 (1 vez/veces)",
+   "fragmento": "IF CAST(SERVERPROPERTY(N'EngineEdition') AS int) <> 5   -- Not an Azure SQL DB",
+   "clase": "número",
+   "valor": "5",
+   "lineas": [
+    16
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_enableinmemory",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "código en duro N'WWI_InMemory_Data' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.filegroups WHERE name = N'WWI_InMemory_Data')",
+   "clase": "código",
+   "valor": "N'WWI_InMemory_Data'",
+   "lineas": [
+    21
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_enableinmemory",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 43,
+   "detalle": "código en duro N'ColdRoomTemperatures' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N'ColdRoomTemperatures' AND is_memory_optimized <> 0)",
+   "clase": "código",
+   "valor": "N'ColdRoomTemperatures'",
+   "lineas": [
+    43
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_enableinmemory",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 98,
+   "detalle": "código en duro N'VehicleTemperatures' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N'VehicleTemperatures' AND is_memory_optimized <> 0)",
+   "clase": "código",
+   "valor": "N'VehicleTemperatures'",
+   "lineas": [
+    98
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_removeauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 19,
+   "detalle": "IF EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.database_audit_specifications WHERE name = N'WWI_DatabaseAuditSpecification')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_removeauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "IF EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.server_audit_specifications WHERE name = N'WWI_ServerAuditSpecification')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.configuration_removeauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 36,
+   "detalle": "IF EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.server_audits WHERE name = N'WWI_Audit')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_removeauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 19,
+   "detalle": "código en duro N'WWI_DatabaseAuditSpecification' (1 vez/veces)",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.database_audit_specifications WHERE name = N'WWI_DatabaseAuditSpecification')",
+   "clase": "código",
+   "valor": "N'WWI_DatabaseAuditSpecification'",
+   "lineas": [
+    19
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_removeauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 27,
+   "detalle": "código en duro N'WWI_ServerAuditSpecification' (1 vez/veces)",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.server_audit_specifications WHERE name = N'WWI_ServerAuditSpecification')",
+   "clase": "código",
+   "valor": "N'WWI_ServerAuditSpecification'",
+   "lineas": [
+    27
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_removeauditing",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 36,
+   "detalle": "código en duro N'WWI_Audit' (1 vez/veces)",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.server_audits WHERE name = N'WWI_Audit')",
+   "clase": "código",
+   "valor": "N'WWI_Audit'",
+   "lineas": [
+    36
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.configuration_removerowlevelsecurity",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 23,
+   "detalle": "número en duro 51000 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'Unable to remove row level security', 1;",
+   "clase": "número",
+   "valor": "51000",
+   "lineas": [
+    23
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "application.createroleifnonexistent",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = @RoleName AND type = N'R')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.createroleifnonexistent",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "código en duro N'R' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = @RoleName AND type = N'R')",
+   "clase": "código",
+   "valor": "N'R'",
+   "lineas": [
+    10
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "application.createroleifnonexistent",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 14,
+   "detalle": "código en duro N'CREATE ROLE ' (1 vez/veces)",
+   "fragmento": "DECLARE @SQL nvarchar(max) = N'CREATE ROLE ' + QUOTENAME(@RoleName) + N';'",
+   "clase": "código",
+   "valor": "N'CREATE ROLE '",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.objects WHERE name = N'GetAreaCode'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 398,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 452,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 873,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 925,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1012,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1063,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1176,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1379,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1542,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1607,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1677,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1800,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1928,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1993,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2102,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2161,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2237,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2332,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2577,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.procedures WHERE SCHEMA_NAME(schema_id) = N'DataLoadSimulation'",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 13,
+   "detalle": "código en duro N'GetAreaCode' (1 vez/veces)",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.objects WHERE name = N'GetAreaCode'",
+   "clase": "código",
+   "valor": "N'GetAreaCode'",
+   "lineas": [
+    13
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 14,
+   "detalle": "código en duro N'FN' (1 vez/veces)",
+   "fragmento": "AND type = N'FN'",
+   "clase": "código",
+   "valor": "N'FN'",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 15,
+   "detalle": "código en duro N'DataLoadSimulation' (20 vez/veces)",
+   "fragmento": "AND SCHEMA_NAME(schema_id) = N'DataLoadSimulation')",
+   "clase": "código",
+   "valor": "N'DataLoadSimulation'",
+   "lineas": [
+    15,
+    398,
+    452,
+    873,
+    925,
+    1012,
+    1063,
+    1176,
+    1379,
+    1542,
+    1607,
+    1677,
+    1800,
+    1928,
+    1993,
+    2102,
+    2161,
+    2237,
+    2332,
+    2577
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 399,
+   "detalle": "código en duro N'ActivateWebsiteLogins' (1 vez/veces)",
+   "fragmento": "AND name = N'ActivateWebsiteLogins')",
+   "clase": "código",
+   "valor": "N'ActivateWebsiteLogins'",
+   "lineas": [
+    399
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 453,
+   "detalle": "código en duro N'AddCustomers' (1 vez/veces)",
+   "fragmento": "AND name = N'AddCustomers')",
+   "clase": "código",
+   "valor": "N'AddCustomers'",
+   "lineas": [
+    453
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 874,
+   "detalle": "código en duro N'AddSpecialDeals' (1 vez/veces)",
+   "fragmento": "AND name = N'AddSpecialDeals')",
+   "clase": "código",
+   "valor": "N'AddSpecialDeals'",
+   "lineas": [
+    874
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 926,
+   "detalle": "código en duro N'AddStockItems' (1 vez/veces)",
+   "fragmento": "AND name = N'AddStockItems')",
+   "clase": "código",
+   "valor": "N'AddStockItems'",
+   "lineas": [
+    926
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1013,
+   "detalle": "código en duro N'ChangePasswords' (1 vez/veces)",
+   "fragmento": "AND name = N'ChangePasswords')",
+   "clase": "código",
+   "valor": "N'ChangePasswords'",
+   "lineas": [
+    1013
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1064,
+   "detalle": "código en duro N'CreateCustomerOrders' (1 vez/veces)",
+   "fragmento": "AND name = N'CreateCustomerOrders')",
+   "clase": "código",
+   "valor": "N'CreateCustomerOrders'",
+   "lineas": [
+    1064
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1177,
+   "detalle": "código en duro N'InvoicePickedOrders' (1 vez/veces)",
+   "fragmento": "AND name = N'InvoicePickedOrders')",
+   "clase": "código",
+   "valor": "N'InvoicePickedOrders'",
+   "lineas": [
+    1177
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1380,
+   "detalle": "código en duro N'MakeTemporalChanges' (1 vez/veces)",
+   "fragmento": "AND name = N'MakeTemporalChanges')",
+   "clase": "código",
+   "valor": "N'MakeTemporalChanges'",
+   "lineas": [
+    1380
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1543,
+   "detalle": "código en duro N'PaySuppliers' (1 vez/veces)",
+   "fragmento": "AND name = N'PaySuppliers')",
+   "clase": "código",
+   "valor": "N'PaySuppliers'",
+   "lineas": [
+    1543
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1608,
+   "detalle": "código en duro N'PerformStocktake' (1 vez/veces)",
+   "fragmento": "AND name = N'PerformStocktake')",
+   "clase": "código",
+   "valor": "N'PerformStocktake'",
+   "lineas": [
+    1608
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1678,
+   "detalle": "código en duro N'PickStockForCustomerOrders' (1 vez/veces)",
+   "fragmento": "AND name = N'PickStockForCustomerOrders')",
+   "clase": "código",
+   "valor": "N'PickStockForCustomerOrders'",
+   "lineas": [
+    1678
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1801,
+   "detalle": "código en duro N'PlaceSupplierOrders' (1 vez/veces)",
+   "fragmento": "AND name = N'PlaceSupplierOrders')",
+   "clase": "código",
+   "valor": "N'PlaceSupplierOrders'",
+   "lineas": [
+    1801
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1929,
+   "detalle": "código en duro N'ProcessCustomerPayments' (1 vez/veces)",
+   "fragmento": "AND name = N'ProcessCustomerPayments')",
+   "clase": "código",
+   "valor": "N'ProcessCustomerPayments'",
+   "lineas": [
+    1929
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 1994,
+   "detalle": "código en duro N'ReceivePurchaseOrders' (1 vez/veces)",
+   "fragmento": "AND name = N'ReceivePurchaseOrders')",
+   "clase": "código",
+   "valor": "N'ReceivePurchaseOrders'",
+   "lineas": [
+    1994
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2103,
+   "detalle": "código en duro N'RecordColdRoomTemperatures' (1 vez/veces)",
+   "fragmento": "AND name = N'RecordColdRoomTemperatures')",
+   "clase": "código",
+   "valor": "N'RecordColdRoomTemperatures'",
+   "lineas": [
+    2103
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2162,
+   "detalle": "código en duro N'RecordDeliveryVanTemperatures' (1 vez/veces)",
+   "fragmento": "AND name = N'RecordDeliveryVanTemperatures')",
+   "clase": "código",
+   "valor": "N'RecordDeliveryVanTemperatures'",
+   "lineas": [
+    2162
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2238,
+   "detalle": "código en duro N'RecordInvoiceDeliveries' (1 vez/veces)",
+   "fragmento": "AND name = N'RecordInvoiceDeliveries')",
+   "clase": "código",
+   "valor": "N'RecordInvoiceDeliveries'",
+   "lineas": [
+    2238
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2333,
+   "detalle": "código en duro N'UpdateCustomFields' (1 vez/veces)",
+   "fragmento": "AND name = N'UpdateCustomFields')",
+   "clase": "código",
+   "valor": "N'UpdateCustomFields'",
+   "lineas": [
+    2333
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.configuration_applydataloadsimulationprocedures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 2578,
+   "detalle": "código en duro N'DailyProcessToCreateHistory' (1 vez/veces)",
+   "fragmento": "AND name = N'DailyProcessToCreateHistory')",
+   "clase": "código",
+   "valor": "N'DailyProcessToCreateHistory'",
+   "lineas": [
+    2578
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "IF EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = N'Configuration_RemoveRowLevelSecurity')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 108,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 145,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 182,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 219,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 256,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 293,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 330,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 367,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 404,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 441,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 478,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 515,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 552,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 589,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 626,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 663,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 700,
+   "detalle": "IF NOT EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = @TableName AND is_memory_optimized <> 0)",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "código en duro N'Configuration_RemoveRowLevelSecurity' (1 vez/veces)",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = N'Configuration_RemoveRowLevelSecurity')",
+   "clase": "código",
+   "valor": "N'Configuration_RemoveRowLevelSecurity'",
+   "lineas": [
+    7
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 14,
+   "detalle": "código en duro N'    ' (1 vez/veces)",
+   "fragmento": "DECLARE @Indent nvarchar(4) = N'    ';",
+   "clase": "código",
+   "valor": "N'    '",
+   "lineas": [
+    14
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 20,
+   "detalle": "código en duro N'ValidFrom' (1 vez/veces)",
+   "fragmento": "DECLARE @TemporalFromColumnName sysname = N'ValidFrom';",
+   "clase": "código",
+   "valor": "N'ValidFrom'",
+   "lineas": [
+    20
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "código en duro N'ValidTo' (1 vez/veces)",
+   "fragmento": "DECLARE @TemporalToColumnName sysname = N'ValidTo';",
+   "clase": "código",
+   "valor": "N'ValidTo'",
+   "lineas": [
+    21
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.deactivatetemporaltablesbeforedataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 22,
+   "detalle": "código en duro N'Archive' (1 vez/veces)",
+   "fragmento": "DECLARE @TemporalTableSuffix nvarchar(max) = N'Archive';",
+   "clase": "código",
+   "valor": "N'Archive'",
+   "lineas": [
+    22
+   ]
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "dataloadsimulation.reactivatetemporaltablesafterdataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "IF EXISTS sin ELSE con cuerpo DDL/EXEC: guarda o configuración idempotente",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = N'Configuration_ApplyRowLevelSecurity')",
+   "cuerpo": "DDL/EXEC"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "dataloadsimulation.reactivatetemporaltablesafterdataload",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 7,
+   "detalle": "código en duro N'Configuration_ApplyRowLevelSecurity' (1 vez/veces)",
+   "fragmento": "IF EXISTS (SELECT 1 FROM sys.procedures WHERE name = N'Configuration_ApplyRowLevelSecurity')",
+   "clase": "código",
+   "valor": "N'Configuration_ApplyRowLevelSecurity'",
+   "lineas": [
+    7
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getcityupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "código en duro '99991231 23:59:59.9999999' (1 vez/veces)",
+   "fragmento": "DECLARE @EndOfTime datetime2(7) = '99991231 23:59:59.9999999';",
+   "clase": "código",
+   "valor": "'99991231 23:59:59.9999999'",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getcityupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 12,
+   "detalle": "código en duro '20130101' (1 vez/veces)",
+   "fragmento": "DECLARE @InitialLoadDate date = '20130101';",
+   "clase": "código",
+   "valor": "'20130101'",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "integration.getcustomerupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 68,
+   "detalle": "INNER JOIN de sales.customercategories a su tabla hija sales.customers: descarta los registros de sales.customercategories sin sales.customers",
+   "fragmento": "INNER JOIN Sales.Customers FOR SYSTEM_TIME AS OF @ValidFrom AS bt",
+   "padre": "sales.customercategories",
+   "hija": "sales.customers"
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "integration.getcustomerupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 116,
+   "detalle": "INNER JOIN de sales.customercategories a su tabla hija sales.customers: descarta los registros de sales.customercategories sin sales.customers",
+   "fragmento": "INNER JOIN Sales.Customers FOR SYSTEM_TIME AS OF @ValidFrom AS bt",
+   "padre": "sales.customercategories",
+   "hija": "sales.customers"
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "integration.getcustomerupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 162,
+   "detalle": "INNER JOIN de sales.customercategories a su tabla hija sales.customers: descarta los registros de sales.customercategories sin sales.customers",
+   "fragmento": "INNER JOIN Sales.Customers FOR SYSTEM_TIME AS OF @ValidFrom AS bt",
+   "padre": "sales.customercategories",
+   "hija": "sales.customers"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getcustomerupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "código en duro '99991231 23:59:59.9999999' (1 vez/veces)",
+   "fragmento": "DECLARE @EndOfTime datetime2(7) = '99991231 23:59:59.9999999';",
+   "clase": "código",
+   "valor": "'99991231 23:59:59.9999999'",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getcustomerupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 12,
+   "detalle": "código en duro '20130101' (1 vez/veces)",
+   "fragmento": "DECLARE @InitialLoadDate date = '20130101';",
+   "clase": "código",
+   "valor": "'20130101'",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getemployeeupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "código en duro '99991231 23:59:59.9999999' (1 vez/veces)",
+   "fragmento": "DECLARE @EndOfTime datetime2(7) = '99991231 23:59:59.9999999';",
+   "clase": "código",
+   "valor": "'99991231 23:59:59.9999999'",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "integration.getorderupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 31,
+   "detalle": "INNER JOIN de sales.orders a su tabla hija sales.orderlines: descarta los registros de sales.orders sin sales.orderlines",
+   "fragmento": "INNER JOIN Sales.OrderLines AS ol",
+   "padre": "sales.orders",
+   "hija": "sales.orderlines"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getorderupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "número en duro 2 (4 vez/veces)",
+   "fragmento": "ROUND(ol.Quantity * ol.UnitPrice, 2) AS [Total Excluding Tax],",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    21,
+    22,
+    23,
+    23
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getorderupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 22,
+   "detalle": "número en duro 100.0 (2 vez/veces)",
+   "fragmento": "ROUND(ol.Quantity * ol.UnitPrice * ol.TaxRate / 100.0, 2) AS [Tax Amount],",
+   "clase": "número",
+   "valor": "100.0",
+   "lineas": [
+    22,
+    23
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getpaymentmethodupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "código en duro '99991231 23:59:59.9999999' (1 vez/veces)",
+   "fragmento": "DECLARE @EndOfTime datetime2(7) = '99991231 23:59:59.9999999';",
+   "clase": "código",
+   "valor": "'99991231 23:59:59.9999999'",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "integration.getpurchaseupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 23,
+   "detalle": "INNER JOIN de purchasing.purchaseorders a su tabla hija purchasing.purchaseorderlines: descarta los registros de purchasing.purchaseorders sin purchasing.purchaseorderlines",
+   "fragmento": "INNER JOIN Purchasing.PurchaseOrderLines AS pol",
+   "padre": "purchasing.purchaseorders",
+   "hija": "purchasing.purchaseorderlines"
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "integration.getsaleupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 32,
+   "detalle": "INNER JOIN de sales.invoices a su tabla hija sales.invoicelines: descarta los registros de sales.invoices sin sales.invoicelines",
+   "fragmento": "INNER JOIN Sales.InvoiceLines AS il",
+   "padre": "sales.invoices",
+   "hija": "sales.invoicelines"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getstockitemupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "código en duro '99991231 23:59:59.9999999' (1 vez/veces)",
+   "fragmento": "DECLARE @EndOfTime datetime2(7) = '99991231 23:59:59.9999999';",
+   "clase": "código",
+   "valor": "'99991231 23:59:59.9999999'",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getsupplierupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "código en duro '99991231 23:59:59.9999999' (1 vez/veces)",
+   "fragmento": "DECLARE @EndOfTime datetime2(7) = '99991231 23:59:59.9999999';",
+   "clase": "código",
+   "valor": "'99991231 23:59:59.9999999'",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.getsupplierupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 12,
+   "detalle": "código en duro '20130101' (1 vez/veces)",
+   "fragmento": "DECLARE @InitialLoadDate date = '20130101';",
+   "clase": "código",
+   "valor": "'20130101'",
+   "lineas": [
+    12
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "integration.gettransactiontypeupdates",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 11,
+   "detalle": "código en duro '99991231 23:59:59.9999999' (1 vez/veces)",
+   "fragmento": "DECLARE @EndOfTime datetime2(7) = '99991231 23:59:59.9999999';",
+   "clase": "código",
+   "valor": "'99991231 23:59:59.9999999'",
+   "lineas": [
+    11
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "sequences.reseedsequencebeyondtablevalues",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 17,
+   "detalle": "código en duro N'Sequences' (1 vez/veces)",
+   "fragmento": "AND SCHEMA_NAME(schema_id) = N'Sequences');",
+   "clase": "código",
+   "valor": "N'Sequences'",
+   "lineas": [
+    17
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.activatewebsitelogon",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 24,
+   "detalle": "número en duro 51000 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'Invalid PersonID', 1;",
+   "clase": "número",
+   "valor": "51000",
+   "lineas": [
+    24
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.changepassword",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 23,
+   "detalle": "número en duro 51000 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'Invalid Password Change', 1;",
+   "clase": "número",
+   "valor": "51000",
+   "lineas": [
+    23
+   ]
+  },
+  {
+   "categoria": "inner_join_hija",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 91,
+   "detalle": "INNER JOIN de warehouse.stockitems a su tabla hija warehouse.stockitemholdings: descarta los registros de warehouse.stockitems sin warehouse.stockitemholdings",
+   "fragmento": "INNER JOIN Warehouse.StockItemHoldings AS sih",
+   "padre": "warehouse.stockitems",
+   "hija": "warehouse.stockitemholdings"
+  },
+  {
+   "categoria": "if_exists_guarda",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 43,
+   "detalle": "IF EXISTS sin ELSE con cuerpo guarda: guarda o configuración idempotente",
+   "fragmento": "IF EXISTS (SELECT 1 FROM @OrdersToInvoice AS oti WHERE NOT EXISTS (SELECT 1 FROM @InvoicesToGenerate AS itg WHERE itg.OrderID = oti.OrderID))",
+   "cuerpo": "guarda"
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 46,
+   "detalle": "número en duro 51000 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'At least one orderID either does not exist, is not picked, or is already invoiced', 1;",
+   "clase": "número",
+   "valor": "51000",
+   "lineas": [
+    46
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 64,
+   "detalle": "número en duro 126 (1 vez/veces)",
+   "fragmento": "N'$.EventTime', CONVERT(nvarchar(20), SYSDATETIME(), 126)),",
+   "clase": "número",
+   "valor": "126",
+   "lineas": [
+    64
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 65,
+   "detalle": "número en duro 1050 (1 vez/veces)",
+   "fragmento": "N'$.ConNote', N'EAN-125-' + CAST(itg.InvoiceID + 1050 AS nvarchar(20)))),",
+   "clase": "número",
+   "valor": "1050",
+   "lineas": [
+    65
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 81,
+   "detalle": "número en duro 100.0 (2 vez/veces)",
+   "fragmento": "ROUND(ol.PickedQuantity * ol.UnitPrice * ol.TaxRate / 100.0, 2),",
+   "clase": "número",
+   "valor": "100.0",
+   "lineas": [
+    81,
+    84
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 81,
+   "detalle": "número en duro 2 (4 vez/veces)",
+   "fragmento": "ROUND(ol.PickedQuantity * ol.UnitPrice * ol.TaxRate / 100.0, 2),",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    81,
+    82,
+    83,
+    84
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 98,
+   "detalle": "código en duro N'Stock Issue' (1 vez/veces)",
+   "fragmento": "SELECT il.StockItemID, (SELECT TransactionTypeID FROM [Application].TransactionTypes WHERE TransactionTypeName = N'Stock Issue'),",
+   "clase": "código",
+   "valor": "N'Stock Issue'",
+   "lineas": [
+    98
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.invoicecustomerorders",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 129,
+   "detalle": "código en duro N'Customer Invoice' (1 vez/veces)",
+   "fragmento": "(SELECT TransactionTypeID FROM [Application].TransactionTypes WHERE TransactionTypeName = N'Customer Invoice'),",
+   "clase": "código",
+   "valor": "N'Customer Invoice'",
+   "lineas": [
+    129
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.recordcoldroomtemperatures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 9,
+   "detalle": "código en duro N'English' (1 vez/veces)",
+   "fragmento": "LANGUAGE = N'English'",
+   "clase": "código",
+   "valor": "N'English'",
+   "lineas": [
+    9
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.recordcoldroomtemperatures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 47,
+   "detalle": "número en duro 51000 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'Unable to apply the sensor data', 2;",
+   "clase": "número",
+   "valor": "51000",
+   "lineas": [
+    47
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.recordcoldroomtemperatures",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 47,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'Unable to apply the sensor data', 2;",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    47
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.recordvehicletemperature",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 10,
+   "detalle": "código en duro N'JSON sensor data is invalid. An example of what is required is as follows:' (1 vez/veces)",
+   "fragmento": "DECLARE @HelpMessage nvarchar(max) = N'JSON sensor data is invalid. An example of what is required is as follows:' + @CrLf + @CrLf",
+   "clase": "código",
+   "valor": "N'JSON sensor data is invalid. An example of what is required is as follows:'",
+   "lineas": [
+    10
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.recordvehicletemperature",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 21,
+   "detalle": "número en duro 51000 (2 vez/veces)",
+   "fragmento": "THROW 51000, N'FullSensorDataArray must be valid JSON data', 1;",
+   "clase": "número",
+   "valor": "51000",
+   "lineas": [
+    21,
+    53
+   ]
+  },
+  {
+   "categoria": "literal_magico",
+   "objeto": "website.recordvehicletemperature",
+   "tipo_objeto": "PROCEDIMIENTO",
+   "linea": 53,
+   "detalle": "número en duro 2 (1 vez/veces)",
+   "fragmento": "THROW 51000, N'Valid JSON was supplied but does not match the temperature recordings array structure', 2;",
+   "clase": "número",
+   "valor": "2",
+   "lineas": [
+    53
+   ]
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries.formalname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries.isoalpha3code",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries.isonumericcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries.countrytype",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries.border",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries_archive.formalname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries_archive.isoalpha3code",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries_archive.isonumericcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries_archive.countrytype",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.countries_archive.border",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "application.deliverymethods_archive",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people.logonname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people.isexternallogonprovider",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people.issystemuser",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people.emailaddress",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people.customfields",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people.otherlanguages",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people_archive.logonname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people_archive.isexternallogonprovider",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people_archive.issystemuser",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people_archive.emailaddress",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people_archive.customfields",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.people_archive.otherlanguages",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.stateprovinces.stateprovincecode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.stateprovinces.border",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.stateprovinces_archive.stateprovincecode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "application.stateprovinces_archive.border",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "application.systemparameters",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderlines.purchaseorderlineid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderlines.expectedunitpriceperouter",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorderlines.lastreceiptdate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.purchaseorders.isorderfinalized",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.postalcityid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.bankaccountname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.bankaccountbranch",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.bankaccountcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.bankaccountnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.bankinternationalcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.postaladdressline1",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.postaladdressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers.postalpostalcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.postalcityid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.bankaccountname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.bankaccountbranch",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.bankaccountcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.bankaccountnumber",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.bankinternationalcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.postaladdressline1",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.postaladdressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "purchasing.suppliers_archive.postalpostalcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.postalcityid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.creditlimit",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.accountopeneddate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.standarddiscountpercentage",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.isstatementsent",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.isoncredithold",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.postaladdressline1",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.postaladdressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers.postalpostalcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.postalcityid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.creditlimit",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.accountopeneddate",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.standarddiscountpercentage",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.isstatementsent",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.isoncredithold",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.postaladdressline1",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.postaladdressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.customers_archive.postalpostalcode",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.invoices.confirmedreceivedby",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.specialdeals.specialdealid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "sales.specialdeals.dealdescription",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "warehouse.coldroomtemperatures.coldroomtemperatureid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "warehouse.coldroomtemperatures_archive",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "warehouse.colors_archive",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "warehouse.packagetypes_archive",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "warehouse.stockgroups",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "tabla_sin_lectura",
+   "objeto": "warehouse.stockgroups_archive",
+   "tipo_objeto": "TABLA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee (sólo se escribe o la lee otra aplicación)"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "warehouse.stockitems.marketingcomments",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "warehouse.stockitems.customfields",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "warehouse.stockitems_archive.marketingcomments",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "warehouse.stockitems_archive.customfields",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "columna_sin_lectura",
+   "objeto": "warehouse.stockitemstockgroups.stockitemstockgroupid",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "ningún procedimiento, vista, trigger ni job la lee: sólo una comparación de esquema columna por columna nota si se pierde"
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "purchasing.suppliertransactions.amountexcludingtax",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "366 filas (15.0%) con Decimal('0.00'): 0.00 queda fuera del rango del resto de la columna (76.80 … 1627734.00); la columna no usa NULL",
+   "valor": "0.00",
+   "filas": 366,
+   "total": 2438,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "purchasing.suppliertransactions.taxamount",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "366 filas (15.0%) con Decimal('0.00'): 0.00 queda fuera del rango del resto de la columna (11.52 … 244160.10); la columna no usa NULL",
+   "valor": "0.00",
+   "filas": 366,
+   "total": 2438,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "purchasing.suppliertransactions.outstandingbalance",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "2,436 filas (99.9%) con Decimal('0.00'): 0.00 queda fuera del rango del resto de la columna (849784.11 … 1871894.10); la columna no usa NULL",
+   "valor": "0.00",
+   "filas": 2436,
+   "total": 2438,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "sales.customertransactions.amountexcludingtax",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "26,637 filas (27.4%) con Decimal('0.00'): 0.00 queda fuera del rango del resto de la columna (4.80 … 32026.00); la columna no usa NULL",
+   "valor": "0.00",
+   "filas": 26637,
+   "total": 97147,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "sales.customertransactions.taxamount",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "26,637 filas (27.4%) con Decimal('0.00'): 0.00 queda fuera del rango del resto de la columna (0.72 … 4803.90); la columna no usa NULL",
+   "valor": "0.00",
+   "filas": 26637,
+   "total": 97147,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "sales.customertransactions.outstandingbalance",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "97,063 filas (99.9%) con Decimal('0.00'): 0.00 queda fuera del rango del resto de la columna (44.85 … 28280.80); la columna no usa NULL",
+   "valor": "0.00",
+   "filas": 97063,
+   "total": 97147,
+   "usa_null": false
+  },
+  {
+   "categoria": "centinela",
+   "objeto": "sales.invoices.totalchilleritems",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "69,519 filas (98.6%) con Decimal('0'): 0 queda fuera del rango del resto de la columna (1 … 3); la columna no usa NULL",
+   "valor": "0",
+   "filas": 69519,
+   "total": 70510,
+   "usa_null": false
+  },
+  {
+   "categoria": "mojibake",
+   "objeto": "application.people.fullname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "1 filas con secuencias de UTF-8 leído como latin-1; en la muestra, 1 de 1 valores distintos se reparan al revertir la decodificación",
+   "filas": 1,
+   "ejemplos": [
+    "'Vicente Ch\\xc3\\xa1vez'"
+   ]
+  },
+  {
+   "categoria": "mojibake",
+   "objeto": "application.people.searchname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "1 filas con secuencias de UTF-8 leído como latin-1; en la muestra, 1 de 1 valores distintos se reparan al revertir la decodificación",
+   "filas": 1,
+   "ejemplos": [
+    "'Vicente Vicente Ch\\xc3\\xa1vez'"
+   ]
+  },
+  {
+   "categoria": "mojibake",
+   "objeto": "sales.customers.deliveryaddressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "2 filas con secuencias de UTF-8 leído como latin-1; en la muestra, 2 de 2 valores distintos se reparan al revertir la decodificación",
+   "filas": 2,
+   "ejemplos": [
+    "'148 Ch\\xc3\\xa1vez Street'",
+    "'1774 Ch\\xc3\\xa1vez Road'"
+   ]
+  },
+  {
+   "categoria": "mojibake",
+   "objeto": "sales.customers.postaladdressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "2 filas con secuencias de UTF-8 leído como latin-1; en la muestra, 1 de 1 valores distintos se reparan al revertir la decodificación",
+   "filas": 2,
+   "ejemplos": [
+    "'Ch\\xc3\\xa1vezville'"
+   ]
+  },
+  {
+   "categoria": "mojibake",
+   "objeto": "sales.invoices.deliveryinstructions",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "213 filas con secuencias de UTF-8 leído como latin-1; en la muestra, 2 de 2 valores distintos se reparan al revertir la decodificación",
+   "filas": 213,
+   "ejemplos": [
+    "'Shop 144, 1774 Ch\\xc3\\xa1vez Road'",
+    "'Suite 72, 148 Ch\\xc3\\xa1vez Street'"
+   ]
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "application.cities.cityname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "14,668 filas repiten un valor (23,272 distintos en 37,940); las filas repetidas comparten el 50% de sus columnas (dos filas cualesquiera, el 52%); en 40 de 40 grupos la fila de id mayor es la de ValidTo más reciente",
+   "similitud": 0.504,
+   "similitud_base": 0.521,
+   "repetidas": 14668
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "application.people.preferredname",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "231 filas repiten un valor (880 distintos en 1,111); las filas repetidas comparten el 69% de sus columnas (dos filas cualesquiera, el 63%); en 40 de 40 grupos la fila de id mayor es la de ValidTo más reciente",
+   "similitud": 0.693,
+   "similitud_base": 0.627,
+   "repetidas": 231
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "application.people.userpreferences",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "123 filas repiten un valor (59 distintos en 182); las filas repetidas comparten el 46% de sus columnas (dos filas cualesquiera, el 63%); en 40 de 40 grupos la fila de id mayor es la de ValidFrom más reciente",
+   "similitud": 0.457,
+   "similitud_base": 0.627,
+   "repetidas": 123
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "application.people.emailaddress",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "81 filas repiten un valor (1,029 distintos en 1,110); las filas repetidas comparten el 71% de sus columnas (dos filas cualesquiera, el 63%); en 40 de 40 grupos la fila de id mayor es la de ValidTo más reciente",
+   "similitud": 0.708,
+   "similitud_base": 0.627,
+   "repetidas": 81
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "application.people.otherlanguages",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "2 filas repiten un valor (17 distintos en 19); las filas repetidas comparten el 53% de sus columnas (dos filas cualesquiera, el 63%); en 1 de 1 grupos la fila de id mayor es la de ValidFrom más reciente",
+   "similitud": 0.526,
+   "similitud_base": 0.627,
+   "repetidas": 2
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "sales.customers.websiteurl",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "60 filas repiten un valor (603 distintos en 663); las filas repetidas comparten el 34% de sus columnas (dos filas cualesquiera, el 50%); en 1 de 1 grupos la fila de id mayor es la de AccountOpenedDate más reciente",
+   "similitud": 0.345,
+   "similitud_base": 0.503,
+   "repetidas": 60
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "sales.customers.deliveryaddressline1",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "300 filas repiten un valor (363 distintos en 663); las filas repetidas comparten el 38% de sus columnas (dos filas cualesquiera, el 50%); en 40 de 40 grupos la fila de id mayor es la de AccountOpenedDate más reciente",
+   "similitud": 0.378,
+   "similitud_base": 0.503,
+   "repetidas": 300
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "sales.customers.postaladdressline1",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "19 filas repiten un valor (644 distintos en 663); las filas repetidas comparten el 40% de sus columnas (dos filas cualesquiera, el 50%); en 19 de 19 grupos la fila de id mayor es la de AccountOpenedDate más reciente",
+   "similitud": 0.396,
+   "similitud_base": 0.503,
+   "repetidas": 19
+  },
+  {
+   "categoria": "llave_candidata_con_duplicados",
+   "objeto": "sales.customers.postaladdressline2",
+   "tipo_objeto": "COLUMNA",
+   "linea": null,
+   "fragmento": "",
+   "detalle": "211 filas repiten un valor (452 distintos en 663); las filas repetidas comparten el 43% de sus columnas (dos filas cualesquiera, el 50%); en 40 de 40 grupos la fila de id mayor es la de AccountOpenedDate más reciente",
+   "similitud": 0.429,
+   "similitud_base": 0.503,
+   "repetidas": 211
+  }
+ ],
+ "resumen": {
+  "literal_magico": 87,
+  "if_exists_guarda": 65,
+  "inner_join_hija": 7,
+  "columna_sin_lectura": 75,
+  "tabla_sin_lectura": 7,
+  "centinela": 7,
+  "mojibake": 5,
+  "llave_candidata_con_duplicados": 9
+ },
+ "tiempos": {
+  "arranque_contenedor": 6.4,
+  "restauracion": 8.2,
+  "inventario": 2.8,
+  "patrones_codigo": 0.1,
+  "patrones_datos": 29.9,
+  "total": 47.9
+ }
+}
