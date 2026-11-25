@@ -37,3 +37,9 @@ ruta; aquí no hay identidad que probar, e inventar una sólo para tener esas pr
 ## Consecuencias
 El repositorio no debe desplegarse con datos reales tal cual. Agregar una ruta exige actualizar este ADR y la prueba
 de superficie; la autorización entra con el primer consumidor real, con las pruebas del punto 4.
+
+## Actualización (ADR 0017)
+La superficie suma `POST /graphql`, de SÓLO LECTURA. Se enruta con todos los verbos y HotChocolate sólo ejecuta POST
+con JSON. La prueba de superficie lo lista como `* /graphql`, y `GraphQL.ContratoTests` prueba que GET no ejecuta
+consultas. Su contrato de errores lleva `extensions.code` y no filtra nada interno, igual que el `problem+json` de
+esta API. Con usuarios reales, cada campo raíz lleva los mismos roles que su ruta REST equivalente.
