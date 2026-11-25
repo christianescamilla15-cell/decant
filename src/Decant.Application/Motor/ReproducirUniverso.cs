@@ -17,17 +17,26 @@ namespace Decant.Application.Motor;
 /// </summary>
 public sealed record ReproducirUniverso(OpcionesDelMotor Opciones, string Origen) : ISolicitud<ResumenDeReplay>;
 
+/// <remarks>
+/// <see cref="Errores"/> son RECHAZOS de validación o de negocio (un mensaje mal formado, un re-registro de algo no
+/// enviado): se cuentan, quedan con su motivo y NO se reintentan. Un error técnico (la base no responde) es una
+/// excepción y la corrida no guarda nada: el estado anterior queda intacto y volver a correr es reanudar.
+/// </remarks>
 public sealed record ResumenDeReplay(
     int Operaciones, int Documentos, int Registros, int ReRegistros, int Confirmaciones,
     int ConfirmacionesConSegundosDelRespaldo, int Liquidaciones, int Descartadas, int Huerfanas, int Noches,
     int Vencidas, int Conciliadas, int Marcas, DateTimeOffset FinDelUniverso, DateTimeOffset Limite,
-    IReadOnlyDictionary<string, int> Errores);
+    IReadOnlyDictionary<string, int> Errores, int Archivos = 0, int ArchivosConFalla = 0,
+    int ConfirmacionesRepetidas = 0);
 
 public sealed class ReproducirUniversoManejador(IUniverso universo, IAlmacenTobe almacen, IClock relojDelSistema)
     : IManejador<ReproducirUniverso, ResumenDeReplay>
 {
     public const string ReglaVencimiento = "R10-vencimiento";
     public const string ReglaConciliacion = "R07-conciliacion";
+
+    /// <summary>Estado de un archivo del lote que no se pudo leer (los demás se procesan igual).</summary>
+    public const string EstadoNoLeido = "no se pudo leer";
 
     private enum Tipo
     {
@@ -43,11 +52,12 @@ public sealed class ReproducirUniversoManejador(IUniverso universo, IAlmacenTobe
         var errores = new Dictionary<string, int>(StringComparer.Ordinal);
         void Contar(Error e) => errores[e.Codigo] = errores.GetValueOrDefault(e.Codigo) + 1;
 
-        // 1. operaciones, en orden de llegada: el folio FX es el consumible en ese orden
+        // 1. operaciones, en orden de llegada: el folio FX es el consumible en ese orden. La llegada es el id (la
+        // identidad del legado), explícito: el resultado no depende del orden en que venga el lote.
         var consecutivos = new Consecutivos(universo.Series());
         var operaciones = new Dictionary<long, Operacion>();
         var primerDia = DateOnly.MaxValue;
-        foreach (var entrada in universo.Operaciones())
+        foreach (var entrada in universo.Operaciones().OrderBy(e => e.Id))
         {
             var datos = Entradas.Operacion(entrada);
             if (!datos.EsExito)
@@ -96,17 +106,60 @@ public sealed class ReproducirUniversoManejador(IUniverso universo, IAlmacenTobe
 
         var confirmaciones = 0;
         var conSegundos = 0;
+        var repetidas = 0;
         long secuencia = 0;
-        foreach (var mensaje in universo.MensajesDelBuzon())
+        var vistas = new HashSet<(Guid, string, DateTime)>();
+        var archivos = new List<ResultadoDeArchivo>();
+        var lote = new List<ConfirmacionDelCorresponsal>();
+        foreach (var archivo in universo.ArchivosDelBuzon())
         {
-            var leida = Mt910.Leer(mensaje);
-            if (!leida.EsExito)
+            // cada archivo deja su resultado aunque falle (o falle otro): nada se detiene por un archivo dañado
+            if (archivo.Contenido is null)
             {
-                Contar(leida.Error!);
+                archivos.Add(new ResultadoDeArchivo(archivo.Nombre, 0, 0, 0, 0, EstadoNoLeido,
+                    archivo.FallaDeLectura ?? string.Empty));
                 continue;
             }
 
-            var confirmacion = leida.Valor;
+            int mensajes = 0, leidos = 0, rechazados = 0, repetidosAqui = 0;
+            var motivos = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var mensaje in Mt910.Separar(archivo.Contenido))
+            {
+                mensajes++;
+                var leida = Mt910.Leer(mensaje);
+                if (!leida.EsExito)
+                {
+                    rechazados++;
+                    motivos.Add(leida.Error!.Codigo);
+                    Contar(leida.Error!);
+                    continue;
+                }
+
+                // la misma confirmación dos veces en el lote (un archivo repetido) cuenta UNA vez
+                if (!vistas.Add((leida.Valor.Uetr, leida.Valor.TrnCorresponsal, leida.Valor.HoraLocal)))
+                {
+                    repetidosAqui++;
+                    repetidas++;
+                    continue;
+                }
+
+                leidos++;
+                lote.Add(leida.Valor);
+            }
+
+            archivos.Add(new ResultadoDeArchivo(archivo.Nombre, mensajes, leidos, rechazados, repetidosAqui,
+                rechazados == 0 ? "leído" : "leído con rechazos", string.Join(", ", motivos)));
+        }
+
+        // el desempate entre confirmaciones del mismo instante no depende del orden de los archivos
+        lote.Sort((a, b) =>
+        {
+            var c = a.Uetr.CompareTo(b.Uetr);
+            return c == 0 ? string.CompareOrdinal(a.TrnCorresponsal, b.TrnCorresponsal) : c;
+        });
+        foreach (var leida in lote)
+        {
+            var confirmacion = leida;
             if (segundos.TryGetValue(confirmacion.TrnCorresponsal, out var exacta))
             {
                 var precisa = confirmacion.ConSegundos(exacta);
@@ -304,11 +357,12 @@ public sealed class ReproducirUniversoManejador(IUniverso universo, IAlmacenTobe
         var estado = new EstadoTobe(
             new Corrida("replay", VersionDeReglas.Actual, inicioCorrida, limite, banderas, solicitud.Origen),
             universo.Monedas(), consecutivos.Siguientes, operaciones.Values.OrderBy(o => o.Id).ToList(),
-            documentos.Values.ToList(), descartadas, marcadas.Values.ToList());
+            documentos.Values.ToList(), descartadas, marcadas.Values.ToList(), archivos);
         await almacen.GuardarAsync(estado, ct);
         return new ResumenDeReplay(operaciones.Count, documentos.Count, registros, reRegistros, confirmaciones,
             conSegundos, liquidaciones, descartadas.Count - huerfanas, huerfanas, noches, vencidas, conciliadas,
-            marcadas.Count, fin, limite, errores);
+            marcadas.Count, fin, limite, errores, archivos.Count,
+            archivos.Count(a => a.Estado == EstadoNoLeido), repetidas);
     }
 
     private static LiquidacionDescartada Descartada(ConfirmacionDelCorresponsal c, string motivo) =>

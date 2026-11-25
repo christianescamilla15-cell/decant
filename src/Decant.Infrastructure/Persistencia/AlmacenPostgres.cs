@@ -97,7 +97,21 @@ public sealed class AlmacenPostgres(DecantDbContext contexto) : IAlmacenTobe
                     w.Write(m.Cumple, NpgsqlDbType.Boolean);
                     Txt(w, m.Detalle);
                 }, ct);
-            await InsertarCorrida(conexion, transaccion, estado.Corrida, ct);
+            var corrida = await InsertarCorrida(conexion, transaccion, estado.Corrida, ct);
+            await Copiar(conexion,
+                "resultado_archivo (corrida_id, archivo, mensajes, leidos, rechazados, repetidos, estado, detalle)",
+                estado.Archivos ?? [],
+                (w, a) =>
+                {
+                    w.Write(corrida, NpgsqlDbType.Integer);
+                    Txt(w, a.Archivo);
+                    w.Write(a.Mensajes, NpgsqlDbType.Integer);
+                    w.Write(a.Leidos, NpgsqlDbType.Integer);
+                    w.Write(a.Rechazados, NpgsqlDbType.Integer);
+                    w.Write(a.Repetidos, NpgsqlDbType.Integer);
+                    Txt(w, a.Estado);
+                    Txt(w, a.Detalle);
+                }, ct);
             await transaccion.CommitAsync(ct);
         }
         finally
@@ -163,12 +177,13 @@ public sealed class AlmacenPostgres(DecantDbContext contexto) : IAlmacenTobe
         }
     }
 
-    private static async Task InsertarCorrida(NpgsqlConnection conexion, NpgsqlTransaction transaccion,
+    /// <summary>Registra la corrida y devuelve su id (los resultados por archivo cuelgan de ella).</summary>
+    private static async Task<int> InsertarCorrida(NpgsqlConnection conexion, NpgsqlTransaction transaccion,
         Corrida corrida, CancellationToken ct)
     {
         await using var comando = new NpgsqlCommand(
             $"INSERT INTO {DecantDbContext.Esquema}.corrida (tipo, version_reglas, inicio, hasta, banderas, origen) " +
-            "VALUES (@tipo, @version, @inicio, @hasta, @banderas, @origen)", conexion, transaccion);
+            "VALUES (@tipo, @version, @inicio, @hasta, @banderas, @origen) RETURNING id", conexion, transaccion);
         comando.Parameters.AddWithValue("tipo", corrida.Tipo);
         comando.Parameters.AddWithValue("version", corrida.VersionDeReglas);
         comando.Parameters.AddWithValue("inicio", corrida.Inicio.ToUniversalTime());
@@ -181,7 +196,7 @@ public sealed class AlmacenPostgres(DecantDbContext contexto) : IAlmacenTobe
             Value = corrida.Banderas is { } b ? Describir(b) : DBNull.Value,
         });
         comando.Parameters.AddWithValue("origen", corrida.Origen);
-        await comando.ExecuteNonQueryAsync(ct);
+        return (int)(await comando.ExecuteScalarAsync(ct))!;
     }
 
     private static string Describir(Banderas b) =>

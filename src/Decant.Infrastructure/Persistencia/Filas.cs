@@ -126,3 +126,17 @@ public sealed class CorridaFila
     public string? Banderas { get; set; }
     public required string Origen { get; set; }
 }
+
+/// <summary>Lo que dejó cada archivo del lote en una corrida (se acumula con la corrida, no se vacía).</summary>
+public sealed class ResultadoDeArchivoFila
+{
+    public long Id { get; set; }
+    public int CorridaId { get; set; }
+    public required string Archivo { get; set; }
+    public int Mensajes { get; set; }
+    public int Leidos { get; set; }
+    public int Rechazados { get; set; }
+    public int Repetidos { get; set; }
+    public required string Estado { get; set; }
+    public required string Detalle { get; set; }
+}

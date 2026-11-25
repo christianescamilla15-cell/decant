@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Decant.Application.Puertos;
 using Decant.Domain.Comun;
 using Decant.Domain.Conciliacion;
@@ -57,16 +58,31 @@ public sealed class UniversoEnArchivos(string carpeta) : IUniverso
         Jsonl.Leer(Ruta("partida_solicitada.jsonl"), ColumnasPartida).Select(f => new PartidaDeEntrada(
             f.Largo("id"), f.Decimal("monto"), f.Hora("fecha_hora"), f.Requerido("referencia")));
 
-    /// <summary>Todos los mensajes del buzón del corresponsal, archivo por archivo en orden de fecha.</summary>
-    public IEnumerable<string> MensajesDelBuzon()
+    /// <summary>UTF-8 ESTRICTO: un byte inválido es un archivo dañado, no un carácter de reemplazo silencioso.</summary>
+    private static readonly UTF8Encoding Utf8Estricto = new(encoderShouldEmitUTF8Identifier: false,
+        throwOnInvalidBytes: true);
+
+    /// <summary>
+    /// Los archivos del buzón del corresponsal en orden de nombre (fecha). Un archivo que no se puede leer (permisos,
+    /// bytes inválidos) se devuelve con su falla y NO detiene a los demás.
+    /// </summary>
+    public IEnumerable<ArchivoDeInterfaz> ArchivosDelBuzon()
     {
         var buzon = Path.Combine(carpeta, "interfaces", "corresponsal");
         foreach (var archivo in Directory.GetFiles(buzon, "*.fin").OrderBy(a => a, StringComparer.Ordinal))
         {
-            foreach (var mensaje in Mt910.Separar(File.ReadAllText(archivo)))
+            string? contenido = null;
+            string? falla = null;
+            try
             {
-                yield return mensaje;
+                contenido = File.ReadAllText(archivo, Utf8Estricto);
             }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or DecoderFallbackException)
+            {
+                falla = e.GetType().Name;
+            }
+
+            yield return new ArchivoDeInterfaz(Path.GetFileName(archivo), contenido, falla);
         }
     }
 

@@ -13,12 +13,16 @@ internal sealed class UniversoEnMemoria : IUniverso
     public List<PartidaDeEntrada> ListaPartidas { get; } = [];
     public List<string> Buzon { get; } = [];
 
+    /// <summary>Archivos explícitos; si no hay, los mensajes de <see cref="Buzon"/> llegan en un solo archivo.</summary>
+    public List<ArchivoDeInterfaz> Archivos { get; } = [];
+
     public IReadOnlyList<Moneda> Monedas() => [new("USD", "840", "Dólar estadounidense", 2, true)];
     public IReadOnlyList<string> Series() => ["FX", "OP"];
     public IEnumerable<OperacionDeEntrada> Operaciones() => ListaOperaciones;
     public IEnumerable<RegistroDeEntrada> RegistrosDeOrden() => ListaRegistros;
     public IEnumerable<PartidaDeEntrada> PartidasDelCorresponsal() => ListaPartidas;
-    public IEnumerable<string> MensajesDelBuzon() => Buzon;
+    public IEnumerable<ArchivoDeInterfaz> ArchivosDelBuzon() =>
+        Archivos.Count > 0 ? Archivos : [new ArchivoDeInterfaz("buzon.fin", string.Join("\n$", Buzon), null)];
     public IReadOnlyList<HorarioDelJob> Horario() => [new("conciliacion nocturna", 4, 1, new TimeOnly(23, 30))];
 }
 

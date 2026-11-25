@@ -520,6 +520,61 @@ namespace Decant.Infrastructure.Persistencia.Migraciones
                     b.ToTable("registro_orden", "decant");
                 });
 
+            modelBuilder.Entity("Decant.Infrastructure.Persistencia.ResultadoDeArchivoFila", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Archivo")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("archivo");
+
+                    b.Property<int>("CorridaId")
+                        .HasColumnType("integer")
+                        .HasColumnName("corrida_id");
+
+                    b.Property<string>("Detalle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("detalle");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("estado");
+
+                    b.Property<int>("Leidos")
+                        .HasColumnType("integer")
+                        .HasColumnName("leidos");
+
+                    b.Property<int>("Mensajes")
+                        .HasColumnType("integer")
+                        .HasColumnName("mensajes");
+
+                    b.Property<int>("Rechazados")
+                        .HasColumnType("integer")
+                        .HasColumnName("rechazados");
+
+                    b.Property<int>("Repetidos")
+                        .HasColumnType("integer")
+                        .HasColumnName("repetidos");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CorridaId", "Archivo")
+                        .IsUnique();
+
+                    b.ToTable("resultado_archivo", "decant");
+                });
+
             modelBuilder.Entity("Decant.Infrastructure.Persistencia.OperacionFila", b =>
                 {
                     b.HasOne("Decant.Infrastructure.Persistencia.MonedaFila", null)
@@ -567,6 +622,15 @@ namespace Decant.Infrastructure.Persistencia.Migraciones
                     b.HasOne("Decant.Infrastructure.Persistencia.OrdenFila", null)
                         .WithMany()
                         .HasForeignKey("Uetr")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Decant.Infrastructure.Persistencia.ResultadoDeArchivoFila", b =>
+                {
+                    b.HasOne("Decant.Infrastructure.Persistencia.CorridaFila", null)
+                        .WithMany()
+                        .HasForeignKey("CorridaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

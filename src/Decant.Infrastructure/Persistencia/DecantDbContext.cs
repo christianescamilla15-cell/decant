@@ -21,6 +21,7 @@ public sealed class DecantDbContext(DbContextOptions<DecantDbContext> opciones) 
     public DbSet<LiquidacionDescartadaFila> LiquidacionesDescartadas => Set<LiquidacionDescartadaFila>();
     public DbSet<MarcaFila> Marcas => Set<MarcaFila>();
     public DbSet<CorridaFila> Corridas => Set<CorridaFila>();
+    public DbSet<ResultadoDeArchivoFila> ResultadosDeArchivo => Set<ResultadoDeArchivoFila>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -172,6 +173,23 @@ public sealed class DecantDbContext(DbContextOptions<DecantDbContext> opciones) 
             e.Property(x => x.Hasta).HasColumnName("hasta");
             e.Property(x => x.Banderas).HasColumnName("banderas").HasMaxLength(200);
             e.Property(x => x.Origen).HasColumnName("origen").HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<ResultadoDeArchivoFila>(e =>
+        {
+            e.ToTable("resultado_archivo");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).HasColumnName("id").UseIdentityAlwaysColumn();
+            e.Property(x => x.CorridaId).HasColumnName("corrida_id");
+            e.HasOne<CorridaFila>().WithMany().HasForeignKey(x => x.CorridaId).OnDelete(DeleteBehavior.Cascade);
+            e.Property(x => x.Archivo).HasColumnName("archivo").HasMaxLength(120);
+            e.HasIndex(x => new { x.CorridaId, x.Archivo }).IsUnique();
+            e.Property(x => x.Mensajes).HasColumnName("mensajes");
+            e.Property(x => x.Leidos).HasColumnName("leidos");
+            e.Property(x => x.Rechazados).HasColumnName("rechazados");
+            e.Property(x => x.Repetidos).HasColumnName("repetidos");
+            e.Property(x => x.Estado).HasColumnName("estado").HasMaxLength(30);
+            e.Property(x => x.Detalle).HasColumnName("detalle").HasMaxLength(200);
         });
     }
 

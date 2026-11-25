@@ -67,4 +67,41 @@ public static class Escenario
                 "documento VENCIDA")],
             [new Marca("R10-vencimiento", Vencida.ToString(), Mx(2023, 12, 4, 23, 30), true, "prueba")]);
     }
+
+    /// <summary>
+    /// Bordes de fecha: el último segundo y el primer instante de cada día LOCAL, el día de 25 horas (fin del horario
+    /// de verano, 30-oct-2022) y el de 23 (inicio, 3-abr-2022); y tres fechas valor seguidas para los rangos.
+    /// </summary>
+    public static EstadoTobe Bordes()
+    {
+        var operaciones = new List<Operacion>
+        {
+            Operacion(21, Mx(2022, 10, 29, 23, 59, 59), null, null, 19.9m), // 04:59:59Z del 30 (desfase -5)
+            Operacion(22, Mx(2022, 10, 30, 0, 0, 0), null, null, 19.9m),    // 05:00:00Z del 30
+            Operacion(23, Mx(2022, 10, 30, 23, 59, 59), null, null, 19.9m), // 05:59:59Z del 31 (ya con -6)
+            Operacion(24, Mx(2022, 10, 31, 0, 0, 0), null, null, 19.9m),    // 06:00:00Z del 31
+            Operacion(25, Mx(2022, 4, 3, 23, 59, 59), null, null, 19.9m),   // el día de 23 horas
+            Operacion(26, Mx(2022, 4, 4, 0, 0, 0), null, null, 19.9m),
+        };
+        var ordenes = new List<OrdenDePago>();
+        var uetrs = new[] { Guid.Parse("0c6f3f3e-5a52-4f11-9d0e-2f9b1d1a0001"),
+            Guid.Parse("0c6f3f3e-5a52-4f11-9d0e-2f9b1d1a0002"), Guid.Parse("0c6f3f3e-5a52-4f11-9d0e-2f9b1d1a0003") };
+        for (var i = 0; i < 3; i++)
+        {
+            var valor = new DateOnly(2022, 10, 28).AddDays(i * 3); // 28-oct, 31-oct y 3-nov
+            var referencia = $"BFN22102800000{i + 1}";
+            var orden = OrdenDePago.Registrar(uetrs[i], $"OP-00000001{i}", 21 + i,
+                Orden(referencia, Mx(2022, 10, 27, 10, i), valor, Gastos.Sha), operaciones[i].MontoMxn,
+                Mx(2022, 10, 27, 10, i), 100 + i);
+            orden.RegistrarLiquidacion(new ConfirmacionDelCorresponsal(uetrs[i], referencia, $"FICT00000000010{i}",
+                new DateTime(2022, 10, 28 + i, 9, 0, 0), TimeSpan.FromHours(-4), valor, "USD", 1000.00m, 0m));
+            ordenes.Add(orden);
+        }
+
+        return new EstadoTobe(
+            new Corrida("bordes", VersionDeReglas.Actual, Mx(2026, 11, 25, 12, 0), null, Banderas.Todas, "escenario"),
+            [new Moneda("USD", "840", "Dólar estadounidense", 2, true)],
+            new Dictionary<string, int> { ["FX"] = 27, ["OP"] = 13 },
+            operaciones, ordenes, [], []);
+    }
 }

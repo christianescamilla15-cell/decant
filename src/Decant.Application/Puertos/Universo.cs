@@ -41,6 +41,10 @@ public sealed record PartidaDeEntrada(long Id, decimal Monto, DateTime FechaHora
 
 public sealed record HorarioDelJob(string Nombre, int Frecuencia, int Intervalo, TimeOnly Hora);
 
+/// <summary>Un archivo de interfaz tal como se pudo leer: su contenido o la falla de lectura (un archivo dañado no
+/// detiene a los demás).</summary>
+public sealed record ArchivoDeInterfaz(string Nombre, string? Contenido, string? FallaDeLectura);
+
 /// <summary>
 /// El UNIVERSO: lo único que alimenta el replay. Columnas de entrada del respaldo, archivos de interfaz y horario del
 /// job. No hay manera de pedirle un resultado del legado.
@@ -57,7 +61,8 @@ public interface IUniverso
 
     IEnumerable<PartidaDeEntrada> PartidasDelCorresponsal();
 
-    IEnumerable<string> MensajesDelBuzon();
+    /// <summary>Los archivos del buzón del corresponsal, en orden de nombre (fecha).</summary>
+    IEnumerable<ArchivoDeInterfaz> ArchivosDelBuzon();
 
     IReadOnlyList<HorarioDelJob> Horario();
 }

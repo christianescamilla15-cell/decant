@@ -34,14 +34,31 @@ public sealed class ArchivosTests : IDisposable
     }
 
     [Fact]
-    public void El_buzon_se_lee_archivo_por_archivo_y_mensaje_por_mensaje()
+    public void El_buzon_se_lee_archivo_por_archivo_en_orden_de_fecha()
     {
-        Directory.CreateDirectory(Path.Combine(_carpeta, "interfaces", "corresponsal"));
-        File.WriteAllText(Path.Combine(_carpeta, "interfaces", "corresponsal", "20230601.fin"),
+        var buzon = Directory.CreateDirectory(Path.Combine(_carpeta, "interfaces", "corresponsal")).FullName;
+        File.WriteAllText(Path.Combine(buzon, "20230602.fin"), "{3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n-}\n");
+        File.WriteAllText(Path.Combine(buzon, "20230601.fin"),
             "{3:{121:3edcbeae-c21e-40f1-b309-430eca67e133}}\n:20:A\n-}\n${3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n:20:B\n-}\n");
-        var mensajes = new UniversoEnArchivos(_carpeta).MensajesDelBuzon().ToList();
-        Assert.Equal(2, mensajes.Count);
-        Assert.Contains(":20:B", mensajes[1], StringComparison.Ordinal);
+        var archivos = new UniversoEnArchivos(_carpeta).ArchivosDelBuzon().ToList();
+        Assert.Equal(["20230601.fin", "20230602.fin"], archivos.Select(a => a.Nombre));
+        Assert.All(archivos, a => Assert.Null(a.FallaDeLectura));
+        Assert.Contains(":20:B", archivos[0].Contenido!, StringComparison.Ordinal);
+    }
+
+    /// <summary>Lotes (retro 2): un archivo dañado deja su falla y los demás se leen igual.</summary>
+    [Fact]
+    public void Un_archivo_danado_deja_su_falla_y_no_detiene_a_los_demas()
+    {
+        var buzon = Directory.CreateDirectory(Path.Combine(_carpeta, "interfaces", "corresponsal")).FullName;
+        File.WriteAllText(Path.Combine(buzon, "20230601.fin"), "{3:{121:3edcbeae-c21e-40f1-b309-430eca67e133}}\n-}\n");
+        File.WriteAllBytes(Path.Combine(buzon, "20230602.fin"), [0x3A, 0x32, 0x30, 0x3A, 0xC3, 0x28, 0x0A]);
+        File.WriteAllText(Path.Combine(buzon, "20230603.fin"), "{3:{121:8a235e0d-82f7-4b1c-beff-439ed3620b32}}\n-}\n");
+        var archivos = new UniversoEnArchivos(_carpeta).ArchivosDelBuzon().ToList();
+        Assert.Equal(3, archivos.Count);
+        Assert.Equal((null, "DecoderFallbackException"), (archivos[1].Contenido, archivos[1].FallaDeLectura));
+        Assert.NotNull(archivos[0].Contenido);
+        Assert.NotNull(archivos[2].Contenido);
     }
 
     [Fact]

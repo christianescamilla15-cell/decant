@@ -15,6 +15,11 @@ public sealed record LiquidacionDescartada(
     Guid Uetr, string ReferenciaMt103, string TrnCorresponsal, DateTimeOffset Instante, decimal Abono,
     decimal Comision, string Motivo);
 
+/// <summary>Lo que dejó cada archivo del lote, aunque otros hayan fallado: mensajes, leídos, rechazados por
+/// formato, repetidos y su estado.</summary>
+public sealed record ResultadoDeArchivo(
+    string Archivo, int Mensajes, int Leidos, int Rechazados, int Repetidos, string Estado, string Detalle);
+
 public sealed record EstadoTobe(
     Corrida Corrida,
     IReadOnlyList<Moneda> Monedas,
@@ -22,7 +27,8 @@ public sealed record EstadoTobe(
     IReadOnlyList<Operacion> Operaciones,
     IReadOnlyList<OrdenDePago> Ordenes,
     IReadOnlyList<LiquidacionDescartada> Descartadas,
-    IReadOnlyList<Marca> Marcas);
+    IReadOnlyList<Marca> Marcas,
+    IReadOnlyList<ResultadoDeArchivo>? Archivos = null);
 
 /// <summary>Escritura del TO-BE en bloque y lectura de lo resuelto para reprocesar.</summary>
 public interface IAlmacenTobe
