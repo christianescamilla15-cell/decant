@@ -1,0 +1,144 @@
+# Renglones de la puerta de cobertura de salidas (ADR 0014; criterio 1 del plan de S3).
+#
+# Un renglón por objeto del inventario (corte/inventario/objetos.json, que sale del código) y por login observado
+# (corte/inventario/observado.json, que sale del CI). `python -m corte.puerta` exige uno para cada uno.
+#
+# destino:
+#   comparado                su salida se compara con la del TO-BE           → evidencia archivo::prueba (que exista)
+#   reemplazado_con_paridad  el TO-BE hace lo que hacía, con paridad medida  → evidencia archivo::prueba (que exista)
+#   retirado                 nadie lo usa                                     → dueno, fecha y confirmacion_vigia
+#   pendiente                falta                                            → la puerta lo lista (y sale en rojo)
+#
+# Sólo se llenó lo que la semana 2 YA compara (verificación de la migración, motor, paridad de reporte y gemelos).
+# El motor compara el TO-BE contra las TABLAS del respaldo; las pruebas del ciclo atan esas tablas a lo que hacen los
+# procedimientos. La paridad de ESTADO de cada escritor (correrlo y comparar su efecto, ADR 0015) es del paso 6 y
+# no se da por hecha aquí. Todo lo demás es `pendiente`: no se inventan coberturas.
+
+objetos:
+  # ── escritores con paridad del motor (S2) ──────────────────────────────────────────────────────────────────────
+  - objeto: dbo.sp_registrar_operacion
+    destino: reemplazado_con_paridad
+    evidencia:
+      - tests/integracion/test_paridad.py::test_el_motor_no_tiene_defectos_nuestros_y_r08_replica_al_legado
+      - tests/integracion/test_ciclo.py::test_tipo_de_cambio_y_pesos_del_procedimiento_son_los_del_generador
+    nota: motor R01–R03 (folio FX, tipo de cambio, pesos); el ciclo ata el procedimiento al generador en el delta.
+
+  - objeto: dbo.sp_registrar_orden
+    destino: reemplazado_con_paridad
+    evidencia:
+      - tests/integracion/test_paridad.py::test_el_motor_no_tiene_defectos_nuestros_y_r08_replica_al_legado
+      - tests/integracion/test_ciclo.py::test_la_comision_que_trunca_el_procedimiento_es_la_del_generador
+      - tests/integracion/test_ciclo.py::test_el_re_registro_del_procedimiento_reemplaza_y_conserva_el_folio
+    nota: motor R04, R05 y R09 (folio OP, partidas del cliente, re-registro).
+
+  - objeto: dbo.sp_registrar_liquidacion
+    destino: reemplazado_con_paridad
+    evidencia:
+      - tests/integracion/test_paridad.py::test_el_motor_no_tiene_defectos_nuestros_y_r08_replica_al_legado
+    nota: >-
+      motor R06, R07 y R12 (partidas del corresponsal, estatus y descartadas por llegar vencidas). A diferencia de
+      los otros escritores, ninguna prueba del ciclo ata este procedimiento al generador: la paridad de estado del
+      paso 6 lo cerrará.
+
+  - objeto: dbo.sp_conciliar
+    destino: reemplazado_con_paridad
+    evidencia:
+      - tests/integracion/test_paridad.py::test_el_motor_no_tiene_defectos_nuestros_y_r08_replica_al_legado
+      - tests/integracion/test_paridad.py::test_la_correccion_de_t5_es_hipotesis_auditada_en_los_dos_sentidos
+      - tests/integracion/test_ciclo.py::test_el_job_calcula_las_horas_como_el_generador_y_su_getdate_vence_todo_lo_pendiente
+    nota: motor R07 (conciliación y vencimiento con reloj inyectado) y R08 (horas, réplica de T5).
+
+  - objeto: "job:BFN - conciliacion nocturna"
+    destino: reemplazado_con_paridad
+    evidencia:
+      - tests/integracion/test_paridad.py::test_el_motor_no_tiene_defectos_nuestros_y_r08_replica_al_legado
+      - tests/integracion/test_ciclo.py::test_el_job_calcula_las_horas_como_el_generador_y_su_getdate_vence_todo_lo_pendiente
+    nota: >-
+      su único paso es sp_conciliar; el TO-BE corre las noches con el horario del job (universo) y «sólo marca»
+      coincide 100 % con lo que el job dejó en la bitácora (R07 y R10).
+
+  # ── salidas que la semana 2 compara ────────────────────────────────────────────────────────────────────────────
+  - objeto: dbo.sp_reporte_ordenes
+    destino: comparado
+    evidencia:
+      - tests/integracion/test_paridad.py::test_la_paridad_de_reporte_cumple_el_contrato_y_juzga_los_empates_contra_el_piso
+      - tests/integracion/test_paridad.py::test_los_mutantes_del_reporte_fallan_y_ninguna_llave_secundaria_queda_supuesta
+    nota: paridad de reporte contra el reporte del mes que el legado publicó al respaldar.
+
+  - objeto: dbo.vw_reporte_ordenes
+    destino: comparado
+    evidencia:
+      - tests/integracion/test_paridad.py::test_la_paridad_de_reporte_cumple_el_contrato_y_juzga_los_empates_contra_el_piso
+    nota: indirecto, sólo por sp_reporte_ordenes (el reporte del mes); nadie más la lee en el código.
+
+  - objeto: dbo.sp_detalle_operacion
+    destino: comparado
+    evidencia:
+      - tests/integracion/test_paridad.py::test_t4_el_detalle_del_tobe_muestra_lo_que_pinta_cada_rejilla_no_lo_que_dice_la_tabla
+    nota: gemelos, 3 casos (pantalla de detalle contra el JSON de la API).
+
+  - objeto: interfaz:buzon_corresponsal
+    destino: reemplazado_con_paridad
+    evidencia:
+      - tests/integracion/test_paridad.py::test_el_motor_no_tiene_defectos_nuestros_y_r08_replica_al_legado
+      - tests/integracion/test_ciclo.py::test_las_liquidaciones_que_el_legado_descarto_estan_en_el_buzon
+    nota: el TO-BE lee los archivos `.fin` (UniversoEnArchivos.cs) y el motor compara R06, R07 y R12.
+
+  # ── pendientes: lo que la semana 2 no compara ──────────────────────────────────────────────────────────────────
+  - objeto: dbo.sp_lista_operaciones
+    destino: pendiente
+    nota: >-
+      la lista del día anterior se captura al respaldar (oráculo), pero nada la compara con el TO-BE; las cifras del
+      encabezado sólo se cotejan contra el respaldo restaurado.
+
+  - objeto: pantalla:legado/pantalla
+    destino: pendiente
+    nota: el detalle lo comparan los gemelos; la lista y el encabezado, no.
+
+  - objeto: interfaz:archivo_sucursales
+    destino: pendiente
+    nota: el TO-BE no lee el archivo; las operaciones del canal ARCHIVO le llegan de la tabla del respaldo.
+
+  - objeto: dbo.tr_orden_pago_bitacora
+    destino: pendiente
+    nota: >-
+      escribe la bitácora; S2 no la migra como tabla viva (retención) y sólo la usa como fuente del replay y del
+      arbitraje de «sólo marca». Nadie compara lo que escribe. Reemplazar o retirar es decisión con dueño.
+
+  - objeto: dbo.sp_reporte_posicion
+    destino: pendiente
+    nota: ronda 1, T1 (latente); oráculo del corte y variantes del plan.
+
+  - objeto: dbo.sp_ordenes_por_vencer
+    destino: pendiente
+    nota: ronda 1, T2 (reloj por variable); oráculo del corte con reloj inyectado.
+
+  - objeto: dbo.sp_liquidaciones_recientes
+    destino: pendiente
+    nota: ronda 2, T1 (lee la vista con ORDER BY que no ordena).
+
+  - objeto: dbo.vw_liquidaciones_recientes
+    destino: pendiente
+    nota: ronda 2, T1.
+
+  - objeto: dbo.sp_constancia_operacion
+    destino: pendiente
+    nota: ronda 2, T2 (latente).
+
+  - objeto: dbo.sp_tablero_corresponsales
+    destino: pendiente
+    nota: ronda 2, T3 (división entera y AVG de enteros).
+
+  - objeto: dbo.sp_reflejar_estatus_operacion
+    destino: pendiente
+    nota: ronda 3, T1 (UPDATE … FROM 1:N); escritor sin ejecución en el ciclo, va a la paridad de estado.
+
+  - objeto: dbo.sp_antiguedad_ordenes
+    destino: pendiente
+    nota: ronda 3, T2 (reloj dentro de SQL dinámico); oráculo del corte con reloj inyectado.
+
+  - objeto: dbo.sp_alta_manual_orden
+    destino: pendiente
+    nota: ronda 3, T3 (@@IDENTITY con trigger que inserta); escritor de contingencia, va a la paridad de estado.
+
+logins: []

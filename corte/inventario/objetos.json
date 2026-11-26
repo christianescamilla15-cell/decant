@@ -1,0 +1,1059 @@
+{
+ "generado_por": "python -m corte.escribir (desde el código; no editar a mano)",
+ "base": "BFN_DIVISAS",
+ "fuentes": {
+  "sql": [
+   "legado/sql/01_base.sql",
+   "legado/sql/02_tablas.sql",
+   "legado/sql/03_vista.sql",
+   "legado/sql/04_trigger.sql",
+   "legado/sql/05_procedimientos.sql",
+   "legado/sql/06_job.sql"
+  ],
+  "pantalla": [
+   "legado/pantalla/__init__.py",
+   "legado/pantalla/app.py"
+  ],
+  "interfaces": "legado/generador/interfaces.py"
+ },
+ "por_tipo": {
+  "procedimiento": 15,
+  "vista": 2,
+  "trigger": 1,
+  "funcion": 0,
+  "job": 1,
+  "interfaz": 2,
+  "pantalla": 1
+ },
+ "objetos": [
+  {
+   "id": "dbo.sp_alta_manual_orden",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:342",
+   "acceso": "escribe",
+   "lee": [],
+   "escribe": {
+    "dbo.folio": [
+     "UPDATE"
+    ],
+    "dbo.orden_pago": [
+     "INSERT"
+    ]
+   },
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [
+    "GETDATE"
+   ],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [
+    "@@IDENTITY"
+   ],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [],
+    "escribe": {
+     "dbo.bitacora": [
+      "INSERT"
+     ],
+     "dbo.folio": [
+      "UPDATE"
+     ],
+     "dbo.orden_pago": [
+      "INSERT"
+     ]
+    },
+    "llama": [],
+    "dispara": [
+     "dbo.tr_orden_pago_bitacora"
+    ],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE",
+     "GETDATE (dbo.tr_orden_pago_bitacora)"
+    ],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_antiguedad_ordenes",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:325",
+   "acceso": "lee",
+   "lee": [
+    "dbo.orden_pago"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [
+    "GETDATE (en SQL dinámico)"
+   ],
+   "sql_dinamico": [
+    "sp_executesql"
+   ],
+   "desde_sql_dinamico": [
+    "dbo.orden_pago"
+   ],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.orden_pago"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE (en SQL dinámico)"
+    ],
+    "sql_dinamico": [
+     "sp_executesql (dbo.sp_antiguedad_ordenes)"
+    ]
+   }
+  },
+  {
+   "id": "dbo.sp_conciliar",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:120",
+   "acceso": "escribe",
+   "lee": [
+    "dbo.orden_pago",
+    "dbo.partida_liquidada",
+    "dbo.partida_solicitada"
+   ],
+   "escribe": {
+    "dbo.orden_pago": [
+     "UPDATE"
+    ]
+   },
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [
+    "GETDATE"
+   ],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [
+    "#lote"
+   ],
+   "efectivo": {
+    "lee": [
+     "dbo.orden_pago",
+     "dbo.partida_liquidada",
+     "dbo.partida_solicitada"
+    ],
+    "escribe": {
+     "dbo.bitacora": [
+      "INSERT"
+     ],
+     "dbo.orden_pago": [
+      "UPDATE"
+     ]
+    },
+    "llama": [],
+    "dispara": [
+     "dbo.tr_orden_pago_bitacora"
+    ],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE",
+     "GETDATE (dbo.tr_orden_pago_bitacora)"
+    ],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_constancia_operacion",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:271",
+   "acceso": "lee",
+   "lee": [
+    "dbo.operacion",
+    "dbo.orden_pago"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.operacion",
+     "dbo.orden_pago"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_detalle_operacion",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:163",
+   "acceso": "lee",
+   "lee": [
+    "dbo.moneda",
+    "dbo.operacion",
+    "dbo.orden_pago",
+    "dbo.partida_liquidada",
+    "dbo.partida_solicitada"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.moneda",
+     "dbo.operacion",
+     "dbo.orden_pago",
+     "dbo.partida_liquidada",
+     "dbo.partida_solicitada"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_liquidaciones_recientes",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:260",
+   "acceso": "lee",
+   "lee": [
+    "dbo.vw_liquidaciones_recientes"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.vw_liquidaciones_recientes"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_lista_operaciones",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:143",
+   "acceso": "lee",
+   "lee": [
+    "dbo.operacion",
+    "dbo.orden_pago"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.operacion",
+     "dbo.orden_pago"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_ordenes_por_vencer",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:244",
+   "acceso": "lee",
+   "lee": [
+    "dbo.orden_pago"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [
+    "GETDATE"
+   ],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.orden_pago"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE"
+    ],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_reflejar_estatus_operacion",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:311",
+   "acceso": "escribe",
+   "lee": [
+    "dbo.operacion",
+    "dbo.orden_pago"
+   ],
+   "escribe": {
+    "dbo.operacion": [
+     "UPDATE"
+    ]
+   },
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.operacion",
+     "dbo.orden_pago"
+    ],
+    "escribe": {
+     "dbo.operacion": [
+      "UPDATE"
+     ]
+    },
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_registrar_liquidacion",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:93",
+   "acceso": "escribe",
+   "lee": [
+    "dbo.orden_pago"
+   ],
+   "escribe": {
+    "dbo.orden_pago": [
+     "UPDATE"
+    ],
+    "dbo.partida_solicitada": [
+     "INSERT"
+    ]
+   },
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.orden_pago"
+    ],
+    "escribe": {
+     "dbo.bitacora": [
+      "INSERT"
+     ],
+     "dbo.orden_pago": [
+      "UPDATE"
+     ],
+     "dbo.partida_solicitada": [
+      "INSERT"
+     ]
+    },
+    "llama": [],
+    "dispara": [
+     "dbo.tr_orden_pago_bitacora"
+    ],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE (dbo.tr_orden_pago_bitacora)"
+    ],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_registrar_operacion",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:4",
+   "acceso": "escribe",
+   "lee": [],
+   "escribe": {
+    "dbo.folio": [
+     "UPDATE"
+    ],
+    "dbo.operacion": [
+     "INSERT"
+    ]
+   },
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [
+    "GETDATE"
+   ],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [
+    "SCOPE_IDENTITY"
+   ],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [],
+    "escribe": {
+     "dbo.folio": [
+      "UPDATE"
+     ],
+     "dbo.operacion": [
+      "INSERT"
+     ]
+    },
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE"
+    ],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_registrar_orden",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:37",
+   "acceso": "escribe",
+   "lee": [
+    "dbo.operacion",
+    "dbo.orden_pago"
+   ],
+   "escribe": {
+    "dbo.folio": [
+     "UPDATE"
+    ],
+    "dbo.orden_pago": [
+     "INSERT",
+     "UPDATE"
+    ],
+    "dbo.partida_liquidada": [
+     "INSERT"
+    ]
+   },
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [
+    "GETDATE"
+   ],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [
+    "SCOPE_IDENTITY"
+   ],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.operacion",
+     "dbo.orden_pago"
+    ],
+    "escribe": {
+     "dbo.bitacora": [
+      "INSERT"
+     ],
+     "dbo.folio": [
+      "UPDATE"
+     ],
+     "dbo.orden_pago": [
+      "INSERT",
+      "UPDATE"
+     ],
+     "dbo.partida_liquidada": [
+      "INSERT"
+     ]
+    },
+    "llama": [],
+    "dispara": [
+     "dbo.tr_orden_pago_bitacora"
+    ],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE",
+     "GETDATE (dbo.tr_orden_pago_bitacora)"
+    ],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_reporte_ordenes",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:190",
+   "acceso": "lee",
+   "lee": [
+    "dbo.vw_reporte_ordenes"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.vw_reporte_ordenes"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_reporte_posicion",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:204",
+   "acceso": "lee",
+   "lee": [
+    "dbo.moneda",
+    "dbo.operacion"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.moneda",
+     "dbo.operacion"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.sp_tablero_corresponsales",
+   "tipo": "procedimiento",
+   "fuente": "legado/sql/05_procedimientos.sql:293",
+   "acceso": "lee",
+   "lee": [
+    "dbo.operacion",
+    "dbo.orden_pago"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.operacion",
+     "dbo.orden_pago"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.vw_liquidaciones_recientes",
+   "tipo": "vista",
+   "fuente": "legado/sql/03_vista.sql:14",
+   "acceso": "lee",
+   "lee": [
+    "dbo.orden_pago",
+    "dbo.partida_solicitada"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.orden_pago",
+     "dbo.partida_solicitada"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.vw_reporte_ordenes",
+   "tipo": "vista",
+   "fuente": "legado/sql/03_vista.sql:4",
+   "acceso": "lee",
+   "lee": [
+    "dbo.orden_pago",
+    "dbo.partida_solicitada"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.orden_pago",
+     "dbo.partida_solicitada"
+    ],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   }
+  },
+  {
+   "id": "dbo.tr_orden_pago_bitacora",
+   "tipo": "trigger",
+   "fuente": "legado/sql/04_trigger.sql:3",
+   "acceso": "escribe",
+   "lee": [],
+   "escribe": {
+    "dbo.bitacora": [
+     "INSERT"
+    ]
+   },
+   "llama": [],
+   "efectos_externos": [],
+   "reloj": [
+    "GETDATE"
+   ],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [],
+    "escribe": {
+     "dbo.bitacora": [
+      "INSERT"
+     ]
+    },
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE"
+    ],
+    "sql_dinamico": []
+   },
+   "tabla": "dbo.orden_pago",
+   "eventos": [
+    "INSERT",
+    "UPDATE"
+   ],
+   "momento": "AFTER"
+  },
+  {
+   "id": "job:BFN - conciliacion nocturna",
+   "tipo": "job",
+   "fuente": "legado/sql/06_job.sql:7",
+   "acceso": "escribe",
+   "lee": [],
+   "escribe": {},
+   "llama": [
+    "dbo.sp_conciliar"
+   ],
+   "efectos_externos": [],
+   "reloj": [
+    "horario «todas las noches 23:30» (frecuencia 4, 23:30)"
+   ],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.orden_pago",
+     "dbo.partida_liquidada",
+     "dbo.partida_solicitada"
+    ],
+    "escribe": {
+     "dbo.bitacora": [
+      "INSERT"
+     ],
+     "dbo.orden_pago": [
+      "UPDATE"
+     ]
+    },
+    "llama": [
+     "dbo.sp_conciliar"
+    ],
+    "dispara": [
+     "dbo.tr_orden_pago_bitacora"
+    ],
+    "efectos_externos": [],
+    "reloj": [
+     "GETDATE (dbo.sp_conciliar)",
+     "GETDATE (dbo.tr_orden_pago_bitacora)",
+     "horario «todas las noches 23:30» (frecuencia 4, 23:30)"
+    ],
+    "sql_dinamico": []
+   },
+   "descripcion": "Concilia las órdenes liquidadas y vence las que siguen enviadas.",
+   "pasos": [
+    {
+     "paso": "conciliar",
+     "subsistema": "TSQL",
+     "base": "BFN_DIVISAS",
+     "comando": "EXEC dbo.sp_conciliar;",
+     "fuente": "legado/sql/06_job.sql:11",
+     "llama": [
+      "dbo.sp_conciliar"
+     ],
+     "lee": [],
+     "escribe": {},
+     "efectos_externos": [],
+     "acceso": "escribe",
+     "efectivo": {
+      "lee": [
+       "dbo.orden_pago",
+       "dbo.partida_liquidada",
+       "dbo.partida_solicitada"
+      ],
+      "escribe": {
+       "dbo.bitacora": [
+        "INSERT"
+       ],
+       "dbo.orden_pago": [
+        "UPDATE"
+       ]
+      },
+      "llama": [
+       "dbo.sp_conciliar"
+      ],
+      "dispara": [
+       "dbo.tr_orden_pago_bitacora"
+      ],
+      "efectos_externos": [],
+      "reloj": [
+       "GETDATE (dbo.sp_conciliar)",
+       "GETDATE (dbo.tr_orden_pago_bitacora)"
+      ],
+      "sql_dinamico": []
+     }
+    }
+   ],
+   "horarios": [
+    {
+     "horario": "todas las noches 23:30",
+     "frecuencia": 4,
+     "intervalo": 1,
+     "hora": "23:30"
+    }
+   ]
+  },
+  {
+   "id": "interfaz:archivo_sucursales",
+   "tipo": "interfaz",
+   "fuente": "legado/generador/interfaces.py:66",
+   "acceso": "entrada",
+   "lee": [],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [
+    "archivos: sucursales/{dia:%Y%m%d}.csv",
+    "archivos: sucursales/{dia:%Y%m%d}_{op.sucursal}_reenvio.csv"
+   ],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [
+     "archivos: sucursales/{dia:%Y%m%d}.csv",
+     "archivos: sucursales/{dia:%Y%m%d}_{op.sucursal}_reenvio.csv"
+    ],
+    "reloj": [],
+    "sql_dinamico": []
+   },
+   "nombre": "Archivo de sucursales",
+   "direccion": "entrada",
+   "carpeta": "sucursales",
+   "archivos": [
+    "sucursales/{dia:%Y%m%d}.csv",
+    "sucursales/{dia:%Y%m%d}_{op.sucursal}_reenvio.csv"
+   ]
+  },
+  {
+   "id": "interfaz:buzon_corresponsal",
+   "tipo": "interfaz",
+   "fuente": "legado/generador/interfaces.py:52",
+   "acceso": "entrada",
+   "lee": [],
+   "escribe": {},
+   "llama": [],
+   "efectos_externos": [
+    "archivos: corresponsal/{dia:%Y%m%d}.fin"
+   ],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [],
+    "escribe": {},
+    "llama": [],
+    "dispara": [],
+    "efectos_externos": [
+     "archivos: corresponsal/{dia:%Y%m%d}.fin"
+    ],
+    "reloj": [],
+    "sql_dinamico": []
+   },
+   "nombre": "Buzón del corresponsal",
+   "direccion": "entrada",
+   "carpeta": "corresponsal",
+   "archivos": [
+    "corresponsal/{dia:%Y%m%d}.fin"
+   ]
+  },
+  {
+   "id": "pantalla:legado/pantalla",
+   "tipo": "pantalla",
+   "fuente": "legado/pantalla",
+   "acceso": "lee",
+   "lee": [],
+   "escribe": {},
+   "llama": [
+    "dbo.sp_detalle_operacion",
+    "dbo.sp_lista_operaciones"
+   ],
+   "efectos_externos": [],
+   "reloj": [],
+   "sql_dinamico": [],
+   "desde_sql_dinamico": [],
+   "identidad": [],
+   "transaccion": [],
+   "temporales": [],
+   "efectivo": {
+    "lee": [
+     "dbo.moneda",
+     "dbo.operacion",
+     "dbo.orden_pago",
+     "dbo.partida_liquidada",
+     "dbo.partida_solicitada"
+    ],
+    "escribe": {},
+    "llama": [
+     "dbo.sp_detalle_operacion",
+     "dbo.sp_lista_operaciones"
+    ],
+    "dispara": [],
+    "efectos_externos": [],
+    "reloj": [],
+    "sql_dinamico": []
+   },
+   "consultas": [
+    {
+     "fuente": "legado/pantalla/app.py:69",
+     "llama": [
+      "dbo.sp_lista_operaciones"
+     ],
+     "lee": []
+    },
+    {
+     "fuente": "legado/pantalla/app.py:89",
+     "llama": [
+      "dbo.sp_detalle_operacion"
+     ],
+     "lee": []
+    }
+   ]
+  }
+ ],
+ "escritores": [
+  "dbo.sp_alta_manual_orden",
+  "dbo.sp_conciliar",
+  "dbo.sp_reflejar_estatus_operacion",
+  "dbo.sp_registrar_liquidacion",
+  "dbo.sp_registrar_operacion",
+  "dbo.sp_registrar_orden",
+  "dbo.tr_orden_pago_bitacora",
+  "job:BFN - conciliacion nocturna/paso:conciliar"
+ ],
+ "tablas": {
+  "dbo.bitacora": {
+   "fuente": "legado/sql/02_tablas.sql:92",
+   "identidad": true,
+   "leen": [],
+   "escriben": [
+    "dbo.tr_orden_pago_bitacora"
+   ]
+  },
+  "dbo.folio": {
+   "fuente": "legado/sql/02_tablas.sql:13",
+   "identidad": false,
+   "leen": [],
+   "escriben": [
+    "dbo.sp_alta_manual_orden",
+    "dbo.sp_registrar_operacion",
+    "dbo.sp_registrar_orden"
+   ]
+  },
+  "dbo.moneda": {
+   "fuente": "legado/sql/02_tablas.sql:4",
+   "identidad": false,
+   "leen": [
+    "dbo.sp_detalle_operacion",
+    "dbo.sp_reporte_posicion"
+   ],
+   "escriben": []
+  },
+  "dbo.operacion": {
+   "fuente": "legado/sql/02_tablas.sql:20",
+   "identidad": true,
+   "leen": [
+    "dbo.sp_constancia_operacion",
+    "dbo.sp_detalle_operacion",
+    "dbo.sp_lista_operaciones",
+    "dbo.sp_reflejar_estatus_operacion",
+    "dbo.sp_registrar_orden",
+    "dbo.sp_reporte_posicion",
+    "dbo.sp_tablero_corresponsales"
+   ],
+   "escriben": [
+    "dbo.sp_reflejar_estatus_operacion",
+    "dbo.sp_registrar_operacion"
+   ]
+  },
+  "dbo.orden_pago": {
+   "fuente": "legado/sql/02_tablas.sql:40",
+   "identidad": true,
+   "leen": [
+    "dbo.sp_antiguedad_ordenes",
+    "dbo.sp_conciliar",
+    "dbo.sp_constancia_operacion",
+    "dbo.sp_detalle_operacion",
+    "dbo.sp_lista_operaciones",
+    "dbo.sp_ordenes_por_vencer",
+    "dbo.sp_reflejar_estatus_operacion",
+    "dbo.sp_registrar_liquidacion",
+    "dbo.sp_registrar_orden",
+    "dbo.sp_tablero_corresponsales",
+    "dbo.vw_liquidaciones_recientes",
+    "dbo.vw_reporte_ordenes"
+   ],
+   "escriben": [
+    "dbo.sp_alta_manual_orden",
+    "dbo.sp_conciliar",
+    "dbo.sp_registrar_liquidacion",
+    "dbo.sp_registrar_orden"
+   ]
+  },
+  "dbo.partida_liquidada": {
+   "fuente": "legado/sql/02_tablas.sql:78",
+   "identidad": true,
+   "leen": [
+    "dbo.sp_conciliar",
+    "dbo.sp_detalle_operacion"
+   ],
+   "escriben": [
+    "dbo.sp_registrar_orden"
+   ]
+  },
+  "dbo.partida_solicitada": {
+   "fuente": "legado/sql/02_tablas.sql:65",
+   "identidad": true,
+   "leen": [
+    "dbo.sp_conciliar",
+    "dbo.sp_detalle_operacion",
+    "dbo.vw_liquidaciones_recientes",
+    "dbo.vw_reporte_ordenes"
+   ],
+   "escriben": [
+    "dbo.sp_registrar_liquidacion"
+   ]
+  }
+ }
+}

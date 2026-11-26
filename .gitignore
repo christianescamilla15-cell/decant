@@ -21,6 +21,7 @@ sbom.spdx.json
 legado/datos/
 respaldos/
 paridad/datos/
+corte/observado-ci/
 muestras/
 *.bak
 

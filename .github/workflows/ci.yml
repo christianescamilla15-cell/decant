@@ -1,5 +1,6 @@
 # CI de Decant: pruebas por regla, el ciclo completo del legado contra SQL Server real, el control público (S1), el
-# TO-BE en .NET 10 con sus pruebas por capa y la paridad del TO-BE contra el legado del ciclo (S2).
+# TO-BE en .NET 10 con sus pruebas por capa, la paridad del TO-BE contra el legado del ciclo (S2) y la puerta de
+# cobertura de salidas (S3, todavía fuera del ruleset).
 # Un job «skipped» por depender de otro en rojo NO es verde: en la rama protegida todos son requeridos.
 name: ci
 
@@ -52,8 +53,28 @@ jobs:
           clave="Dc1-$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"
           echo "::add-mask::$clave"
           echo "DECANT_SA_PASSWORD=$clave" >> "$GITHUB_ENV"
+      # S3 (ADR 0014): mientras corre el ciclo se muestrea qué ejecuta el servidor y quién se conecta. Este job sólo
+      # deja el artefacto; lo juzga el job «puerta». Si el observador falla, este job no cae por eso: la puerta sí.
+      - name: observar el ciclo (sesiones y ejecuciones, en segundo plano; corte/observar.py)
+        continue-on-error: true
+        run: |
+          mkdir -p corte/observado-ci
+          nohup python -m corte.observar --salida corte/observado-ci/observado.json \
+            > corte/observado-ci/observar.log 2>&1 &
       - name: ciclo completo (levantar, esquema, generar y cargar, pantalla, respaldar, vivo, radiografiar, medir)
         run: ./ciclo.sh
+      # Se cierra ANTES de las pruebas de integración: lo que ellas ejecutan no es parte del ciclo.
+      - name: cerrar la observación del ciclo
+        if: always()
+        continue-on-error: true
+        run: |
+          python -m corte.observar --detener corte/observado-ci/observado.json
+          cat corte/observado-ci/observar.log
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: ejecucion-observada
+          path: corte/observado-ci/
       - name: integración contra el motor real
         run: pytest -q -m integracion --junitxml=reporte-integracion.xml
       - run: python3 herramientas/verificar_reportes.py pytest reporte-integracion.xml
@@ -71,6 +92,37 @@ jobs:
       - name: apagar el legado
         if: always()
         run: docker compose -f legado/docker-compose.yml down -v
+
+  # S3 · puerta de cobertura de salidas (ADR 0014, criterio 1). Job aparte y NO requerido en el ruleset: hoy sale en
+  # rojo a propósito, porque define el alcance y lista lo que falta. Juzga la observación de ESTA corrida (artefacto
+  # del job legado) contra el inventario que sale del código en el momento y los renglones versionados; los conteos
+  # por destino quedan en el resumen del job.
+  puerta:
+    name: puerta de cobertura de salidas (S3, no requerida todavía)
+    needs: legado
+    if: '!cancelled()'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ejecucion-observada
+          path: corte/observado-ci
+      - name: la puerta (en rojo mientras haya algo sin renglón o pendiente)
+        run: >-
+          python -m corte.puerta --observado corte/observado-ci/observado.json
+          --resumen "$GITHUB_STEP_SUMMARY" --json puerta.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: puerta
+          path: puerta.json
 
   control-publico:
     name: control (radiografía sobre WideWorldImporters)
