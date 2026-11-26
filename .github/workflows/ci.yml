@@ -81,6 +81,7 @@ jobs:
       - name: medir el corte por dos caminos y las cifras de control (corte/medir.py)
         continue-on-error: true
         run: |
+          set -o pipefail      # el shell del paso es `bash -e`: sin esto, tee taparía una medición en rojo
           mkdir -p corte/medido-ci
           python -m corte.medir --salida corte/medido-ci 2>&1 | tee corte/medido-ci/medir.log
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

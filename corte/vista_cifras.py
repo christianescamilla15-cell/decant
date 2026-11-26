@@ -14,6 +14,10 @@ def _json(ruta: Path) -> dict:
     return json.loads(ruta.read_text(encoding='utf-8'))
 
 
+def _numero(valor) -> str:
+    return '–' if valor is None else f'{valor:,}'
+
+
 def _montos(montos: dict) -> str:
     return ' · '.join(f'{m} {Decimal(v):,.2f}' for m, v in sorted(montos.items())) or '–'
 
@@ -50,7 +54,8 @@ def markdown(directorio: Path) -> str:
             m = c['comparacion']['mayores_al_corte']
             marca = 'sí' if c['comparacion']['coincide'] else (
                 f"NO: {m['solo_por_identidad']} sólo por identidad, {m['solo_por_sellos']} sólo por sellos")
-            nombre = f"{c['nombre']}{' *(control negativo)*' if c['control_negativo'] else ''}"
+            nombre = c['nombre'] if not c['control_negativo'] or 'negativo' in c['nombre'] else \
+                f"{c['nombre']} (control negativo)"
             filas.append(f"{inicio} {nombre}: {c['delta']:,} + {c['posterior']:,} | {marca} |")
     partes.append('\n'.join(filas))
     n = corte.get('control_negativo') or {}
@@ -64,7 +69,7 @@ def markdown(directorio: Path) -> str:
              '|---|---|---|---|---|---|---|']
     for tabla, t in control['tablas'].items():
         filas.append(f"| `{tabla}` | {t['respaldo']:,} | {t.get('delta', '–')} | {t['congelamiento']:,} | "
-                     f"{t.get('posterior', '–')} | {t['ahora']:,} | {t.get('ident_current') or '–'} |")
+                     f"{t.get('posterior', '–')} | {t['ahora']:,} | {_numero(t.get('ident_current'))} |")
     partes.append('\n'.join(filas))
     folios = control['consumibles']['folios']
     partes.append('Folios (siguiente por serie): ' + ' · '.join(
@@ -115,8 +120,9 @@ def markdown(directorio: Path) -> str:
     k = control['controles_negativos']
     if 'un_centavo' in k:
         u = k['un_centavo']
+        totales = '; '.join(f"{t}: {', '.join(v)}" for t, v in u['globales_distintos'].items()) or 'iguales'
         filas.append(f"| un centavo | `{u['documento']}` +0.01 | {'sí' if u['detectado'] else 'NO'} | su huella y "
-                     f"el grupo {' · '.join(u['grupo'])}; totales: {u['globales_distintos']} |")
+                     f"el grupo {' · '.join(u['grupo'])}; en los totales de {totales} |")
     if 'grieta_utc' in k:
         g = k['grieta_utc']
         filas.append(f"| grieta UTC | el mes en UTC: {g['documentos_que_cambian_de_mes']:,} documentos cambian de mes "
@@ -125,7 +131,7 @@ def markdown(directorio: Path) -> str:
     if 'duplicado' in k:
         d = k['duplicado']
         filas.append(f"| duplicado | otro registro vigente de `{d['documento']}` | {'sí' if d['detectado'] else 'NO'}"
-                     f" | duplicados por documento: {d['duplicados_por_documento']} |")
+                     f" | duplicados por documento: {', '.join(f'`{x}`' for x in d['duplicados_por_documento'])} |")
     partes.append('\n'.join(filas))
 
     partes.append('## 4. Huella versionada')

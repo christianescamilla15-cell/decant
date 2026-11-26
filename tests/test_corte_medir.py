@@ -232,8 +232,8 @@ def test_el_veredicto_falla_si_el_corte_no_coincide_o_el_control_negativo_no_fal
 
 def test_el_digest_del_artefacto_publicado_es_el_sha256_del_archivo(medido):
     sha = veredicto.sha256(medido / medir.HUELLAS)
-    faltas, filas = veredicto.revisar_artefactos(medido, [f'{medir.HUELLAS}=sha256:{sha}'])
-    assert faltas == [] and filas[0]['coincide']
+    faltas, filas = veredicto.revisar_artefactos(medido, [f'{medir.HUELLAS}=sha256:{sha}', f'{medir.HUELLAS}={sha}'])
+    assert faltas == [] and all(f['coincide'] for f in filas)      # con o sin «sha256:», como lo da cada fuente
     faltas, _ = veredicto.revisar_artefactos(medido, [f'{medir.CIFRAS}=sha256:{sha}', f'{medir.HUELLAS}='])
     assert len(faltas) == 2
 
@@ -269,3 +269,17 @@ def test_la_foto_del_vivo_no_regresa_hasta_que_el_reloj_del_servidor_avanza():
     reloj = CursorReloj(['2026-11-26 10:00:00.003', '2026-11-26 10:00:00.010'])
     vivo_main.foto(reloj, espera=0)
     assert reloj.pedidos == 2
+
+
+def test_lo_versionado_es_coherente_y_su_vista_esta_al_dia():
+    """corte/cifras/ es una corrida del CI: el sha de las cifras versionadas es el de huella.json (que el job `corte`
+    exige en cada corrida) y CIFRAS.md es la vista que sale de esos archivos."""
+    huella = json.loads((veredicto.VERSIONADO / 'huella.json').read_text(encoding='utf-8'))
+    assert veredicto.sha256(veredicto.VERSIONADO / medir.CIFRAS) == huella['archivos'][medir.CIFRAS]
+    for nombre, artefacto in huella.get('artefactos', {}).items():
+        assert artefacto['digest'] == f"sha256:{huella['archivos'][nombre]}"
+    from corte import vista_cifras
+    assert (veredicto.VERSIONADO / 'CIFRAS.md').read_text(encoding='utf-8') == vista_cifras.markdown(
+        veredicto.VERSIONADO)
+    control = json.loads((veredicto.VERSIONADO / medir.CIFRAS).read_text(encoding='utf-8'))
+    assert control['verde'] and control['huellas_por_documento']['sha256'] == huella['archivos'][medir.HUELLAS]

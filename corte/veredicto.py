@@ -154,9 +154,11 @@ def revisar_artefactos(directorio: Path, artefactos: list[str]) -> tuple[list[st
     faltas, filas = [], []
     for dato in artefactos:
         nombre, _, digest = dato.partition('=')
-        esperado = 'sha256:' + sha256(directorio / nombre)
-        filas.append({'artefacto': nombre, 'digest': digest or '(vacío)', 'coincide': digest == esperado})
-        if digest != esperado:
+        # la salida `artifact-digest` de la acción es el hex solo; la API de artefactos lo antepone con «sha256:»
+        hexadecimal = digest.removeprefix('sha256:')
+        esperado = sha256(directorio / nombre)
+        filas.append({'artefacto': nombre, 'digest': digest or '(vacío)', 'coincide': hexadecimal == esperado})
+        if hexadecimal != esperado:
             faltas.append(f'el digest del artefacto {nombre} ({digest or "vacío"}) no es el sha256 del archivo '
                           f'({esperado})')
     return faltas, filas
