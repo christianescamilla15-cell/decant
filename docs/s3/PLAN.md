@@ -250,8 +250,11 @@ choques preparados) y el emulador del corresponsal.
    - **Avance (26-nov, en `corte/`; job `estado` de `carga.yml`, fuera del ruleset):**
      - **Las 6 trampas observables, detectadas 6 de 6.** Cada una por una comparación que FALLA con la trampa y pasa
        sin ella (el parche del TO-BE), nombrada desde los catálogos sellados después de detectar:
-       - r3-T1: 100,259 diferencias en `operacion.estatus`, auditadas una por una como el JOIN 1:N (defecto del legado,
-         pendiente de decisión). Con el parche en la copia, 0. El catálogo midió 100,299: la cifra depende del plan;
+       - r3-T1: 99,713 diferencias en `operacion.estatus` (corrida 45903816553), auditadas una por una como el JOIN
+         1:N (defecto del legado, pendiente de decisión). Con el parche en la copia, 0. La cifra NO es la del catálogo
+         (100,299) y no se repite: la misma copia da 100,011 y 100,271 en las dos corridas siguientes, 100,259 en el
+         PR anterior, y 54,394 sin paralelismo. «Una orden cualquiera» cambia de una ejecución a otra con el plan de
+         hoy;
        - r3-T3: devolvió 685,277 (la bitácora) y la orden quedó con 270,617, el id que devuelve el TO-BE;
        - r1-T2 y r3-T2: con el reloj del oráculo coinciden (108 órdenes); con el reloj propio del TO-BE, 8 y 0;
        - r2-T1: el legado entrega al revés 2,371 de 4,603 pares contiguos de lo que su vista promete; el TO-BE, 0;
@@ -276,9 +279,12 @@ choques preparados) y el emulador del corresponsal.
        fallar el oráculo (prueba sin base).
      - El lado TO-BE es el efecto escrito en SQL sobre la base de referencia (las reglas del dominio .NET y sus
        parches), no el dominio corriendo: es un límite declarado (`corte/README.md`).
-     - Tiempos del PR con la base construida (no había volcado vigente; corrida 45898183988): el job, 19 min 30 s,
-       por encima del objetivo: 536 s de los 939 del arnés son construir los 36 meses. Memoria pico: PostgreSQL 1 GiB
-       (el tope, con caché de páginas), SQL Server 2,198 MiB de 4,096 y el proceso del arnés 2.0 GB de RSS.
+     - Tiempos del PR con el volcado de la nocturna (corrida 45903816553, volcado de la 45900567255 lanzada a mano
+       sobre la rama): el job, 9 min 35 s; el arnés, 357 s (restaurar y verificar la base 21 s, delta 24 s, oráculo
+       4.5 s, copia 30 s, escenarios A 113 s, B 28 s y C 36 s, comparar 20 s). Memoria pico: PostgreSQL 1 GiB (el
+       tope, con caché de páginas), SQL Server 2,169 MiB de 4,096 y el arnés 2.0 GB de RSS. Sin volcado vigente la
+       base se construye (536 s) y el job pasa a 19 min 30 s (corrida 45898183988): lo evita la nocturna de `main`.
+       Nada se recortó de «Si aprieta».
 7. Latentes con plan variado: las 2.
 8. Runbook en el CI, banderas en orden y humo contra el vecino emulado.
 9. Lo que sólo se documenta.

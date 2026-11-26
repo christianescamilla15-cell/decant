@@ -283,6 +283,9 @@ comprueba y lo deja en su resumen. Para versionar una corrida:
   consumidor. El disparador se emula en PostgreSQL con dos disparadores de sentencia dentro de la transacción revertida.
 - Paso 5: el UPDATE … FROM de `sp_conciliar` no tiene datos 1:N (una PRINCIPAL por orden y la suma agrupada): con estos
   datos no se puede probar su multiplicidad. El de `sp_reflejar_estatus_operacion` sí (r3-T1).
+- Paso 5: la cifra de r3-T1 no es estable: el UPDATE … FROM 1:N elige «una orden cualquiera» y, con el plan paralelo,
+  la elección cambia de una ejecución a otra (99,713 a 100,271 en estas corridas; 54,394 sin paralelismo; el catálogo,
+  100,299). Se detecta en todas; la cifra exacta del catálogo no se puede exigir.
 - Paso 5: las dos latentes (r1-T1 y r2-T2) coinciden hoy en el oráculo: no se detectan aquí; son del paso siguiente,
   con el plan variado.
 - Paso 5: lo que el legado escribe después del congelamiento no entra en la paridad de estado (lo ve el barrido del

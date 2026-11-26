@@ -58,15 +58,17 @@ Lo que el código decidió y la propuesta no decía (`corte/estado.py`, `corte/e
 - **Los controles de las trampas aplican el parche del TO-BE a la copia del legado** (texto exacto, una sola vez): con
   él, el legado tiene que coincidir con el TO-BE en 0 diferencias.
 
-**Medido en el PR** (corrida 45898183988, base construida porque no había volcado vigente):
+**Medido en el PR** (corrida 45903816553, sobre el volcado de la nocturna 45900567255; la anterior, 45898183988,
+construyó la base y dio lo mismo salvo la cifra de r3-T1):
 - 8 de 8 escritores corridos, según el servidor: registrar operación 422 veces, orden 270, liquidación 162, el paso
   del job y `sp_conciliar` 1, la mesa 1, la contingencia 1, el disparador 574.
 - Efecto igual por llave en A (421 operaciones; 270 órdenes y 139 re-registros que pasan a REEMPLAZADA; 893 partidas
   del cliente; 162 liquidaciones con 271 partidas del corresponsal; 164 órdenes de la noche; 736 renglones de
   bitácora) y en C (la orden y su bitácora).
-- r3-T1: 100,259 diferencias en `operacion.estatus`, todas auditadas como el JOIN 1:N; con el parche, 0. El catálogo
-  midió 100,299 con otro plan: «una orden cualquiera» depende del plan, y esa cifra con él (`variacion_de_plan_r3_t1`
-  la cuenta en SQL en cada corrida).
+- r3-T1: 99,713 diferencias en `operacion.estatus`, todas auditadas como el JOIN 1:N; con el parche, 0. La cifra no se
+  repite y no es la del catálogo (100,299): contada en SQL en la misma corrida (`variacion_de_plan_r3_t1`), la misma
+  copia da 100,011 y 100,271, la corrida anterior dio 100,259 y sin paralelismo (MAXDOP 1) da 54,394. «Una orden
+  cualquiera» no sólo depende del plan: con el plan paralelo de hoy cambia de una ejecución a otra.
 - r3-T3: devolvió 685,277 (la bitácora) y la orden quedó con 270,617, que es lo que devuelve el TO-BE; con el parche,
   270,617 en los dos.
 - Controles: un procedimiento con su propio ROLLBACK dispara la guarda (error 266, `@@TRANCOUNT` 1 → 0) y su volcado

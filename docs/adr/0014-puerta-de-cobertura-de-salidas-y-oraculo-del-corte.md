@@ -54,8 +54,8 @@ Lo que el código decidió y la propuesta no decía (`corte/oraculo.py`, `corte/
 - **El TOP sin ORDER BY** (T1 del catálogo original) de la lista del día se arbitra: el legado puede entregar otro
   subconjunto del día, del tamaño del TOP. Se audita que lo sea; si no, es defecto nuestro.
 
-**Medido en el PR** (corrida 45898183988): 12 de 12 objetos de lectura y 21 casos, capturados en 1.9 s con el
-reloj del servidor en 2026-11-26 15:29 (el del runner); el reloj propio del TO-BE, 2023-12-29 18:00. Con el reloj del
+**Medido en el PR** (corridas 45898183988 y 45903816553, iguales): 12 de 12 objetos de lectura y 21 casos,
+capturados en 1.9 s con el reloj del servidor del runner (2026-11-26); el reloj propio del TO-BE, 2023-12-29 18:00. Con el reloj del
 oráculo coinciden los 21 (uno por el árbitro del TOP: la lista del 30-nov). Las trampas:
 - r1-T2: 108 órdenes por vencer; sin inyectar el reloj, 8;
 - r3-T2: 108 órdenes con antigüedad (79 de un corresponsal); sin inyectar el reloj, 0;
