@@ -197,6 +197,55 @@ choques preparados) y el emulador del corresponsal.
 4. Cuadre mes a mes y grieta plantada. (Entró en el paso 3: la huella del mes es el cuadre y la grieta es uno de sus
    controles.)
 5. Delta del mismo día, numerado DESPUÉS de subir los consumibles.
+   - **Avance (26-nov, en `corte/`; job `delta` de `carga.yml`, fuera del ruleset):**
+     - Base: la CERRADA. La nocturna la vuelca con `pg_dump` (artefacto `destino-cerrado`) y el delta la restaura en
+       una base limpia: la segunda línea de defensa del ADR 0013, ahora en el CI. A la foto no se le cree:
+       - sha256 del volcado y huella al restaurar;
+       - el plan de esta corrida y los 36 meses aplicados con él;
+       - llaves foráneas y totales del origen.
+       Sin volcado vigente, la base se construye: 36 meses en 322 s en el PR (corrida 45884082598).
+     - Qué entra, POR ID, de `(corte, congelamiento]`: operación 421 · orden 270 · partida del corresponsal 271 ·
+       partida del cliente 893 · bitácora 571, y la moneda SLE. Así entran las 5 altas de la sucursal 0012 fechadas
+       hacia atrás (412,185–412,189), con su folio y su fecha.
+     - Filas del corte que cambian: 139 UPDATE derivados de la bitácora posterior al corte (138 → REEMPLAZADA por
+       re-registro y 1 → LIQUIDADA) y SLL inactiva. Se comprueban fila por fila contra el origen al congelamiento.
+       - Las otras 161 liquidaciones y el re-registro del día caen sobre filas del propio delta: entran ya con su
+         estado.
+       - 0 cambios después del congelamiento sobre filas que entran.
+     - El rol de aplicar del delta inserta y actualiza SÓLO las columnas que el legado escribe sobre una fila ya
+       registrada; la reversa va con otro rol (ADR 0013). Su reversa guarda los VALORES PREVIOS antes de escribir.
+     - Conciliación por llave: 138 registros viejos salen (REEMPLAZADA, con su vigente del delta), la misma muestra
+       que el paso 2; 0 duplicados por documento.
+     - Lo derivado por id: hoy no hay nada en el destino (valores crudos). El gancho re-arma tras el delta y su reversa,
+       con su prueba.
+     - Fuera del delta, listadas para el barrido: 4 órdenes (OP-000150851 a 854, ya usadas por el legado), 10
+       operaciones, 13 partidas del cliente y 4 renglones de bitácora.
+       - El destino numera desde OP-000160720 y FX-000422126: 0 choques.
+       - Las secuencias suben a `IDENT_CURRENT` del legado de ahora (270,890 en la orden), por encima de lo posterior.
+     - Cifras de control tras el delta, contra las versionadas del paso 2 (sha256 `bc45ff89…`):
+       - 563,396 documentos en el destino = lo cargado del paso 2;
+       - más 14 que no viajan (pendientes: 10 operaciones y 4 órdenes) = 563,410 del origen;
+       - los 182 grupos tipo + estado + mes, con su huella;
+       - 0 duplicados.
+     - Controles negativos, 6 de 6 detectados en el PR:
+       1. el delta por FECHA pierde las 5 altas fechadas hacia atrás y la comparación las nombra;
+       2. por id SIN conciliar quedan 138 documentos duplicados (los 139 UPDATE no se aplican);
+       3. sin margen, el folio choca con los 10 FX y los 4 OP que el legado usó tras el congelamiento;
+       4. repetirlo lo niegan el registro, la guarda del corte y el índice único de la base, y el destino no cambia;
+       5. la reversa que no devuelve el valor previo de UN UPDATE la ve la huella; la buena vuelve a la huella previa y
+          el delta se reaplica con la misma huella;
+       6. tras una acción de negocio, la reversa del delta se niega.
+     - Tiempos del PR con la base construida: delta y controles en 180 s (leer 5 s, controles 1–3 37 s, ensayo 6 s,
+       aplicar 6 s, controles 4–5 98 s, cifras 19 s); el job completo, 11 min 24 s.
+     - Cada noche (corrida 45884022731, lanzada a mano con `workflow_dispatch` sobre la rama):
+       - 36 de 36 meses y el cierre;
+       - la base cerrada se vuelca en 15 s: 48.9 MB, sha256 `2b12b582…`, 14 días de retención;
+       - el delta corre sobre ese volcado restaurado en otra base: restaurar 5.6 s, verificar 7.8 s (huella igual a
+         la del cierre, el mismo plan `9c9c8bb4…`, 36 meses, 5 llaves foráneas, totales del origen);
+       - mismas cifras que en el PR y 6 de 6 controles; el delta, 305 s; el job completo, 29 min.
+     - En el PR con ese volcado (la misma corrida 45884082598, intento 2): bajarlo 17 s, restaurar 3.8 s, verificar
+       7.4 s; el delta con sus controles, 300 s (controles 4 y 5, 148 s: recorren la huella del destino completo);
+       el job, 9 min 16 s. Memoria pico de PostgreSQL: 1 GiB, el tope (incluye caché de páginas), sin cortes.
 6. Paridad de estado (escriben) y oráculo del corte (leen): las 6 trampas.
 7. Latentes con plan variado: las 2.
 8. Runbook en el CI, banderas en orden y humo contra el vecino emulado.

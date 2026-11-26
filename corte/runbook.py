@@ -92,11 +92,13 @@ FOLIOS_DEL_VIVO = 'SELECT serie, siguiente FROM BFN_DIVISAS.dbo.folio ORDER BY s
 
 
 class NoCuadra(Exception):
-    """La verificación dentro de la transacción falló: se revirtió y el destino quedó como estaba."""
+    """La verificación dentro de la transacción falló: se revirtió y el destino quedó como estaba. `detalle` lleva lo
+    que vio la verificación (los controles negativos lo leen)."""
 
-    def __init__(self, faltas: list[str]):
+    def __init__(self, faltas: list[str], detalle: dict | None = None):
         super().__init__('; '.join(faltas))
         self.faltas = faltas
+        self.detalle = detalle or {}
 
 
 # ── conexiones ──────────────────────────────────────────────────────────────────────────────────────────────────

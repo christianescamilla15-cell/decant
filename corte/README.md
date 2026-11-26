@@ -6,7 +6,9 @@ El corte del legado al TO-BE (plan: [`docs/s3/PLAN.md`](../docs/s3/PLAN.md)). Ho
 - el paso 2: el **corte medido por dos caminos** y las **cifras de control por documento** (ADR 0013 y 0016,
   criterios 3, 7 y 8). La vista legible está en [`cifras/CIFRAS.md`](cifras/CIFRAS.md);
 - el paso 3: la **carga histórica por mes** con sólo INSERT, la reversa generada antes y el `setval` al cierre
-  (ADR 0013 y 0016, criterios 4, 5, 6 y 12), con su runbook `ensayo | aplicar | reversa`.
+  (ADR 0013 y 0016, criterios 4, 5, 6 y 12), con su runbook `ensayo | aplicar | reversa`;
+- el paso 4: el **delta del mismo día** sobre la base cerrada, restaurada del volcado de la nocturna, con la reversa
+  de sus UPDATE con los valores previos y sus 6 controles negativos (ADR 0013 y 0016, criterios 5, 7, 8 y 12).
 
 ## Qué hay
 
@@ -25,7 +27,12 @@ El corte del legado al TO-BE (plan: [`docs/s3/PLAN.md`](../docs/s3/PLAN.md)). Ho
 | `carga.py` | Paso 3, sin base: las 7 tablas (tipos del legado), las consultas literales al origen, el plan por mes (rangos contiguos de ids por el sello de cada fila), la huella del mes, las guardas (sólo ids > corte) y la reversa. |
 | `destino.sql` | Paso 3: el esquema `legado` de PostgreSQL (valores CRUDOS, los mismos índices únicos, sin llaves foráneas hasta el cierre) y el esquema `corte` (registro de meses y ensayos, interruptores, acciones de negocio, avisos y punto de no retorno, y los dos roles). |
 | `runbook.py` | Paso 3: `python -m corte.runbook preparar\|ensayo\|aplicar\|reversa\|cierre\|estado --mes AAAA-MM`. |
-| `carga_ci.py` | Paso 3, en el CI (`.github/workflows/carga.yml`): restaura el respaldo, corre los meses y los controles negativos y deja `carga.json`. |
+| `carga_ci.py` | Paso 3, en el CI (`.github/workflows/carga.yml`): restaura el respaldo, corre los meses y los controles negativos y deja `carga.json`; de noche, con `--volcar`, vuelca la base cerrada. |
+| `delta.py` | Paso 4, sin base: qué entra (por id), los cambios sobre filas del corte desde la bitácora y su comprobación fila por fila, el catálogo del congelamiento, los choques de folio, la reversa con los valores previos, las cifras contra las del paso 2 y el gancho de lo derivado por id. |
+| `delta.sql` | Paso 4: el registro del delta y sus ensayos (a lo más un delta aplicado) y sus dos roles: aplicar (INSERT y UPDATE acotado) y reversa (DELETE y UPDATE acotado). |
+| `runbook_delta.py` | Paso 4: `python -m corte.runbook_delta preparar\|ensayo\|aplicar\|reversa\|cifras\|estado`. |
+| `base.py` | Paso 4: la base cerrada como `pg_dump`: volcar, restaurar, verificar sin creerle o, si no hay volcado, construir. |
+| `delta_ci.py` | Paso 4, en el CI: la base (restaurada o construida), el delta con sus 6 controles negativos y las cifras contra el paso 2; deja `delta.json`. |
 | `veredicto.py`, `vista_cifras.py` | Sin base: re-verifica la medición (recuenta desde el CSV documento por documento), compara con lo versionado, comprueba el digest de los artefactos publicados y versiona una corrida en `cifras/` con su `CIFRAS.md`. |
 
 `inventario/`: `objetos.json` (sale del código), `observado.json` (artefacto de una corrida del CI, versionado con su
@@ -50,6 +57,13 @@ python -m corte.runbook aplicar --mes 2021-01
 python -m corte.runbook reversa --mes 2021-01
 python -m corte.runbook cierre                     # con los 36 meses aplicados
 python -m corte.carga_ci --meses pr --salida corte/carga-ci        # lo del CI: restaura, carga y controles
+# paso 4: con el legado vivo (después de ./ciclo.sh) y la base cerrada en decant_corte
+python -m corte.runbook_delta preparar
+python -m corte.runbook_delta ensayo
+python -m corte.runbook_delta aplicar
+python -m corte.runbook_delta reversa
+python -m corte.runbook_delta cifras               # el destino contra las cifras versionadas del paso 2
+python -m corte.delta_ci --base corte/base --salida corte/delta-ci   # lo del CI (--construir-base sin volcado)
 ```
 
 En el CI, el job `legado` deja el artefacto `ejecucion-observada` y el job `puerta` (aparte y fuera del ruleset) lo
@@ -133,6 +147,38 @@ comprueba y lo deja en su resumen. Para versionar una corrida:
 - `setval` no es transaccional en PostgreSQL: cuando una transacción se revierte (el ensayo, o una verificación que no
   cuadra), el runbook regresa las secuencias a mano; si no, la huella lo ve.
 
+### El delta del mismo día (paso 4)
+
+- **Base:** la cerrada. La nocturna la vuelca (`pg_dump -Fc` desde el contenedor, artefacto `destino-cerrado`) y el
+  delta la restaura en una base limpia: la segunda línea de defensa del ADR 0013, probada cada noche y en cada PR. A la
+  foto no se le cree:
+  - sha256 del volcado;
+  - huella al restaurar;
+  - el plan de esta corrida;
+  - los 36 meses aplicados con ese plan;
+  - las llaves foráneas del cierre;
+  - los totales del origen hasta el corte;
+  - sin punto de no retorno ni automatismos encendidos.
+- **Qué entra, por id:** `(corte, congelamiento]` en las 5 tablas con identidad, los dos medidos en el paso 2. La
+  selección se compara con la identidad y lo que falta se nombra.
+- **Filas del corte que cambian:** las dice la bitácora y se comprueban contra el origen al congelamiento, fila por fila:
+  - REEMPLAZADA por re-registro y LIQUIDADA; si el job concilia, también `horas_liquidacion`;
+  - las distintas son exactamente las anotadas y sólo en las columnas mutables.
+  Lo anotado después del congelamiento queda para el barrido.
+- **`aplicar`** exige un ensayo verde del mismo plan sobre la misma huella y se niega con un automatismo encendido o si
+  el delta ya está aplicado. Escribe con su rol (INSERT y UPDATE acotado) y guarda la reversa antes. Confirma sólo si:
+  - cada lote es igual en origen y destino;
+  - las filas actualizadas quedan como el origen;
+  - el resto del corte sigue idéntico;
+  - no hay nada después del congelamiento;
+  - el catálogo es el de la foto;
+  - hay 0 duplicados por documento y 0 choques de folio.
+- **Reversa:** borra los rangos, devuelve los valores previos (de la orden y del catálogo), las secuencias y los folios,
+  y confirma sólo si vuelve a la huella previa. Desde el punto de no retorno se niega.
+- **Cifras de control:** los documentos del destino, con la forma canónica del paso 2, contra las cifras VERSIONADAS
+  (su sha256 es el de `cifras/huella.json`). Por tipo y por grupo tipo + estado + mes, destino = cargado del paso 2 y
+  destino + no viaja = origen.
+
 ## Límites declarados
 
 - Las sesiones se muestrean cada 0.25 s: una conexión más corta puede no verse. La bitácora cubre a quienes
@@ -149,7 +195,14 @@ comprueba y lo deja en su resumen. Para versionar una corrida:
 - Paso 3: con la grieta UTC, `operacion` deja de partir en rangos contiguos (su sello es la fecha de NEGOCIO y las
   altas por archivo de las 22:00 traen horas del día): el plan la rechaza antes de cargar. Las otras tablas sí parten
   contiguo y es el cuadre del mes el que la ve. El control lo reporta en sus dos capas.
-- Paso 3: la segunda línea de defensa (restaurar el destino desde una foto tomada antes de aplicar) todavía no corre
-  en el CI; la primera, la reversa generada antes, sí, con sus controles.
+- Paso 3: la segunda línea de defensa (restaurar el destino desde una foto) corre desde el paso 4: el delta restaura
+  la base cerrada que volcó la nocturna. Una foto tomada antes de CADA mes no se guarda: la reversa del mes, sí.
+- Paso 4: `operacion.estatus` lo escribe un procedimiento sin bitácora (`sp_reflejar_estatus_operacion`). El delta no
+  puede derivar ese cambio: si corriera dentro de la ventana, lo verían las cifras por documento, no el delta. En el
+  vivo nada lo corre.
+- Paso 4: `sp_registrar_orden` no es atómico (el INSERT de la orden nueva y el UPDATE a REEMPLAZADA de la vieja van por
+  separado). Un respaldo tomado entre los dos dejaría dos registros vigentes en la base. El delta lo deja bien, pero
+  la conciliación lo reporta: exige que el registro vigente haya entrado en el delta. En el ciclo, el respaldo se toma
+  antes de que el vivo escriba.
 - El CI mide sin escribir: el hueco de identidad se prueba sin base y se ensayó una vez en local contra el motor real
   (una inserción revertida: los dos caminos coinciden y se reporta 1 hueco).

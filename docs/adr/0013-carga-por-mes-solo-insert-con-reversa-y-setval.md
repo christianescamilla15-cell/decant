@@ -43,6 +43,48 @@ Lo que el código decidió y la propuesta no decía (`corte/carga.py`, `corte/ru
 - **La grieta UTC tiene dos capas:** en `operacion` (su sello es la fecha de negocio) el plan con la grieta se encima
   y se rechaza antes de cargar; en las demás tablas lo ve el cuadre del mes. Los totales globales no la ven en ninguna.
 
+## Al construir el delta (26-nov, paso 4)
+Lo que el código del delta decidió (`corte/delta.py`, `corte/runbook_delta.py`, `corte/delta.sql`, `corte/base.py`):
+- **Base:** el delta va sobre la base CERRADA (36 meses, `setval`, folios con margen, llaves foráneas). La nocturna la
+  vuelca con `pg_dump` (artefacto `destino-cerrado`, 14 días) y el delta la RESTAURA en una base limpia: ésa es la
+  segunda línea de defensa («restaurar desde la corrida anterior») y corre cada noche y en cada PR. A la foto no se le
+  cree: se comprueban su sha256, la huella después de restaurar, el plan de ESTA corrida (mismos rangos y montos por
+  mes), los 36 meses aplicados, las llaves foráneas y los totales del origen hasta el corte. Si no hay volcado vigente,
+  la base se construye con el mismo runbook.
+- **Qué entra, por id:** las filas entre el corte y el congelamiento por tabla, los dos medidos en el paso 2. La
+  selección se compara con el rango de la identidad y lo que falta se nombra (un delta por fecha pierde las altas que
+  la sucursal reenvió fechadas hacia atrás).
+- **Cambios sobre filas ≤ corte:** salen de la bitácora posterior al corte y hasta el congelamiento, y se comprueban
+  FILA POR FILA contra el origen al congelamiento. Las filas del corte que difieren tienen que ser exactamente las que
+  la bitácora anota y diferir sólo en las columnas que el legado escribe sobre una orden ya registrada. El valor del
+  destino tiene que ser el primer «anterior» de su cadena; si no, el destino no está en la foto del corte y no se
+  aplica nada. Lo anotado después del congelamiento se deshace y queda para el barrido posterior al corte, junto con
+  las filas de id > congelamiento.
+- **UPDATE acotado, y por qué:** el re-registro y la liquidación cambian filas que ya cargó la histórica. Sin
+  UPDATE, el documento queda dos veces (el registro viejo sigue vigente) o en un estado que ya no es el del legado.
+  - La alternativa (borrar y volver a insertar la fila con el estado nuevo) le daría a `aplicar` el DELETE, que es más
+    poder que un UPDATE de dos columnas. Además rompería las llaves foráneas de sus partidas.
+  - Por eso el delta tiene sus propios roles y los de la carga por mes no cambian (`aplicar` sigue sólo insertando).
+  - `decant_corte_delta_aplica` inserta y actualiza SÓLO `estatus` y `horas_liquidacion` de la orden y `activa` de la
+    moneda: las columnas que escriben `sp_registrar_orden`, `sp_registrar_liquidacion`, el job y la baja del catálogo.
+    Una prueba las compara con los procedimientos.
+  - `decant_corte_delta_revierte` borra y devuelve esas mismas columnas a su valor previo. No inserta.
+  - Ninguno toca el punto de no retorno.
+  - El resto de las filas del corte se comprueba intacto por huella dentro de la misma transacción.
+- **La reversa del delta** se genera ANTES de escribir, con los VALORES PREVIOS de cada fila actualizada y de cada
+  moneda, leídos del destino. También guarda los rangos que se borran, las secuencias, los folios y la huella previa.
+  Confirma sólo si el destino vuelve a esa huella, folios incluidos.
+- **Secuencias y folios:** las secuencias suben a `IDENT_CURRENT` del legado de AHORA, por encima de las filas
+  posteriores al congelamiento, que quedan para el barrido: el TO-BE no reusa un id que el legado ya dio. Los folios
+  sólo suben, y el delta se niega si el siguiente del destino choca con un folio que el legado ya usó, también después
+  del congelamiento.
+- **Idempotencia:** a lo más un delta aplicado. Lo cuidan tres cosas: el registro, la guarda «el destino llega
+  exactamente al corte» y un índice único parcial en la base.
+- **Catálogo:** no tiene bitácora. La foto del congelamiento del legado vivo lo anota completo y el delta toma las
+  monedas de ahí.
+- **Lo derivado por id** se re-arma después del delta y de su reversa (`delta.DERIVADOS`). Hoy no hay nada derivado:
+  el esquema `legado` guarda los valores crudos y los parches del ADR 0007 van al TO-BE, fuera del corte.
+
 ## Alternativas descartadas
 - **TRUNCATE + COPY del estado completo (S2):** no convive con lo capturado y su reversa es todo o nada.
 - **UPSERT / MERGE:** esconde duplicados que deberían fallar y hace que la reversa dependa del estado previo.
