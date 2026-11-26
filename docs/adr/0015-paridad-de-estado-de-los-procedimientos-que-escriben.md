@@ -67,8 +67,8 @@ construyó la base y dio lo mismo salvo la cifra de r3-T1):
   bitácora) y en C (la orden y su bitácora).
 - r3-T1: 99,713 diferencias en `operacion.estatus`, todas auditadas como el JOIN 1:N; con el parche, 0. La cifra no se
   repite y no es la del catálogo (100,299): contada en SQL en la misma corrida (`variacion_de_plan_r3_t1`), la misma
-  copia da 100,011 y 100,271, la corrida anterior dio 100,259 y la siguiente 100,156, 99,870 y 99,685; sin paralelismo
-  (MAXDOP 1), 54,394 las dos veces. «Una orden cualquiera» no sólo depende del plan: con el plan paralelo de hoy
+  copia da 100,011 y 100,271, la corrida anterior dio 100,259, la siguiente 100,156, 99,870 y 99,685 y la última 99,771,
+  100,399 y 100,065 (entre 99,685 y 100,399 en 10 ejecuciones); sin paralelismo (MAXDOP 1), 54,394 las tres veces. «Una orden cualquiera» no sólo depende del plan: con el plan paralelo de hoy
   cambia de una ejecución a otra.
 - r3-T3: devolvió 685,277 (la bitácora) y la orden quedó con 270,617, que es lo que devuelve el TO-BE; con el parche,
   270,617 en los dos.
