@@ -23,6 +23,26 @@ partes, verificarse parte por parte y deshacerse sin tocar lo que no cargó.
 - El delta concilia por llave de negocio (documento + sucursal): un re-registro trae id nuevo, el viejo sale y no
   queda ningún documento duplicado. Lo derivado por id se re-arma después de cada carga.
 
+## Al construirla (26-nov, paso 3)
+Lo que el código decidió y la propuesta no decía (`corte/carga.py`, `corte/runbook.py`, `corte/destino.sql`):
+- **El esquema `legado` guarda los valores CRUDOS:** `char(n)` con su relleno, los centinelas tal cual, la hora local
+  sin zona. Los parches del ADR 0007 se aplican de `legado` al TO-BE, como ya los aplica y mide S2. Si se aplicaran
+  al cargar, la huella del mes no podría ser igual en origen y destino.
+- **«Sólo ids > corte», mes a mes:** el corte de un mes es lo que el destino ya tiene, medido por dos caminos
+  (`MAX(id)` y el registro de meses aplicados). Lo que no pasa del corte del respaldo (el medido en el paso 2) es la
+  carga histórica; lo que pasa, el delta del paso 5.
+- **El mes de cada fila es el de su sello en hora local.** Se comprobó sobre los 3 años que en las 5 tablas el mes del
+  sello no retrocede con el id: cada mes es un rango contiguo. Si alguna vez se enciman, no hay plan.
+- **Sin llaves foráneas mientras se carga:** un mes referencia filas de meses anteriores (re-registros, liquidaciones
+  de órdenes viejas). Se agregan, validando, en el cierre.
+- **El ensayo es el mismo `aplicar` en una transacción revertida sobre el mismo destino**, cuyos índices únicos se
+  comparan contra el catálogo del origen. `aplicar` exige un ensayo verde del mismo mes y plan sobre la misma huella.
+- **Permisos separados:** `aplicar` corre con un rol que sólo puede insertar en las tablas del legado; `reversa`, con
+  uno que sólo puede borrar. Ninguno toca el punto de no retorno.
+- **`setval` no es transaccional en PostgreSQL:** al revertir una transacción, el runbook regresa las secuencias a mano.
+- **La grieta UTC tiene dos capas:** en `operacion` (su sello es la fecha de negocio) el plan con la grieta se encima
+  y se rechaza antes de cargar; en las demás tablas lo ve el cuadre del mes. Los totales globales no la ven en ninguna.
+
 ## Alternativas descartadas
 - **TRUNCATE + COPY del estado completo (S2):** no convive con lo capturado y su reversa es todo o nada.
 - **UPSERT / MERGE:** esconde duplicados que deberían fallar y hace que la reversa dependa del estado previo.

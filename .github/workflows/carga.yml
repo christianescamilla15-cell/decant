@@ -1,0 +1,98 @@
+# S3 paso 3 · carga histórica por mes con reversa y setval (ADR 0013 y 0016; criterios 4, 5, 6 y 12 del plan).
+# Fuera del ruleset: hacerla requerida lo decide el dueño del repo. El mismo patrón que mutacion.yml:
+# - en cada PR, 3 meses (el primero, el de la grieta UTC y el último), cada uno ensayo → aplicar (huella del mes
+#   origen = destino) → reversa (huella previa), y los controles negativos, que tienen que FALLAR donde se dice;
+# - cada noche (y a mano), los 36 meses acumulando (aplicar, reversa y aplicar otra vez), el cierre y los mismos
+#   controles.
+# Origen: el respaldo FECHADO del ciclo restaurado como BFN_DIVISAS_CORTE; destino: PostgreSQL limpio por corrida.
+name: carga
+
+on:
+  pull_request:
+  schedule:
+    - cron: '23 8 * * *'   # cada noche: los 36 meses
+  workflow_dispatch:
+    inputs:
+      meses:
+        description: "'todos' (36, acumulando, con cierre), 'pr' (los 3 del PR) o meses AAAA-MM separados por comas"
+        default: todos
+
+permissions:
+  contents: read
+
+jobs:
+  carga:
+    name: carga por mes con reversa y setval (S3, no requerida todavía)
+    runs-on: ubuntu-latest
+    # El PR tiene que caber en 15 min junto con lo demás; de noche son 36 meses.
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 120 }}
+    env:
+      DECANT_PG_PUERTO: '15460'
+      MESES: ${{ github.event_name == 'pull_request' && 'pr' || inputs.meses || 'todos' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: contraseñas por corrida (sa del legado y PostgreSQL del destino)
+        run: |
+          clave="Dc1-$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"
+          echo "::add-mask::$clave"
+          echo "DECANT_SA_PASSWORD=$clave" >> "$GITHUB_ENV"
+          pg="$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"
+          echo "::add-mask::$pg"
+          echo "DECANT_PG_PASSWORD=$pg" >> "$GITHUB_ENV"
+      # El legado del ciclo (el mismo de S1 y de la paridad): deja el respaldo fechado y su manifiesto.
+      - name: ciclo completo del legado
+        run: ./ciclo.sh
+      # Imagen fija por digest y tope de memoria de 1 GB (la carga es por mes, no el estado completo).
+      - name: PostgreSQL del destino (imagen fija por digest)
+        run: |
+          docker run -d --name decant-pg-carga --memory 1g -e POSTGRES_USER=decant \
+            -e POSTGRES_PASSWORD="$DECANT_PG_PASSWORD" -p "127.0.0.1:$DECANT_PG_PUERTO:5432" \
+            postgres:16-alpine@sha256:f2f98726820d0342055351c6e9d36e705f5bfffb3dd53ff556325114b08afb6d
+          for _ in $(seq 1 60); do
+            if docker exec decant-pg-carga pg_isready -h 127.0.0.1 -U decant -q &&
+               docker exec decant-pg-carga psql -h 127.0.0.1 -U decant -tAc 'SELECT 1' | grep -qx 1; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs decant-pg-carga
+          exit 1
+      - name: la carga por mes y sus controles negativos (corte/carga_ci.py)
+        run: |
+          set -o pipefail      # el shell del paso es `bash -e`: sin esto, tee taparía una carga en rojo
+          mkdir -p corte/carga-ci
+          python -m corte.carga_ci --meses "$MESES" --salida corte/carga-ci --resumen "$GITHUB_STEP_SUMMARY" \
+            2>&1 | tee corte/carga-ci/carga.log
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: carga-por-mes
+          path: |
+            corte/carga-ci/
+            respaldos/*.json
+      # Memoria pico de cada contenedor (cgroup v2: memory.peak) contra su tope.
+      - name: memoria pico
+        if: always()
+        run: |
+          for c in $(docker ps -q --filter name=decant); do
+            id=$(docker inspect -f '{{.Id}}' "$c"); nombre=$(docker inspect -f '{{.Name}}' "$c")
+            tope=$(docker inspect -f '{{.HostConfig.Memory}}' "$c")
+            pico=/sys/fs/cgroup/system.slice/docker-$id.scope/memory.peak
+            if [ -r "$pico" ]; then
+              echo "$nombre: pico $(( $(cat "$pico") / 1048576 )) MiB · tope $(( tope / 1048576 )) MiB"
+            else
+              echo "$nombre: memory.peak no disponible · tope $(( tope / 1048576 )) MiB"
+            fi
+          done
+          free -m
+      - name: apagar el legado y PostgreSQL
+        if: always()
+        run: |
+          docker compose -f legado/docker-compose.yml down -v
+          docker rm -f -v decant-pg-carga || true
+          docker ps -aq --filter name=decant-radiografia- | xargs -r docker rm -f

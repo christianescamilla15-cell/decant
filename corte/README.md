@@ -4,7 +4,9 @@ El corte del legado al TO-BE (plan: [`docs/s3/PLAN.md`](../docs/s3/PLAN.md)). Ho
 - el paso 1: el inventario de salidas y consumidores del legado y su **puerta** (ADR 0014, criterio 1). La vista
   legible está en [`inventario/INVENTARIO.md`](inventario/INVENTARIO.md);
 - el paso 2: el **corte medido por dos caminos** y las **cifras de control por documento** (ADR 0013 y 0016,
-  criterios 3, 7 y 8). La vista legible está en [`cifras/CIFRAS.md`](cifras/CIFRAS.md).
+  criterios 3, 7 y 8). La vista legible está en [`cifras/CIFRAS.md`](cifras/CIFRAS.md);
+- el paso 3: la **carga histórica por mes** con sólo INSERT, la reversa generada antes y el `setval` al cierre
+  (ADR 0013 y 0016, criterios 4, 5, 6 y 12), con su runbook `ensayo | aplicar | reversa`.
 
 ## Qué hay
 
@@ -20,6 +22,10 @@ El corte del legado al TO-BE (plan: [`docs/s3/PLAN.md`](../docs/s3/PLAN.md)). Ho
 | `caminos.py` | Paso 2, sin base: los caminos por sellos de cada tabla (consultas literales), sus límites desde las fotos del vivo, la diferencia de conjuntos contra la identidad, los huecos y la cobertura contra las tablas del inventario. |
 | `cifras.py` | Paso 2, sin base: la forma canónica y la huella sha256 de cada documento, su destino (cargado o no viaja por motivo), los agregados por tipo + estado + mes, el cuadre, la reconstrucción del estatus con la bitácora y la conciliación por llave de negocio. |
 | `medir.py` | En el CI, sobre el legado vivo que deja `./ciclo.sh`: lee la base (sólo lee), mide los dos caminos, arma los documentos al congelamiento y corre los controles negativos sobre los documentos reales. |
+| `carga.py` | Paso 3, sin base: las 7 tablas (tipos del legado), las consultas literales al origen, el plan por mes (rangos contiguos de ids por el sello de cada fila), la huella del mes, las guardas (sólo ids > corte) y la reversa. |
+| `destino.sql` | Paso 3: el esquema `legado` de PostgreSQL (valores CRUDOS, los mismos índices únicos, sin llaves foráneas hasta el cierre) y el esquema `corte` (registro de meses y ensayos, interruptores, acciones de negocio, avisos y punto de no retorno, y los dos roles). |
+| `runbook.py` | Paso 3: `python -m corte.runbook preparar\|ensayo\|aplicar\|reversa\|cierre\|estado --mes AAAA-MM`. |
+| `carga_ci.py` | Paso 3, en el CI (`.github/workflows/carga.yml`): restaura el respaldo, corre los meses y los controles negativos y deja `carga.json`. |
 | `veredicto.py`, `vista_cifras.py` | Sin base: re-verifica la medición (recuenta desde el CSV documento por documento), compara con lo versionado, comprueba el digest de los artefactos publicados y versiona una corrida en `cifras/` con su `CIFRAS.md`. |
 
 `inventario/`: `objetos.json` (sale del código), `observado.json` (artefacto de una corrida del CI, versionado con su
@@ -37,6 +43,13 @@ python -m corte.escribir                   # regenera objetos.json e INVENTARIO.
 python -m corte.medir --salida corte/medido-ci     # con el legado vivo arriba (después de ./ciclo.sh)
 python -m corte.veredicto corte/medido-ci          # sin base: re-verifica y compara con corte/cifras/huella.json
 python -m corte.veredicto <artefacto corte-medido> --versionar --artefactos artefactos.json   # a corte/cifras/
+# paso 3: con el respaldo restaurado como BFN_DIVISAS_CORTE y PostgreSQL arriba (DECANT_PG_PASSWORD, DECANT_PG_PUERTO)
+python -m corte.runbook preparar [--recrear]
+python -m corte.runbook ensayo  --mes 2021-01
+python -m corte.runbook aplicar --mes 2021-01
+python -m corte.runbook reversa --mes 2021-01
+python -m corte.runbook cierre                     # con los 36 meses aplicados
+python -m corte.carga_ci --meses pr --salida corte/carga-ci        # lo del CI: restaura, carga y controles
 ```
 
 En el CI, el job `legado` deja el artefacto `ejecucion-observada` y el job `puerta` (aparte y fuera del ruleset) lo
@@ -86,6 +99,40 @@ comprueba y lo deja en su resumen. Para versionar una corrida:
   en totales globales y no por mes) y un duplicado (falla nombrándolo).
 - Las cifras y el CSV no dependen del reloj de la corrida: el job `corte` exige los sha256 versionados.
 
+### La carga histórica por mes (paso 3)
+
+- **Origen:** el respaldo FECHADO restaurado como `BFN_DIVISAS_CORTE` (sha256 contra su manifiesto y VERIFYONLY). El
+  corte de cada tabla es el `MAX(id)` del manifiesto y tiene que ser el medido por dos caminos en el paso 2
+  (`cifras/corte.json`); si no, el runbook se niega.
+- **Destino:** el esquema `legado` de PostgreSQL con las 7 tablas fila por fila, CON sus ids y sus valores CRUDOS
+  (`char(n)` con su relleno, los centinelas tal cual, la hora local sin zona, cada decimal con su escala). Los parches
+  del ADR 0007 se aplican de `legado` al TO-BE, como ya los aplica y mide S2; aquí la huella del mes tiene que ser
+  igual en los dos lados.
+- **Plan:** el mes de cada fila es el de su SELLO en hora local (`fecha_operacion`, `fecha_registro`, la bitácora
+  «→ LIQUIDADA» de su orden, `fecha_hora`, `fecha`). Por tabla y mes, `MIN(id)`, `MAX(id)` y filas en el origen;
+  cada mes es el rango `(fin del anterior, MAX(id)]` y el plan exige que no se enciman y que los meses sumen el
+  origen hasta el corte. Su sha256 ata el ensayo con lo que se aplica.
+- **Sólo INSERT y sólo ids > corte:** el corte de un mes es lo que el destino ya tiene, por dos caminos (`MAX(id)` y
+  el registro de meses aplicados). Un mes que empieza antes, o un lote con un id ≤ corte, se niega; `aplicar` corre
+  con un rol que sólo puede insertar (y `reversa`, con uno que sólo puede borrar).
+- **Huella del mes:** por tabla, `cifras.huella` de cada fila; en el origen se toman por su sello (el mes de verdad) y
+  en el destino por el rango del plan. `aplicar` confirma sólo si son iguales, si las filas con id ≤ corte siguen
+  idénticas y si no quedó nada después del mes.
+- **Reversa:** se guarda ANTES de insertar (en `corte.carga_mes` y en `reversa_AAAA-MM.json`): los rangos, el valor
+  previo de cada secuencia y de cada folio, y la huella previa (las 7 tablas, las secuencias y los consumibles). Sólo
+  revierte el último mes aplicado y confirma sólo si el destino vuelve a esa huella.
+- **Lo que ya trabajó el TO-BE** lo dice la bitácora de ACCIONES de negocio (`corte.accion_negocio`), nunca el token
+  de concurrencia: la primera acción o el primer aviso al exterior (`corte.aviso_exterior`) registran, por disparador,
+  el punto de no retorno (`corte.no_retorno`), y desde ahí `reversa` se niega. `aplicar` se niega con un interruptor
+  de `corte.interruptor` encendido (son las banderas del TO-BE, precargadas apagadas).
+- **Ensayo:** el mismo `aplicar` en una transacción que se revierte, sobre el mismo destino (los mismos índices únicos,
+  comparados contra el catálogo del origen). `aplicar` exige un ensayo verde del mismo mes y plan sobre la misma
+  huella previa: un choque en el ensayo detiene el corte.
+- **Cierre:** con los 36 meses aplicados, `setval` desde `IDENT_CURRENT` del origen (no desde `MAX(id)`), los folios
+  con margen por encima de lo que el legado vivo ya usó, las llaves foráneas validadas y los totales globales.
+- `setval` no es transaccional en PostgreSQL: cuando una transacción se revierte (el ensayo, o una verificación que no
+  cuadra), el runbook regresa las secuencias a mano; si no, la huella lo ve.
+
 ## Límites declarados
 
 - Las sesiones se muestrean cada 0.25 s: una conexión más corta puede no verse. La bitácora cubre a quienes
@@ -99,5 +146,10 @@ comprueba y lo deja en su resumen. Para versionar una corrida:
   catálogo no tienen bitácora: si algo los cambiara después del congelamiento, la foto no lo vería (en el vivo nada los
   cambia). La bitácora no guarda `horas_liquidacion`: si el job conciliara después del congelamiento, la medición
   falla en lugar de reconstruir mal.
+- Paso 3: con la grieta UTC, `operacion` deja de partir en rangos contiguos (su sello es la fecha de NEGOCIO y las
+  altas por archivo de las 22:00 traen horas del día): el plan la rechaza antes de cargar. Las otras tablas sí parten
+  contiguo y es el cuadre del mes el que la ve. El control lo reporta en sus dos capas.
+- Paso 3: la segunda línea de defensa (restaurar el destino desde una foto tomada antes de aplicar) todavía no corre
+  en el CI; la primera, la reversa generada antes, sí, con sus controles.
 - El CI mide sin escribir: el hueco de identidad se prueba sin base y se ensayó una vez en local contra el motor real
   (una inserción revertida: los dos caminos coinciden y se reporta 1 hueco).
