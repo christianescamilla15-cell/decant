@@ -3,6 +3,7 @@ PostgreSQL limpio, con sus controles negativos.
 
     python -m corte.carga_ci --meses pr     --salida corte/carga-ci   # PR: 2021-01, la grieta y 2023-12
     python -m corte.carga_ci --meses todos  --salida corte/carga-ci   # cada noche: los 36, acumulando, y el cierre
+    python -m corte.carga_ci --meses todos  --salida corte/carga-ci --volcar corte/base --contenedor decant-pg-carga
 
 Necesita el legado arriba después de `./ciclo.sh` (DECANT_SA_PASSWORD, DECANT_PUERTO) y PostgreSQL
 (DECANT_PG_PASSWORD, DECANT_PG_PUERTO). Pasos:
@@ -20,6 +21,8 @@ Necesita el legado arriba después de `./ciclo.sh` (DECANT_SA_PASSWORD, DECANT_P
      detiene;
    - `aplicar` con un automatismo encendido: se niega;
    - `reversa` después del punto de no retorno (aviso al exterior y acción de negocio): se niega.
+4. Con `--volcar` (de noche, y sólo si los 36 meses cuadran y el cierre pasa): la base cerrada se vuelca con
+   `pg_dump` (`corte/base.py`) para que el delta del mismo día la restaure (en el PR, desde la nocturna anterior).
 Deja `carga.json` y, con `--resumen`, el resumen del job. Sale con 1 si un mes no cuadra o un control no falla.
 """
 from __future__ import annotations
@@ -32,7 +35,7 @@ import sys
 import time
 from pathlib import Path
 
-from corte import carga, runbook
+from corte import base, carga, runbook
 from corte.runbook import Negado, NoCuadra
 
 CONTROLES_BASE = 'decant_corte_controles'
@@ -313,6 +316,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--manifiesto', type=Path, default=None)
     parser.add_argument('--resumen', type=Path, default=None)
     parser.add_argument('--margen-folios', type=int, default=10_000)
+    parser.add_argument('--volcar', type=Path, default=None,
+                        help='carpeta donde dejar el volcado de la base cerrada (sólo con los 36 meses y el cierre)')
+    parser.add_argument('--contenedor', default='decant-pg-carga', help='el contenedor de PostgreSQL (pg_dump)')
     args = parser.parse_args(argv)
     t0 = time.monotonic()
     meses = {'pr': carga.MESES_PR, 'todos': carga.MESES}.get(args.meses) or tuple(args.meses.split(','))
@@ -342,6 +348,10 @@ def main(argv: list[str] | None = None) -> int:
                     informe['cierre'] = runbook.cerrar(pg, ms, p, corte, args.margen_folios)
                 except (Negado, NoCuadra) as error:
                     informe['cierre'] = {'error': f'{type(error).__name__}: {error}'}
+                cuadran = all(m.get('verde') for m in informe['meses']) and not p['faltas']
+                if args.volcar and cuadran and 'error' not in informe['cierre']:
+                    informe['base'] = {k: v for k, v in base.volcar(pg, args.contenedor, runbook.DESTINO_BASE,
+                                                                    args.volcar, informe).items() if k != 'huella'}
         informe['segundos']['meses'] = round(time.monotonic() - t2, 1)
         t3 = time.monotonic()
         informe['controles'] = controles(ms, p, corte)

@@ -61,6 +61,10 @@ def foto(cursor, espera: float = 0.005) -> dict:
         resultado[tabla] = {'filas': filas, 'max_id': maximo}
     cursor.execute('SELECT serie, siguiente FROM dbo.folio ORDER BY serie')
     resultado['folios'] = {serie.strip(): siguiente for serie, siguiente in cursor.fetchall()}
+    # El catálogo completo (S3 paso 4): no tiene bitácora, así que el delta toma las monedas de ESTA foto y lo que
+    # cambie después queda para el barrido posterior al corte.
+    cursor.execute('SELECT codigo, numerico, nombre, decimales, activa FROM dbo.moneda ORDER BY codigo')
+    resultado['catalogo'] = {'moneda': [[c, n, nombre, int(d), bool(a)] for c, n, nombre, d, a in cursor.fetchall()]}
     while instante_servidor(cursor) <= instante:       # estilo 121: ancho fijo, se compara como texto
         time.sleep(espera)
     return resultado

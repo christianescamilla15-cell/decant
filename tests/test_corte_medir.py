@@ -239,14 +239,16 @@ def test_el_digest_del_artefacto_publicado_es_el_sha256_del_archivo(medido):
 
 
 class CursorReloj:
-    """GETDATE() que avanza cuando se le dice; COUNT/MAX y folios fijos."""
+    """GETDATE() que avanza cuando se le dice; COUNT/MAX, folios y catálogo fijos."""
 
     def __init__(self, instantes):
         self.instantes = list(instantes)
         self.pedidos = 0
         self.fila: list = []
+        self.sql = ''
 
     def execute(self, sql, parametros=None):
+        self.sql = sql
         if 'GETDATE' in sql:
             self.pedidos += 1
             self.fila = [self.instantes.pop(0) if len(self.instantes) > 1 else self.instantes[0]]
@@ -257,6 +259,8 @@ class CursorReloj:
         return self.fila
 
     def fetchall(self):
+        if 'dbo.moneda' in self.sql:
+            return [('MXN', '484', 'Peso mexicano', 2, True), ('SLL', '694', 'Leone', 2, False)]
         return [('FX', 10), ('OP', 3)]
 
 
@@ -266,6 +270,9 @@ def test_la_foto_del_vivo_no_regresa_hasta_que_el_reloj_del_servidor_avanza():
     foto = vivo_main.foto(reloj, espera=0)
     assert foto['servidor'] == '2026-11-26 10:00:00.003' and reloj.pedidos == 4
     assert foto['operacion'] == {'filas': 5, 'max_id': 5} and foto['folios'] == {'FX': 10, 'OP': 3}
+    # el catálogo completo (paso 4: el delta toma las monedas de la foto, no las de ahora), serializable tal cual
+    assert foto['catalogo'] == {'moneda': [['MXN', '484', 'Peso mexicano', 2, True], ['SLL', '694', 'Leone', 2, False]]}
+    assert json.loads(json.dumps(foto)) == foto
     # control: si el reloj ya avanzó al terminar la foto, no espera
     reloj = CursorReloj(['2026-11-26 10:00:00.003', '2026-11-26 10:00:00.010'])
     vivo_main.foto(reloj, espera=0)
