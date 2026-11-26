@@ -5,7 +5,7 @@
 Fases (en hora local del día del respaldo):
   1. delta: operaciones nuevas, órdenes, RE-REGISTROS de la mañana (mismo documento, otra llave interna),
      liquidaciones del corresponsal y cambios de catálogo; los folios (consumibles) avanzan solos.
-  2. congelamiento: se anotan los totales y el MAX(id) de cada tabla en ese instante.
+  2. congelamiento: se anotan los totales, el MAX(id) de cada tabla y el instante del servidor (GETDATE()).
   3. posterior al congelamiento: el legado SIGUE escribiendo un rato (lo que el barrido posterior al corte debe
      clasificar como duplicado huérfano o como pérdida).
 """
@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 from legado.conexion import RAIZ, conectar
@@ -36,9 +37,20 @@ _ALTA_MONEDA = 'INSERT INTO dbo.moneda (codigo, numerico, nombre, decimales, act
 _BAJA_MONEDA = 'UPDATE dbo.moneda SET activa = 0 WHERE codigo = %s'
 
 
-def foto(cursor) -> dict:
-    """COUNT y MAX(id) de cada tabla: lo que el corte vería en este instante."""
-    resultado = {}
+def instante_servidor(cursor) -> str:
+    """GETDATE() del servidor con sus milésimas (estilo 121): el reloj con el que sella la bitácora."""
+    cursor.execute('SELECT CONVERT(varchar(23), GETDATE(), 121)')
+    return cursor.fetchone()[0]
+
+
+def foto(cursor, espera: float = 0.005) -> dict:
+    """COUNT y MAX(id) de cada tabla y el instante del servidor: lo que el corte vería en este instante.
+
+    El instante es el límite del camino por sellos (S3, criterio 3): lo escrito antes de la foto sella con un instante
+    menor o igual, y la foto no regresa hasta que el reloj del servidor AVANZA, para que lo escrito después selle con
+    uno mayor (la bitácora guarda `datetime`, con tics de 1/300 s: sin la espera, dos escrituras pueden empatar)."""
+    instante = instante_servidor(cursor)
+    resultado: dict = {'servidor': instante}
     for tabla in TABLAS:
         cursor.execute(
             "DECLARE @t nvarchar(300) = N'dbo.' + QUOTENAME(%s); "
@@ -49,6 +61,8 @@ def foto(cursor) -> dict:
         resultado[tabla] = {'filas': filas, 'max_id': maximo}
     cursor.execute('SELECT serie, siguiente FROM dbo.folio ORDER BY serie')
     resultado['folios'] = {serie.strip(): siguiente for serie, siguiente in cursor.fetchall()}
+    while instante_servidor(cursor) <= instante:       # estilo 121: ancho fijo, se compara como texto
+        time.sleep(espera)
     return resultado
 
 
