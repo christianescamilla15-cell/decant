@@ -77,8 +77,9 @@ def evaluar(inv: dict, cruzado: dict, lista: list[renglones.Renglon], errores_de
 
 
 def texto(r: dict) -> str:
-    lineas = [f"Puerta de cobertura de salidas (ADR 0014): {r['objetos']} objetos "
-              f"({r['objetos_del_codigo']} del código), {r['logins']} logins",
+    titulo = (f"Puerta de cobertura de salidas (ADR 0014): {r['objetos']} objetos "
+              f"({r['objetos_del_codigo']} del código), {r['logins']} logins")
+    lineas = [titulo,
               '  por tipo: ' + ', '.join(f'{t} {n}' for t, n in sorted(r['por_tipo'].items())),
               '  destinos: ' + ' · '.join(f'{d} {sum(c.values())}' for d, c in r['destinos'].items())]
     faltas = [('objetos sin renglón', r['sin_renglon']['objetos']), ('logins sin renglón', r['sin_renglon']['logins']),
@@ -108,12 +109,12 @@ def markdown(r: dict) -> str:
     filas = '\n'.join(f"| {d} | {sum(c.values())} | {', '.join(f'{t} {n}' for t, n in sorted(c.items())) or '–'} |"
                       for d, c in r['destinos'].items())
     sin = r['sin_renglon']
+    faltas = (f"Sin renglón: {len(sin['objetos'])} objetos, {len(sin['logins'])} logins, "
+              f"{len(sin['aplicaciones'])} aplicaciones. Inválidos: {len(r['renglones_invalidos'])}. "
+              f"Huérfanos: {len(r['huerfanos'])}. Sin ejecución observada: {len(r['sin_ejecucion_observada'])}.")
     partes = [f"## Puerta de cobertura de salidas: {'verde' if r['verde'] else 'ROJA'}",
               f"{r['objetos']} objetos ({r['objetos_del_codigo']} del código) y {r['logins']} logins.",
-              '| destino | renglones | por tipo |', '|---|---|---|', filas,
-              f"Sin renglón: {len(sin['objetos'])} objetos, {len(sin['logins'])} logins, "
-              f"{len(sin['aplicaciones'])} aplicaciones. Inválidos: {len(r['renglones_invalidos'])}. "
-              f"Huérfanos: {len(r['huerfanos'])}. Sin ejecución observada: {len(r['sin_ejecucion_observada'])}."]
+              '| destino | renglones | por tipo |', '|---|---|---|', filas, faltas]
     for titulo, lista in (('Objetos sin renglón', sin['objetos']), ('Logins sin renglón', sin['logins']),
                           ('Aplicaciones sin renglón', sin['aplicaciones'])):
         if lista:

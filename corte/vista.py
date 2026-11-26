@@ -8,6 +8,15 @@ ETIQUETA = {cruce.OBSERVADA: 'observada', cruce.POR_QUIEN_LA_USA: 'por quien la 
             cruce.SIN_EJECUCION: '**sin ejecución observada**'}
 
 
+NOTA = ('> Generado con `python -m corte.escribir` a partir de `objetos.json` (el código), `observado.json` (lo que '
+        'el CI vio durante el ciclo) y `renglones.yml`. No se edita a mano: `tests/test_corte_puerta.py` lo regenera '
+        'y lo compara.')
+CABECERA_OBJETOS = ('| Objeto | Tipo | Acceso | Lee (total) | Escribe (total, con triggers) | Fuera de la base | '
+                    'Reloj | SQL dinámico | En el ciclo | Destino |')
+NOTA_AD_HOC = ('Lo que los clientes mandan como texto (no `EXEC` de un procedimiento por RPC): qué tocan, agrupado. '
+               'No es un objeto del legado; muestra quién lee o escribe tablas directo.')
+
+
 def _lista(valores, vacio: str = '–') -> str:
     return ', '.join(f'`{v}`' for v in valores) if valores else vacio
 
@@ -27,36 +36,27 @@ def markdown(inv: dict, cruzado: dict, renglones_: list, evaluacion: dict) -> st
     conteo = {k: sum(1 for r in cruzado['objetos'].values() if r['ejecucion'] == k) for k in ETIQUETA}
     qs = obs.get('query_store') or {}
     muestras = obs.get('muestras') or {}
+    pendientes = ''
+    if evaluacion['pendientes']:
+        pendientes = (f" ({len(evaluacion['pendientes'])} pendientes: "
+                      + ', '.join(f'{t} {n}' for t, n in sorted(evaluacion['pendientes_por_tipo'].items())) + ')')
+    objetos = (f"- **Objetos desde el código:** {len(inv['objetos'])} · "
+               + ' · '.join(f'{t} {n}' for t, n in inv['por_tipo'].items()) + '.')
+    escritores = (f"- **Escritores** (procedimientos, triggers y pasos de job; paridad de estado, ADR 0015): "
+                  f"{len(inv['escritores'])}.")
+    observacion = (f"- **Observación del ciclo:** corrida `{ci.get('corrida')}` (sha `{(ci.get('sha') or '')[:7]}`), "
+                   f"{obs.get('segundos')} s, {muestras.get('sesiones')} muestras de sesiones y "
+                   f"{muestras.get('estadisticas')} de estadísticas; Query Store `{qs.get('estado')}` con captura "
+                   f"`{qs.get('captura')}`.")
+    ejecuciones = (f"- **Ejecución:** observada {conteo[cruce.OBSERVADA]} · por quien la usa "
+                   f"{conteo[cruce.POR_QUIEN_LA_USA]} · sin ejecución observada {conteo[cruce.SIN_EJECUCION]} "
+                   '(clasifica; no recorta).')
     salida = [
-        '# Inventario de salidas y consumidores del legado',
-        '',
-        '> Generado con `python -m corte.escribir` a partir de `objetos.json` (el código), `observado.json` (lo que el '
-        'CI vio durante el ciclo) y `renglones.yml`. No se edita a mano: `tests/test_corte_puerta.py` lo regenera y '
-        'lo compara.',
-        '',
-        '## Resumen',
-        '',
-        f"- **Objetos desde el código:** {len(inv['objetos'])} · "
-        + ' · '.join(f'{t} {n}' for t, n in inv['por_tipo'].items()) + '.',
-        f"- **Escritores** (procedimientos, triggers y pasos de job; paridad de estado, ADR 0015): "
-        f"{len(inv['escritores'])}.",
-        f"- **Observación del ciclo:** corrida `{ci.get('corrida')}` (sha `{(ci.get('sha') or '')[:7]}`), "
-        f"{obs.get('segundos')} s, {muestras.get('sesiones')} muestras de sesiones y "
-        f"{muestras.get('estadisticas')} de estadísticas; Query Store `{qs.get('estado')}` con captura "
-        f"`{qs.get('captura')}`.",
-        f"- **Ejecución:** observada {conteo[cruce.OBSERVADA]} · por quien la usa {conteo[cruce.POR_QUIEN_LA_USA]} · "
-        f"sin ejecución observada {conteo[cruce.SIN_EJECUCION]} (clasifica; no recorta).",
+        '# Inventario de salidas y consumidores del legado', '', NOTA, '', '## Resumen', '',
+        objetos, escritores, observacion, ejecuciones,
         '- **Renglones:** ' + ' · '.join(f'{d} {sum(c.values())}' for d, c in evaluacion['destinos'].items()) + '.',
-        f"- **Puerta:** {'verde' if evaluacion['verde'] else 'roja'}"
-        + (f" ({len(evaluacion['pendientes'])} pendientes: "
-           + ', '.join(f'{t} {n}' for t, n in sorted(evaluacion['pendientes_por_tipo'].items())) + ')'
-           if evaluacion['pendientes'] else '') + '.',
-        '',
-        '## Objetos',
-        '',
-        '| Objeto | Tipo | Acceso | Lee (total) | Escribe (total, con triggers) | Fuera de la base | Reloj | '
-        'SQL dinámico | En el ciclo | Destino |',
-        '|---|---|---|---|---|---|---|---|---|---|',
+        f"- **Puerta:** {'verde' if evaluacion['verde'] else 'roja'}{pendientes}.",
+        '', '## Objetos', '', CABECERA_OBJETOS, '|---|---|---|---|---|---|---|---|---|---|',
     ]
     for o in inv['objetos']:
         e = o['efectivo']
@@ -91,8 +91,7 @@ def markdown(inv: dict, cruzado: dict, renglones_: list, evaluacion: dict) -> st
             f'`{login}`', _lista(c['aplicaciones']), ', '.join(c['origenes']), c['sesiones'],
             f"{c['filas_en_bitacora']:,}", destino.get(login, '**sin renglón**'))) + ' |')
     salida += ['', '## Acceso fuera de los módulos (lotes ad hoc observados)', '',
-               'Lo que los clientes mandan como texto (no `EXEC` de un procedimiento por RPC): qué tocan, agrupado. '
-               'No es un objeto del legado; muestra quién lee o escribe tablas directo.', '',
+               NOTA_AD_HOC, '',
                '| Lee | Escribe | Llama | Fuera de la base | Lotes | Ejecuciones |', '|---|---|---|---|---|---|']
     for g in cruzado.get('ad_hoc', []):
         salida.append('| ' + ' | '.join(_celda(str(x)) for x in (
