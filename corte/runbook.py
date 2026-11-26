@@ -280,7 +280,8 @@ def preparar(pg, ms, recrear: bool = False) -> dict:
         'SELECT codigo, numerico, nombre, decimales, activa FROM legado.moneda').fetchall())
     if origen_monedas != destino_monedas:
         raise NoCuadra([f'moneda: origen {origen_monedas} ≠ destino {destino_monedas}'])
-    return {'monedas': origen_monedas, 'series': series, 'indices_unicos': indices['destino']}
+    return {'monedas': origen_monedas, 'series': series, 'indices_unicos': indices['destino'],
+            'indices_unicos_iguales': indices['iguales']}
 
 
 # ── ensayo y aplicar ────────────────────────────────────────────────────────────────────────────────────────────

@@ -253,14 +253,16 @@ def controles(ms, p: dict, corte: dict, base: str = CONTROLES_BASE) -> dict:
 # ── el resumen ──────────────────────────────────────────────────────────────────────────────────────────────────
 
 def resumen(informe: dict) -> str:
-    lineas = [f"## Carga histórica por mes ({informe['modo']}: {informe['verdes']} de {len(informe['meses'])} meses)",
-              '', f"Origen: `{informe['origen']['base']}` restaurado de `{informe['origen']['archivo']}` "
-                  f"(sha256 `{informe['origen']['sha256'][:16]}…`, {informe['origen']['verificado']}). "
-                  f"Plan `{informe['plan']['sha'][:12]}`: {len(informe['plan']['meses'])} meses en rangos contiguos, "
-                  f"{len(informe['plan']['faltas'])} faltas. Índices únicos iguales: "
-                  f"{informe['preparar']['indices_unicos_iguales']}.", '',
-              '| mes | operacion | orden_pago | partida_solicitada | partida_liquidada | bitacora | origen = destino | '
-              'reversa = previa | s |', '|---|---|---|---|---|---|---|---|---|']
+    titulo = f"## Carga histórica por mes ({informe['modo']}: {informe['verdes']} de {len(informe['meses'])} meses)"
+    origen = (f"Origen: `{informe['origen']['base']}` restaurado de `{informe['origen']['archivo']}` "
+              f"(sha256 `{informe['origen']['sha256'][:16]}…`, {informe['origen']['verificado']}). "
+              f"Plan `{informe['plan']['sha'][:12]}`: {len(informe['plan']['meses'])} meses en rangos contiguos, "
+              f"{len(informe['plan']['faltas'])} faltas. Índices únicos iguales al origen: "
+              f"{informe['preparar']['indices_unicos_iguales']}.")
+    columnas = ('mes', 'operacion', 'orden_pago', 'partida_solicitada', 'partida_liquidada', 'bitacora',
+                'origen = destino', 'reversa = previa', 's')
+    encabezado = '| ' + ' | '.join(columnas) + ' |'
+    lineas = [titulo, '', origen, '', encabezado, '|---|---|---|---|---|---|---|---|---|']
     for m in informe['meses']:
         if 'filas' not in m:
             lineas.append(f"| {m['mes']} | ✘ {m.get('error', '')[:200]} | | | | | | | {m['segundos_total']} |")
@@ -279,13 +281,28 @@ def resumen(informe: dict) -> str:
     lineas += ['', '| control negativo | detectado | cómo |', '|---|---|---|']
     for nombre, c in informe['controles'].items():
         if isinstance(c, dict) and 'detectado' in c:
-            como = c.get('cuadre_del_mes') or c.get('resultado') or c.get('reversa_por_token') or c.get('guarda') \
-                or c.get('aplicar') or (c.get('por_accion_de_negocio') or {}).get('reversa') or ''
-            lineas.append(f"| {nombre} | {'sí' if c['detectado'] else 'NO'} | {como[:300]} |")
+            lineas.append(f"| {nombre} | {'sí' if c['detectado'] else 'NO'} | {_como(c)} |")
     lineas += ['', f"Tiempos: total {informe['segundos']['total']} s · restaurar {informe['origen']['segundos']} s · "
                    f"plan {informe['segundos']['plan']} s · meses {informe['segundos']['meses']} s · controles "
                    f"{informe['segundos']['controles']} s."]
     return '\n'.join(lineas) + '\n'
+
+
+def _como(c: dict) -> str:
+    """Lo que hizo fallar a un control, en un renglón."""
+    if 'cuadre_del_mes' in c:
+        plan = c['el_plan'] if isinstance(c['el_plan'], str) else '; '.join(c['el_plan'])
+        return (f"cuadre del mes: {c['cuadre_del_mes'][:220]} · plan: {plan[:160]} · totales globales iguales: "
+                f"{'sí' if c['totales_globales_iguales'] else 'NO'}")
+    if 'indice_unico_del_ensayo' in c:
+        return (f"{c['guarda'][:140]} · sin la guarda: {c['indice_unico_del_ensayo'][:120]} · "
+                f"{c['aplicar_despues'][:120]}")
+    if 'por_aviso_al_exterior' in c:
+        return (f"por aviso: {c['por_aviso_al_exterior']['reversa'][:150]} · por acción: "
+                f"{c['por_accion_de_negocio']['reversa'][:150]}")
+    if 'reversa_por_token' in c:
+        return f"{c['reversa_por_token'][:200]} · la reversa buena la incluye: {c['reversa_buena']['la_incluye']}"
+    return (c.get('resultado') or c.get('aplicar') or '')[:300]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -318,8 +335,7 @@ def main(argv: list[str] | None = None) -> int:
         t2 = time.monotonic()
         with runbook.conectar_destino(crear=True) as pg:
             prep = runbook.preparar(pg, ms, recrear=True)
-            informe['preparar'] = {'monedas': prep['monedas'], 'series': prep['series'],
-                                   'indices_unicos': prep['indices_unicos'], 'indices_unicos_iguales': True}
+            informe['preparar'] = prep
             informe['meses'] = [un_mes(pg, ms, p, m, corte, acumular, args.salida / 'reversas') for m in meses]
             if acumular and meses == carga.MESES:
                 try:

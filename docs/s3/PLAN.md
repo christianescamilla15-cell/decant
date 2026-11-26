@@ -150,7 +150,52 @@ choques preparados) y el emulador del corresponsal.
        sin comprimir, de modo que el digest de GitHub sea el sha256 del archivo. La vista legible está en
        `corte/cifras/CIFRAS.md`.
 3. Carga por mes (INSERT, reversa, `setval`) sobre la foto con índices únicos.
-4. Cuadre mes a mes y grieta plantada.
+   - **Avance (26-nov, en `corte/`; workflow `carga.yml`, fuera del ruleset):**
+     - Origen: el respaldo fechado restaurado como `BFN_DIVISAS_CORTE` (sha256 del manifiesto y VERIFYONLY con
+       CHECKSUM). El corte por tabla es el del manifiesto y tiene que ser el medido en el paso 2.
+     - Destino: el esquema `legado` de PostgreSQL con los valores CRUDOS. Tiene los mismos índices únicos que el
+       origen (se comparan los dos catálogos) y las llaves foráneas sólo al cierre. Los parches del ADR 0007 van de
+       `legado` al TO-BE.
+     - Plan: el mes de cada fila es el de su sello en hora local. En las 5 tablas con identidad, los 36 meses son
+       rangos contiguos de ids (0 faltas).
+     - Runbook `preparar | ensayo | aplicar | reversa | cierre | estado`:
+       - `aplicar` exige un ensayo verde del mismo mes y plan sobre la misma huella, corre con un rol que sólo
+         inserta y guarda la reversa antes de insertar;
+       - `reversa` corre con un rol que sólo borra y confirma sólo si vuelve a la huella previa: las 7 tablas, las
+         5 secuencias y los 2 folios;
+       - `setval` no es transaccional: al revertir, las secuencias se regresan a mano.
+     - PR (corrida 45874102902): 3 de 3 meses, cada uno con la huella del mes por tabla origen = destino y la
+       reversa en la huella previa:
+       - 2021-01: 9,696 operaciones · 6,429 órdenes · 5,452 partidas del corresponsal · 21,192 del cliente ·
+         15,871 renglones de bitácora;
+       - 2022-10: 11,457 · 7,682 · 6,761 · 25,398 · 19,368;
+       - 2023-12: 12,012 · 8,538 · 7,549 · 28,167 · 21,566.
+     - Controles negativos, 6 de 6 detectados:
+       - grieta UTC en octubre de 2022 (criterio 6): el cuadre del mes falla en 4 tablas y los totales globales
+         del plan quedan iguales. En `operacion`, además, el plan se encima: su sello es la fecha de negocio;
+       - reversa sin `setval`: la huella nombra las 5 secuencias;
+       - escritura informativa: la reversa la sigue incluyendo; la que decide por el token de concurrencia la deja
+         fuera y la huella lo ve;
+       - fila con id ≤ corte: la niega la guarda; sin la guarda, choca `pk_operacion` en el ensayo y `aplicar` se
+         niega;
+       - `aplicar` con `ConciliarAutomatico` encendido: se niega;
+       - `reversa` tras el punto de no retorno (aviso al exterior y acción de negocio): se niega.
+     - Tiempos del PR: carga y controles en 60 s (meses 24 s, controles 32 s); el job completo, 4 min 32 s, en
+       paralelo con la paridad (≈13 min). Memoria pico: PostgreSQL 385 MiB de 1 GiB.
+     - Cada noche (corrida 45874158091, lanzada a mano con `workflow_dispatch` sobre la rama): 36 de 36 meses
+       acumulando (ensayo → aplicar → reversa a la huella previa → aplicar otra vez), con la huella del mes
+       origen = destino en las 5 tablas de cada mes. Luego el cierre:
+       - las 5 tablas con sus filas, `MAX(id)` y montos iguales al origen (412,125 · 270,616 · 244,869 · 893,174 ·
+         685,276);
+       - `setval` desde `IDENT_CURRENT`, que aquí coincide con `MAX(id)` (0 huecos al final);
+       - folios FX 412,126 → 422,126 y OP 150,720 → 160,720, por encima de lo que el legado vivo ya usó
+         (412,557 y 150,855);
+       - las 5 llaves foráneas validadas.
+       Los mismos 6 controles, detectados. Tiempo de la carga: 836 s (los meses 804 s, de 8 s el primero a 36 s el
+       último, porque la huella previa recorre el destino completo); el job completo, 17 min. Memoria pico de
+       PostgreSQL: 1 GiB, el tope (incluye caché de páginas), sin cortes.
+4. Cuadre mes a mes y grieta plantada. (Entró en el paso 3: la huella del mes es el cuadre y la grieta es uno de sus
+   controles.)
 5. Delta del mismo día, numerado DESPUÉS de subir los consumibles.
 6. Paridad de estado (escriben) y oráculo del corte (leen): las 6 trampas.
 7. Latentes con plan variado: las 2.
