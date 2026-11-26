@@ -151,6 +151,8 @@ def test_los_parches_del_tobe_entran_una_sola_vez_en_el_texto_original(modulos, 
         assert original.count(viejo) == 1
         c = estado.copiar(original, conocidos, parche=(viejo, nuevo))
         assert nuevo.replace('dbo.', 'estado.') in c.texto
+    for e, viejo, nuevo, _que in estado.VARIANTES_DE_PLAN.values():
+        assert modulos[e].texto.count(viejo) == 1 and 'OPTION (MAXDOP 1)' in nuevo
     with pytest.raises(NoSeCopia, match='exactamente una vez'):
         estado.copiar('SELECT 1', set(), parche=('no está', 'x'))
 
@@ -313,9 +315,12 @@ def test_la_transaccion_revertida_de_los_veredictos_siempre_revierte():
         def execute(self, sql, *_):
             self.sentencias.append(sql)
     c = Cursor()
-    with pytest.raises(RuntimeError), revertida(c):
+
+    def falla_a_medias():
         c.execute('EXEC dbo.sp_x')
         raise RuntimeError('falló a medias')
+    with pytest.raises(RuntimeError), revertida(c):
+        falla_a_medias()
     assert c.sentencias == ['BEGIN TRANSACTION', 'EXEC dbo.sp_x', 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION']
 
 

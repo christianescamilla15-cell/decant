@@ -211,6 +211,10 @@ def preparar_copia(ms, objetos: list[dict], escritores: list[str], efectos: dict
         cursor.execute(DEFINICION, (e,))
         c = estado.copiar((cursor.fetchone()[0] or '').strip(), conocidos, parche=(viejo, nuevo))
         cursor.execute(re.sub(rf'(CREATE\s+PROCEDURE\s+{ESQUEMA}\.)(\w+)', r'\1\2_con_parche', c.texto, count=1))
+    for sufijo, (e, viejo, nuevo, _que) in estado.VARIANTES_DE_PLAN.items():
+        cursor.execute(DEFINICION, (e,))
+        c = estado.copiar((cursor.fetchone()[0] or '').strip(), conocidos, parche=(viejo, nuevo))
+        cursor.execute(re.sub(rf'(CREATE\s+PROCEDURE\s+{ESQUEMA}\.)(\w+)', rf'\1\2_{sufijo}', c.texto, count=1))
     cursor.execute(CONTROL_ROLLBACK)
     # el paso del job: su comando, de msdb (y el del código)
     job, paso = estado.JOB.removeprefix('job:').split('/paso:')
@@ -615,6 +619,37 @@ def comparar_escenario(escenario: estado.Escenario, legado: dict, tobe: dict, in
     return resultado
 
 
+CUENTA_1_N = """SELECT COUNT(*) FROM estado.operacion o
+JOIN (SELECT operacion_id, estatus, ROW_NUMBER() OVER (PARTITION BY operacion_id ORDER BY id DESC) AS n
+      FROM estado.orden_pago WHERE estatus <> 'REEMPLAZADA') v ON v.operacion_id = o.id AND v.n = 1
+WHERE o.estatus <> CASE v.estatus WHEN 'CONCILIADA' THEN 'PAGADA' WHEN 'DIFERENCIA' THEN 'PAGADA'
+                                  WHEN 'VENCIDA' THEN 'RECHAZADA' ELSE 'EN_PROCESO' END"""
+REFLEJAR_MS = {'tal cual': 'EXEC estado.sp_reflejar_estatus_operacion',
+               'maxdop1': 'EXEC estado.sp_reflejar_estatus_operacion_maxdop1'}
+
+
+def variacion_de_plan(ms, repeticiones: int = 2) -> dict:
+    """La cifra de r3-T1 contada en SQL (independiente de la comparación en Python): operaciones cuyo estatus quedó
+    distinto del reflejo de su orden vigente, con la copia tal cual (otra vez) y con una variante del plan. Cada
+    corrida en su transacción revertida, con la guarda."""
+    cursor = ms.cursor()
+    corridas = []
+    for nombre in ['tal cual'] * repeticiones + [k for k in REFLEJAR_MS if k != 'tal cual']:
+        t0 = time.monotonic()
+        with revertida(cursor):
+            cursor.execute('SELECT @@TRANCOUNT')
+            antes = cursor.fetchone()[0]
+            cursor.execute(REFLEJAR_MS[nombre])
+            cursor.execute('SELECT @@TRANCOUNT')
+            guarda = estado.guarda_trancount(REFLEJAR_MS[nombre], antes, cursor.fetchone()[0])
+            cursor.execute(CUENTA_1_N)
+            n = cursor.fetchone()[0]
+        corridas.append({'variante': nombre, 'que': estado.VARIANTES_DE_PLAN.get(nombre, ('', '', '', 'la copia'))[3],
+                         'operaciones_con_otro_estatus': n, 'guarda': guarda,
+                         'segundos': round(time.monotonic() - t0, 1)})
+    return {'corridas': corridas, 'distintas': sorted({c['operaciones_con_otro_estatus'] for c in corridas})}
+
+
 def ordenes_por_operacion(ms) -> dict[tuple, list[tuple[int, str]]]:
     """Para el árbitro del 1:N: las órdenes de cada operación en el respaldo, por la llave de la operación."""
     cursor = ms.cursor()
@@ -694,6 +729,9 @@ def paridad_de_estado(ms, pg, objetos: list[dict], escritores: list[str], guion:
                                                                                                 tobe['C'])}
     identidad['todas_las_llamadas'] = [x for e in legado.values() for x in _revisar(e)]
     s['comparar'] = round(time.monotonic() - t, 1)
+    t = time.monotonic()
+    plan = variacion_de_plan(ms)
+    s['variacion_de_plan'] = round(time.monotonic() - t, 1)
     restaurado = restaurar_tobe(pg, preparado)
     # el N de N con lo que dice el servidor
     evidencia = _evidencia(base_stats, evidencia_por_escenario['C'], legado)
@@ -709,7 +747,7 @@ def paridad_de_estado(ms, pg, objetos: list[dict], escritores: list[str], guion:
         'con_parche': {e: {'que': estado.PARCHES[estado.ESCENARIOS[i + 1].etapas[-1].escritor][2],
                            'etapas': {k: _resumen_etapa(v) for k, v in parches[e].items()}}
                        for i, e in enumerate(parches)},
-        'identidad': identidad, 'uno_a_n': uno_a_n(ms),
+        'identidad': identidad, 'uno_a_n': uno_a_n(ms), 'variacion_de_plan_r3_t1': plan,
         'controles': {
             'guarda_trancount': _control_guarda(control),
             'n_de_n_sin_un_escritor': {
@@ -1015,6 +1053,11 @@ def resumen(informe: dict) -> str:
                    f"{c['guarda_trancount']['cambios_en_el_volcado']} cambios |",
                    f"| sin un escritor en la corrida | {'sí' if c['n_de_n_sin_un_escritor']['detectado'] else 'NO'} | "
                    f"{'; '.join(c['n_de_n_sin_un_escritor']['resultado'])[:200]} |"]
+        v = e.get('variacion_de_plan_r3_t1')
+        if v:
+            lineas += ['', '**r3-T1 contado en SQL** (operaciones con un estatus distinto del reflejo de su orden '
+                           'vigente): ' + ' · '.join(f"{x['variante']} {x['operaciones_con_otro_estatus']:,}"
+                                                    for x in v['corridas']) + '.']
     a = informe.get('aceptacion')
     if a:
         lineas += ['', f"**Trampas con efecto observable: {a['detectadas']} de {a['observables']} detectadas.**", '',
@@ -1064,6 +1107,8 @@ def faltas_de(informe: dict) -> list[str]:
         for nombre, c in e['controles'].items():
             if not c['detectado']:
                 faltas.append(f'control {nombre} no detectado')
+        faltas += [f"variación de plan: {c['guarda']}" for c in e['variacion_de_plan_r3_t1']['corridas']
+                   if c['guarda']]
         if not e['tobe_restaurado']['huella_igual']:
             faltas.append(f"la base del TO-BE no volvió a su huella: {e['tobe_restaurado']['diferencias'][:5]}")
     o = informe.get('oraculo')

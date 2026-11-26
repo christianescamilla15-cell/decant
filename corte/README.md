@@ -8,7 +8,10 @@ El corte del legado al TO-BE (plan: [`docs/s3/PLAN.md`](../docs/s3/PLAN.md)). Ho
 - el paso 3: la **carga histórica por mes** con sólo INSERT, la reversa generada antes y el `setval` al cierre
   (ADR 0013 y 0016, criterios 4, 5, 6 y 12), con su runbook `ensayo | aplicar | reversa`;
 - el paso 4: el **delta del mismo día** sobre la base cerrada, restaurada del volcado de la nocturna, con la reversa
-  de sus UPDATE con los valores previos y sus 6 controles negativos (ADR 0013 y 0016, criterios 5, 7, 8 y 12).
+  de sus UPDATE con los valores previos y sus 6 controles negativos (ADR 0013 y 0016, criterios 5, 7, 8 y 12);
+- el paso 5: la **paridad de estado** de los escritores del inventario, corridos sobre el respaldo en transacciones
+  revertidas y comparados con el TO-BE por llave de negocio, y el **oráculo del corte** para los que leen, capturado
+  en el congelamiento y re-corrido por el TO-BE con el reloj del servidor inyectado (ADR 0014 y 0015, criterios 2 y 9).
 
 ## Qué hay
 
@@ -33,6 +36,11 @@ El corte del legado al TO-BE (plan: [`docs/s3/PLAN.md`](../docs/s3/PLAN.md)). Ho
 | `runbook_delta.py` | Paso 4: `python -m corte.runbook_delta preparar\|ensayo\|aplicar\|reversa\|cifras\|estado`. |
 | `base.py` | Paso 4: la base cerrada como `pg_dump`: volcar, restaurar, verificar sin creerle o, si no hay volcado, construir. |
 | `delta_ci.py` | Paso 4, en el CI: la base (restaurada o construida), el delta con sus 6 controles negativos y las cifras contra el paso 2; deja `delta.json`. |
+| `estado.py` | Paso 5, sin base: los escenarios con las llamadas reales del guion, la copia temporal del legado (esquema `estado` del respaldo, con el reloj inyectado), la guarda de `@@TRANCOUNT`, el efecto de cada etapa por llave de negocio, sus árbitros (UPDATE … FROM 1:N, `@@IDENTITY`) y el N de N de los escritores del inventario. |
+| `estado_tobe.sql` | Paso 5: el efecto del TO-BE sobre la base de referencia (las reglas R01–R12 sobre el esquema `legado`, con sus parches: el reloj entra, la orden vigente, `RETURNING id`). Se crea dentro de cada transacción revertida. |
+| `oraculo.py` | Paso 5: los casos del oráculo (cada objeto de lectura, con parámetros representativos y el borde del cierre de mes), su captura en el congelamiento y la re-corrida del TO-BE con el reloj inyectado, con su reloj propio y, donde los motores calculan distinto, con el SQL copiado tal cual. |
+| `trampas.py` | Paso 5: los catálogos sellados de las trampas a ciegas, para NOMBRAR lo que falla. La detección no los lee. |
+| `estado_ci.py` | Paso 5, en el CI (job `estado` de `carga.yml`): el respaldo, la base cerrada y su copia con el delta del paso 4, la copia temporal verificada, los escenarios en los dos lados, los controles negativos, el oráculo y la aceptación de las trampas; deja `estado.json`. |
 | `veredicto.py`, `vista_cifras.py` | Sin base: re-verifica la medición (recuenta desde el CSV documento por documento), compara con lo versionado, comprueba el digest de los artefactos publicados y versiona una corrida en `cifras/` con su `CIFRAS.md`. |
 
 `inventario/`: `objetos.json` (sale del código), `observado.json` (artefacto de una corrida del CI, versionado con su
@@ -64,6 +72,9 @@ python -m corte.runbook_delta aplicar
 python -m corte.runbook_delta reversa
 python -m corte.runbook_delta cifras               # el destino contra las cifras versionadas del paso 2
 python -m corte.delta_ci --base corte/base --salida corte/delta-ci   # lo del CI (--construir-base sin volcado)
+# paso 5: el ciclo con el oráculo capturado en el congelamiento, y luego la paridad de estado y el oráculo
+DECANT_ORACULO=1 ./ciclo.sh
+python -m corte.estado_ci --base corte/base --salida corte/estado-ci   # lo del CI (--construir-base sin volcado)
 ```
 
 En el CI, el job `legado` deja el artefacto `ejecucion-observada` y el job `puerta` (aparte y fuera del ruleset) lo
@@ -179,6 +190,56 @@ comprueba y lo deja en su resumen. Para versionar una corrida:
   (su sha256 es el de `cifras/huella.json`). Por tipo y por grupo tipo + estado + mes, destino = cargado del paso 2 y
   destino + no viaja = origen.
 
+### La paridad de estado y el oráculo del corte (paso 5)
+
+- **Escritores:** los del inventario del CÓDIGO (`corte.codigo`), no una lista fija: hoy 8 (6 procedimientos, el
+  disparador y el paso del job). Cada uno tiene su etapa (o corre dentro de otra: el disparador en cada escritura de
+  la orden y `sp_conciliar` en el paso del job) y el SERVIDOR tiene que verlo correr (`sys.dm_exec_procedure_stats` y
+  `sys.dm_exec_trigger_stats` de la copia). Uno nuevo sin escenario, o uno que no corre, hace fallar el N de N
+  nombrándolo.
+- **La copia temporal:** en el esquema `estado` del respaldo restaurado (`BFN_DIVISAS_CORTE`), nunca en el original:
+  - las 7 tablas con el DDL del código (sus índices, llaves primarias y foráneas) y los datos del respaldo con sus
+    ids. Se exige el mismo catálogo que el original, 0 diferencias de datos y la identidad en el mismo valor;
+  - el disparador y los escritores con el código del RESPALDO (que tiene que ser el del repositorio), transformados por
+    fichas: `dbo.<objeto>` → `estado.<objeto>` y `GETDATE()` → el reloj de `SESSION_CONTEXT`. El servidor confirma que
+    ningún objeto de la copia depende de `dbo` y que el disparador vive en `estado.orden_pago`;
+  - un reloj que no se puede inyectar con un solo valor (UTC, con zona), un servidor enlazado, un nombre de tres partes
+    o SQL dinámico en un escritor detienen la copia en vez de cambiar lo que el original hace.
+- **Efectos fuera de la base:** se declaran por objeto desde el inventario (`estado.efectos_declarados`). Los de un
+  procedimiento del sistema (correo, arranque de jobs, archivos) se EMULAN: la copia llama a `estado.emulado_<nombre>`,
+  que sólo anota la llamada. Servidor enlazado, otra base, SSIS: la corrida se niega. Hoy ningún escritor tiene; el
+  paso del job corre como su comando T-SQL (de msdb) con el Agent apagado, nunca con `sp_start_job`.
+- **Escenarios** (`estado.ESCENARIOS`), cada uno en UNA transacción revertida (`radiografia.veredictos.revertida`), con
+  las identidades regresadas a mano al salir (no son transaccionales):
+  - A, el día del corte y su noche: el catálogo del guion, las operaciones, las órdenes y las liquidaciones de la fase
+    anterior al congelamiento, cada llamada con su instante; el paso del job a las 23:30 de la noche del corte. El día
+    va por escritor: ninguna liquidación del guion precede al registro de su orden y ningún re-registro sigue a una
+    liquidación del mismo documento (una prueba lo verifica sobre el guion);
+  - B, la mesa (`sp_reflejar_estatus_operacion`, sin ejecución observada) sobre el respaldo;
+  - C, la contingencia (`sp_alta_manual_orden`, sin ejecución observada): la primera orden nueva del día, con su
+    operación, dada de alta a mano con los argumentos de sus llamadas reales.
+- **Guarda:** `@@TRANCOUNT` antes y después de CADA llamada, también si el servidor la rechazó. Si cambia, la corrida
+  se detiene nombrando el objeto.
+- **El TO-BE:** el mismo escenario sobre la base cerrada (el estado del respaldo, con los consumibles alineados), en
+  una transacción revertida, con las funciones de `estado_tobe.sql`. Las secuencias se regresan a mano y al final la
+  base vuelve a su huella.
+- **Comparación:** el efecto de cada etapa en las 7 tablas (copia − original en SQL Server, también en bytes; contra
+  una foto md5 por fila en PostgreSQL), por LLAVE DE NEGOCIO: la operación por (folio, sucursal), la orden por (uetr,
+  número de registro), sus partidas por renglón y la bitácora como multiconjunto de lo que anota. Cada diferencia la
+  arbitra una explicación que se AUDITA sobre el respaldo; la que no se explica es defecto nuestro y deja el job en
+  rojo.
+- **Verificaciones fijas:** todo id devuelto se cruza con la fila que insertó ESA llamada; cada UPDATE … FROM se mide
+  con sus datos 1:N.
+- **El oráculo:** se captura en el legado vivo, en el congelamiento, cuando lo pide `DECANT_ORACULO=1` (el job
+  `legado`, que observa el ciclo para la puerta, no lo enciende). El TO-BE lo re-corre sobre la base cerrada CON el
+  delta del paso 4 (el estado del congelamiento), con el instante del servidor de cada caso y con su reloj propio
+  (el de negocio del congelamiento). Cada conjunto se compara como multiconjunto (los números por valor); el orden
+  prometido se cuenta en los dos lados; donde los motores calculan distinto el mismo texto, se re-corre también la
+  copia literal.
+- **Aceptación de las trampas:** una trampa observable cuenta como detectada si una comparación de su objeto FALLA y la
+  misma comparación sin la trampa (el parche del TO-BE, aplicado a la copia del legado o al TO-BE) PASA. El nombre
+  sale de los catálogos sellados, después de la detección.
+
 ## Límites declarados
 
 - Las sesiones se muestrean cada 0.25 s: una conexión más corta puede no verse. La bitácora cubre a quienes
@@ -206,3 +267,23 @@ comprueba y lo deja en su resumen. Para versionar una corrida:
   antes de que el vivo escriba.
 - El CI mide sin escribir: el hueco de identidad se prueba sin base y se ensayó una vez en local contra el motor real
   (una inserción revertida: los dos caminos coinciden y se reporta 1 hueco).
+- Paso 5: el lado TO-BE de la paridad de estado y del oráculo es SQL de PostgreSQL sobre el esquema `legado` de la base
+  de referencia (`estado_tobe.sql`, `oraculo.TOBE`), no el dominio .NET corriendo: el TO-BE de S2 vive en otro esquema
+  y aún no tiene los casos de uso de la mesa ni de la contingencia. Son sus reglas (una prueba ata las constantes al
+  código .NET) y sus parches; S2 ya mide el dominio contra el legado (motor, R01–R12). Cuando el TO-BE tenga esos casos
+  de uso, su efecto se compara con éste.
+- Paso 5: en el CI el reloj del servidor del legado es el del runner (otro año que los datos). El reloj PROPIO del TO-BE
+  es el de negocio del congelamiento: los dos caen a lados distintos de las órdenes ENVIADA y por eso una re-corrida
+  sin el reloj inyectado falla. En un corte real estarían a horas de distancia: la detección depende de que algún dato
+  caiga entre los dos relojes.
+- Paso 5: el oráculo usa parámetros representativos (2 casos por objeto, uno de ellos en el borde del cierre de mes) y
+  la pantalla con 1 caso (lista y un detalle), no todos los parámetros posibles. Los números se comparan por valor: la
+  escala de un ROUND es la de cada motor.
+- Paso 5: el usuario de la bitácora es el login del arnés (`sa`) en los dos lados; en producción, el de cada
+  consumidor. El disparador se emula en PostgreSQL con dos disparadores de sentencia dentro de la transacción revertida.
+- Paso 5: el UPDATE … FROM de `sp_conciliar` no tiene datos 1:N (una PRINCIPAL por orden y la suma agrupada): con estos
+  datos no se puede probar su multiplicidad. El de `sp_reflejar_estatus_operacion` sí (r3-T1).
+- Paso 5: las dos latentes (r1-T1 y r2-T2) coinciden hoy en el oráculo: no se detectan aquí; son del paso siguiente,
+  con el plan variado.
+- Paso 5: lo que el legado escribe después del congelamiento no entra en la paridad de estado (lo ve el barrido del
+  paso 4). La paridad de estado mide el efecto POR LLAMADA sobre el respaldo, no el día completo del legado vivo.

@@ -100,6 +100,14 @@ PARCHES = {
         'SET @id = @@IDENTITY;', 'SET @id = SCOPE_IDENTITY();',
         'devuelve la identidad de SU inserción (en el TO-BE, RETURNING id)'),
 }
+# Una VARIANTE del plan de la misma copia (no del original): «una orden cualquiera» del JOIN 1:N depende del plan, y
+# la cifra de r3-T1 con ella. Sólo se mide; la comparación con el TO-BE es la de la copia tal cual.
+VARIANTES_DE_PLAN = {
+    'maxdop1': ('dbo.sp_reflejar_estatus_operacion',
+                'INNER JOIN dbo.operacion o ON o.id = p.operacion_id;',
+                'INNER JOIN dbo.operacion o ON o.id = p.operacion_id OPTION (MAXDOP 1);',
+                'la misma sentencia sin paralelismo (OPTION (MAXDOP 1))'),
+}
 # El estatus que la mesa refleja en la operación (sp_reflejar_estatus_operacion); lo usa el árbitro del 1:N.
 REFLEJO = {'CONCILIADA': 'PAGADA', 'DIFERENCIA': 'PAGADA', 'VENCIDA': 'RECHAZADA'}
 
@@ -461,19 +469,23 @@ class Refs:
         self.operacion.update(otro.operacion)
 
 
-def llave(tabla: str, fila: tuple, refs: Refs):
-    """La llave de negocio de una fila (sin ids): la que el TO-BE conoce."""
+def llave(tabla: str, fila: tuple, refs: Refs) -> tuple:
+    """La llave de negocio de una fila (sin ids): la que el TO-BE conoce. Su largo depende de la tabla: la operación
+    (folio, sucursal), la orden (uetr, número de registro), la partida (uetr, número de registro, renglón), la bitácora
+    (la orden y lo que anota) y los catálogos su código."""
     c = dict(zip(TABLAS[tabla].nombres, fila))
     if tabla == 'operacion':
-        return (c['folio'], c['sucursal'])
-    if tabla == 'orden_pago':
-        return refs.orden.get(c['id'], ('?', c['id']))
-    if tabla in ('partida_solicitada', 'partida_liquidada'):
-        return (*refs.orden.get(c['orden_id'], ('?', c['orden_id'])), c['renglon'])
-    if tabla == 'bitacora':
-        return (refs.orden.get(c['llave'], ('?', c['llave'])) if c['tabla'] == 'orden_pago' else c['llave'],
-                c['accion'], c['estatus_anterior'], c['estatus_nuevo'], c['usuario'], canonico(c['fecha']))
-    return c[TABLAS[tabla].nombres[0]]
+        partes = [c['folio'], c['sucursal']]
+    elif tabla == 'orden_pago':
+        partes = list(refs.orden.get(c['id'], ('?', c['id'])))
+    elif tabla in ('partida_solicitada', 'partida_liquidada'):
+        partes = [*refs.orden.get(c['orden_id'], ('?', c['orden_id'])), c['renglon']]
+    elif tabla == 'bitacora':
+        orden = refs.orden.get(c['llave'], ('?', c['llave'])) if c['tabla'] == 'orden_pago' else c['llave']
+        partes = [orden, c['accion'], c['estatus_anterior'], c['estatus_nuevo'], c['usuario'], canonico(c['fecha'])]
+    else:
+        partes = [c[TABLAS[tabla].nombres[0]]]
+    return tuple(partes)
 
 
 def valor(tabla: str, fila: tuple, refs: Refs) -> tuple:
