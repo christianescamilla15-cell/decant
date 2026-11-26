@@ -5,7 +5,9 @@
 Fases (en hora local del día del respaldo):
   1. delta: operaciones nuevas, órdenes, RE-REGISTROS de la mañana (mismo documento, otra llave interna),
      liquidaciones del corresponsal y cambios de catálogo; los folios (consumibles) avanzan solos.
-  2. congelamiento: se anotan los totales, el MAX(id) de cada tabla y el instante del servidor (GETDATE()).
+  2. congelamiento: se anotan los totales, el MAX(id) de cada tabla y el instante del servidor (GETDATE()). Con
+     DECANT_ORACULO=1, ahí mismo se captura el oráculo del corte (S3 paso 5, `corte/oraculo.py`): la salida de cada
+     objeto de lectura con el instante del servidor, antes de que el legado siga escribiendo.
   3. posterior al congelamiento: el legado SIGUE escribiendo un rato (lo que el barrido posterior al corte debe
      clasificar como duplicado huérfano o como pérdida).
 """
@@ -13,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -130,6 +133,18 @@ def ejecutar(paso: dict, cursor, ids_operacion: dict[str, int]) -> int | None:
     raise ValueError(f'acción desconocida: {accion}')
 
 
+def oraculo_al_congelar(cursor, delta: dict) -> str | None:
+    """El oráculo del corte (ADR 0014) en el congelamiento, sólo si lo pide DECANT_ORACULO=1: lo enciende el job del
+    corte, no el que observa el ciclo para la puerta (lo que ejecuta el arnés no es un consumidor del legado)."""
+    if os.environ.get('DECANT_ORACULO') != '1':
+        return None
+    from corte import oraculo
+    pantalla = f"http://127.0.0.1:{int(os.environ.get('DECANT_PUERTO_PANTALLA', '8080'))}/"
+    ruta = RAIZ / 'datos' / f"oraculo_{delta['fecha_negocio']}.json"
+    oraculo.escribir(oraculo.capturar(cursor, delta, pantalla), ruta)
+    return str(ruta)
+
+
 def inyectar(ruta: Path) -> dict:
     delta = json.loads(ruta.read_text(encoding='utf-8'))
     pasos = delta['pasos']
@@ -139,22 +154,26 @@ def inyectar(ruta: Path) -> dict:
     with conectar() as conexion:
         cursor = conexion.cursor()
         inicio = foto(cursor)
-        congelamiento = None
+        congelamiento, capturado = None, None
         for paso in pasos:
             fase = paso['fase']
             if fase == 'posterior_congelamiento' and congelamiento is None:
                 congelamiento = foto(cursor)
+                capturado = oraculo_al_congelar(cursor, delta)
             ejecutar(paso, cursor, ids_operacion)
             conteo[fase][paso['accion']] = conteo[fase].get(paso['accion'], 0) + 1
             if paso['accion'] == 'orden' and paso['args'].get('reregistro'):
                 reregistros[fase] += 1
         if congelamiento is None:
             congelamiento = foto(cursor)
+            capturado = oraculo_al_congelar(cursor, delta)
         final = foto(cursor)
         para_s3 = choques(cursor, delta, inicio, congelamiento)
     registro = {'fecha_negocio': delta['fecha_negocio'], 'congelamiento_utc': delta['congelamiento_utc'],
                 'llamadas': conteo, 're_registros': reregistros, 'al_respaldo': inicio,
                 'al_congelamiento': congelamiento, 'al_terminar': final, 'choques': para_s3}
+    if capturado:
+        registro['oraculo'] = capturado
     destino = ruta.with_name(f"vivo_{delta['fecha_negocio']}.json")
     destino.write_text(json.dumps(registro, indent=2) + '\n', encoding='utf-8')
     registro['ruta'] = str(destino)

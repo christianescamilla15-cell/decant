@@ -25,6 +25,7 @@ corte/observado-ci/
 corte/medido-ci/
 corte/carga-ci/
 corte/carga-trabajo/
+corte/estado-ci/
 muestras/
 *.bak
 
