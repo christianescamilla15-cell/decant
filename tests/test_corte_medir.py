@@ -244,16 +244,17 @@ class CursorReloj:
     def __init__(self, instantes):
         self.instantes = list(instantes)
         self.pedidos = 0
-        self.ultimo = None
+        self.fila: list = []
 
     def execute(self, sql, parametros=None):
-        self.ultimo = sql
+        if 'GETDATE' in sql:
+            self.pedidos += 1
+            self.fila = [self.instantes.pop(0) if len(self.instantes) > 1 else self.instantes[0]]
+        else:
+            self.fila = [5, 5]
 
     def fetchone(self):
-        if 'GETDATE' in self.ultimo:
-            self.pedidos += 1
-            return (self.instantes.pop(0) if len(self.instantes) > 1 else self.instantes[0],)
-        return (5, 5)
+        return self.fila
 
     def fetchall(self):
         return [('FX', 10), ('OP', 3)]
