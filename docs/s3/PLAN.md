@@ -1,8 +1,7 @@
-# Semana 3 · El corte (borrador para revisión)
+# Semana 3 · El corte (plan)
 
-- Estado: borrador, sin implementar · Fecha: 2026-11-25 · Decisiones: ADR 0013–0016.
-- Mientras corra la medición a ciegas de la ronda 3 (PR abierto) no se toca `paridad/`: S3 vive en `corte/` y en sus
-  propios jobs.
+- Estado: revisado (25-nov), sin implementar · Fecha: 2026-11-25 · Decisiones: ADR 0013–0016.
+- S3 vive en `corte/` y en sus propios jobs; `paridad/` (S2, ya medida a ciegas en la ronda 3) no se toca.
 
 ## Objetivo
 Pasar de «el TO-BE replica al legado» a «el TO-BE puede reemplazarlo un día concreto, con reversa». Se ensaya el corte
@@ -19,13 +18,12 @@ que dejó S2: toda salida del legado con consumidor queda comparada, reemplazada
    - La puerta también cuenta CONSUMIDORES, no sólo objetos: un lector externo que hace SELECT directo a tablas o
      vistas no aparece como objeto. Se inventarían los logins y aplicaciones conectados durante el ciclo, con 0 logins
      sin renglón. Después del corte, el vigía cuenta conexiones y lecturas, no sólo EXEC.
-2. **Trampas a ciegas como aceptación** (rN-Tk = ronda N, trampa k de `legado/TRAMPAS_CIEGAS*.md`; el catálogo de
-   la ronda 3 llega con su PR): las 6 con efecto observable (r1-T2, r2-T1, r2-T3, r3-T1, r3-T2, r3-T3) quedan
-   DETECTADAS 6 de 6 por una comparación que falla nombrándola. Tener renglón no basta, porque el criterio 1 ya le
+2. **Trampas a ciegas como aceptación** (rN-Tk = ronda N, trampa k de `legado/TRAMPAS_CIEGAS*.md`): las 6 con
+   efecto observable (r1-T2, r2-T1, r2-T3, r3-T1, r3-T2, r3-T3) quedan DETECTADAS 6 de 6 por una comparación que falla nombrándola. Tener renglón no basta, porque el criterio 1 ya le
    da renglón a todo. Las 2 latentes (r1-T1, r2-T2) se miden con las variantes del plan del piso. La de los
    espacios finales (r1-T3) ya la ve S2.
    - Evidencia de por qué hace falta: la radiografía vio 0 de 9 a ciegas en las tres rondas, y la paridad de
-     salidas vio 0 de 3 en la ronda 3 (`radiografia/CONTROL_CIEGO_3.md`, rama de la ronda 3). La ronda 3 sembró
+     salidas vio 0 de 3 en la ronda 3 (`radiografia/CONTROL_CIEGO_3.md`). La ronda 3 sembró
      procedimientos NUEVOS que nada del ciclo ejecuta: no hubo efecto que comparar.
 3. **Corte medido por dos caminos:** `MAX(id)` por tabla y sellos (bitácora / fecha de operación). «Discrepancia» es
    diferencia de CONJUNTOS: se exigen 0 ids > corte presentes en un camino y ausentes en el otro. Los huecos de
@@ -135,7 +133,6 @@ choques preparados) y el emulador del corresponsal.
   ellas los dejaría fuera. Ya pasó: los 3 procedimientos de la ronda 3 no se ejecutan en el ciclo, y la paridad de
   salidas vio 0 de 3 (la radiografía, 0 de 9 en las tres rondas). Mitigación: renglón para todo lo que está en el
   código y paridad de estado aunque no se haya observado su ejecución.
-- La ronda 3 vive en `paridad/` (su PR): S3 no la toca hasta que se fusione.
 - Lo que en un corte real salió caro (revisión del 25-nov), en orden:
   - los candados o avisos entre procesos que casan por TEXTO: uno mal redactado deja el recurso «tomado» un día;
   - configuración de producción distinta de la del ensayo;
