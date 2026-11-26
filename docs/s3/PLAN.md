@@ -252,9 +252,9 @@ choques preparados) y el emulador del corresponsal.
        sin ella (el parche del TO-BE), nombrada desde los catálogos sellados después de detectar:
        - r3-T1: 99,713 diferencias en `operacion.estatus` (corrida 45903816553), auditadas una por una como el JOIN
          1:N (defecto del legado, pendiente de decisión). Con el parche en la copia, 0. La cifra NO es la del catálogo
-         (100,299) y no se repite: la misma copia da 100,011 y 100,271 en las dos corridas siguientes, 100,259 en el
-         PR anterior, y 54,394 sin paralelismo. «Una orden cualquiera» cambia de una ejecución a otra con el plan de
-         hoy;
+         (100,299) y no se repite: la misma copia da 100,011 y 100,271 en las dos ejecuciones siguientes, 100,259 en
+         el PR anterior y 100,156, 99,870 y 99,685 en el siguiente (7 ejecuciones, entre 99,685 y 100,271); sin
+         paralelismo, 54,394 las 2 veces. «Una orden cualquiera» cambia de una ejecución a otra con el plan de hoy;
        - r3-T3: devolvió 685,277 (la bitácora) y la orden quedó con 270,617, el id que devuelve el TO-BE;
        - r1-T2 y r3-T2: con el reloj del oráculo coinciden (108 órdenes); con el reloj propio del TO-BE, 8 y 0;
        - r2-T1: el legado entrega al revés 2,371 de 4,603 pares contiguos de lo que su vista promete; el TO-BE, 0;
