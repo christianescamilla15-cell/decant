@@ -113,6 +113,42 @@ choques preparados) y el emulador del corresponsal.
      - La puerta corre como job aparte, fuera del ruleset, y sale en rojo con esos 17 pendientes. La vista legible
        está en `corte/inventario/INVENTARIO.md`.
 2. Corte por dos caminos y cifras de control por documento.
+   - **Avance (26-nov, en `corte/`; corrida 45862730597 versionada en `corte/cifras/`):**
+     - Corte = foto del respaldo; congelamiento = la foto del legado vivo, que ahora anota también el instante del
+       servidor. Las 5 tablas con identidad salen del inventario y cada una tiene su camino por sellos:
+       - la bitácora (reloj del servidor) y, por ella, las dos partidas;
+       - `fecha_registro` en la orden y en su partida del cliente;
+       - el folio FX en la operación, que no tiene bitácora ni `fecha_registro`.
+     - Diferencia de conjuntos 0 en los 7 caminos, del corte y del congelamiento:
+       - operación: 421 + 10 (delta + posterior);
+       - orden: 270 + 4;
+       - partida del cliente: 893 + 13;
+       - partida del corresponsal: 271 + 0;
+       - bitácora: 571 + 4.
+       Hay 0 huecos de identidad, e `IDENT_CURRENT` = `MAX(id)` en las 5. El hueco por una inserción revertida se
+       probó sin base y, una vez, en local contra el motor: los caminos coinciden y se reporta 1 hueco.
+     - Control negativo: el camino por `fecha_operacion` pierde 5 ids y falla nombrando las 5 altas de la sucursal
+       0012 fechadas hacia atrás (412,185–412,189).
+     - Cifras de control: 563,410 documentos con su huella sha256, en 182 grupos tipo + estado + mes.
+       - Operaciones: 412,556 = 412,546 cargadas + 10 pendientes.
+       - Órdenes: 150,854 = 150,850 cargadas + 4 pendientes (las 4 registradas después del congelamiento).
+       - Sin detalle, duplicado y dato sucio: 0.
+       - El origen por mes, contado en SQL, cuadra con el de Python.
+       - El catálogo llega al congelamiento con 12 monedas (10 activas): se agregó SLE y se dio de baja SLL en el
+         delta. Los consumibles son 2 series de folio y 5 identidades.
+     - Delta por llave de negocio: 139 re-registros del día. 138 son de documentos que ya estaban en el corte, y
+       sus 138 registros viejos salen con 0 duplicados. El otro documento se dio de alta y se re-registró el mismo
+       día después del respaldo, así que vive entero en el delta.
+       - Control negativo: por id, los 138 quedan dos veces.
+       - Duplicados por documento: 0.
+     - Controles negativos sobre documentos reales:
+       - un centavo cambia la huella del documento y la de su grupo (orden · LIQUIDADA · 2023-12);
+       - la grieta UTC mueve 2,663 documentos de mes y cambia 165 grupos, con los totales globales iguales;
+       - un segundo registro vigente sale como duplicado, nombrado.
+     - Las cifras no dependen del reloj de la corrida: el job `corte` (aparte, fuera del ruleset) exige los sha256
+       versionados en `corte/cifras/huella.json`. Publica los dos archivos como artefactos inmutables de 90 días y
+       sin comprimir, de modo que el digest de GitHub sea el sha256 del archivo. La vista legible está en
+       `corte/cifras/CIFRAS.md`.
 3. Carga por mes (INSERT, reversa, `setval`) sobre la foto con índices únicos.
 4. Cuadre mes a mes y grieta plantada.
 5. Delta del mismo día, numerado DESPUÉS de subir los consumibles.

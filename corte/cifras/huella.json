@@ -1,0 +1,28 @@
+{
+ "que_es": "sha256 de las cifras de control y de las huellas por documento de una corrida del CI; el job `corte` exige que las de cada corrida sean éstas (python -m corte.veredicto --versionar)",
+ "corrida": {
+  "repositorio": "christianescamilla15-cell/decant",
+  "corrida": "45862730597",
+  "intento": "1",
+  "sha": "9cd1b62d8b0c9d7979a2423333a3b46c0deb9c7c",
+  "rama": "calidad/s3-corte"
+ },
+ "archivos": {
+  "cifras-de-control.json": "bc45ff8978c9e47fd6ca904900dcfe158938611a8b67a581654c37c4a5b31e0d",
+  "huellas-por-documento.csv": "b72436796260161e068d799deef100462aa996ecc517efbc800f8beb4e9a2fab"
+ },
+ "artefactos": {
+  "cifras-de-control.json": {
+   "id": 15139112746,
+   "digest": "sha256:bc45ff8978c9e47fd6ca904900dcfe158938611a8b67a581654c37c4a5b31e0d",
+   "bytes": 156796,
+   "expira": "2027-02-24T16:52:27Z"
+  },
+  "huellas-por-documento.csv": {
+   "id": 15138139733,
+   "digest": "sha256:b72436796260161e068d799deef100462aa996ecc517efbc800f8beb4e9a2fab",
+   "bytes": 70603450,
+   "expira": "2027-02-24T16:52:27Z"
+  }
+ }
+}

@@ -1,6 +1,6 @@
 # CI de Decant: pruebas por regla, el ciclo completo del legado contra SQL Server real, el control público (S1), el
-# TO-BE en .NET 10 con sus pruebas por capa, la paridad del TO-BE contra el legado del ciclo (S2) y la puerta de
-# cobertura de salidas (S3, todavía fuera del ruleset).
+# TO-BE en .NET 10 con sus pruebas por capa, la paridad del TO-BE contra el legado del ciclo (S2), la puerta de
+# cobertura de salidas y el corte por dos caminos con sus cifras de control (S3, todavía fuera del ruleset).
 # Un job «skipped» por depender de otro en rojo NO es verde: en la rama protegida todos son requeridos.
 name: ci
 
@@ -75,6 +75,20 @@ jobs:
         with:
           name: ejecucion-observada
           path: corte/observado-ci/
+      # S3 paso 2 (criterios 3, 7 y 8): el corte medido por dos caminos y las cifras de control por documento, sobre el
+      # legado vivo tal como lo dejó el ciclo y ANTES de las pruebas de integración. Sólo lee. Este job deja el
+      # artefacto; lo juzga y publica el job «corte». Si la medición falla, este job no cae por eso: el job «corte» sí.
+      - name: medir el corte por dos caminos y las cifras de control (corte/medir.py)
+        continue-on-error: true
+        run: |
+          set -o pipefail      # el shell del paso es `bash -e`: sin esto, tee taparía una medición en rojo
+          mkdir -p corte/medido-ci
+          python -m corte.medir --salida corte/medido-ci 2>&1 | tee corte/medido-ci/medir.log
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: corte-medido
+          path: corte/medido-ci/
       - name: integración contra el motor real
         run: pytest -q -m integracion --junitxml=reporte-integracion.xml
       - run: python3 herramientas/verificar_reportes.py pytest reporte-integracion.xml
@@ -123,6 +137,54 @@ jobs:
         with:
           name: puerta
           path: puerta.json
+
+  # S3 · corte por dos caminos y cifras de control (criterios 3, 7 y 8). Job aparte y NO requerido en el ruleset.
+  # Re-verifica SIN base lo que midió el job legado (recuenta desde el CSV documento por documento, exige el inventario
+  # del código de hoy y lo versionado en corte/cifras/huella.json) y publica las cifras como artefactos inmutables:
+  # sin comprimir (archive: false), así el digest que GitHub calcula ES el sha256 del archivo, y queda en el resumen.
+  corte:
+    name: corte por dos caminos y cifras de control (S3, no requerida todavía)
+    needs: legado
+    if: '!cancelled()'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: corte-medido
+          path: corte/medido-ci
+      - name: el veredicto (sin base; en rojo si un camino no coincide o las cifras no son las versionadas)
+        run: python -m corte.veredicto corte/medido-ci --resumen "$GITHUB_STEP_SUMMARY"
+      - name: cifras de control (artefacto inmutable, 90 días)
+        id: cifras
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: corte/medido-ci/cifras-de-control.json
+          archive: false
+          retention-days: 90
+          if-no-files-found: error
+      - name: huellas por documento (artefacto inmutable, 90 días)
+        id: huellas
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: corte/medido-ci/huellas-por-documento.csv
+          archive: false
+          retention-days: 90
+          if-no-files-found: error
+      - name: el digest de cada artefacto es el sha256 del archivo (queda en el resumen)
+        env:
+          DIGEST_CIFRAS: ${{ steps.cifras.outputs.artifact-digest }}
+          DIGEST_HUELLAS: ${{ steps.huellas.outputs.artifact-digest }}
+        run: >-
+          python -m corte.veredicto corte/medido-ci --resumen "$GITHUB_STEP_SUMMARY"
+          --artefacto "cifras-de-control.json=$DIGEST_CIFRAS"
+          --artefacto "huellas-por-documento.csv=$DIGEST_HUELLAS"
 
   control-publico:
     name: control (radiografía sobre WideWorldImporters)

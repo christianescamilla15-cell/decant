@@ -1,0 +1,572 @@
+{
+ "version": 1,
+ "que_es": "el corte medido por dos caminos sobre el legado vivo (corte/medir.py)",
+ "ci": {
+  "repositorio": "christianescamilla15-cell/decant",
+  "corrida": "45862730597",
+  "intento": "1",
+  "sha": "9cd1b62d8b0c9d7979a2423333a3b46c0deb9c7c",
+  "rama": "calidad/s3-corte"
+ },
+ "fotos": {
+  "respaldo_servidor": "2026-11-26 10:54:59.543",
+  "congelamiento_servidor": "2026-11-26 10:55:01.147",
+  "respaldo_utc": "2023-12-29T12:00:00+00:00",
+  "congelamiento_utc": "2023-12-30T00:00:00+00:00"
+ },
+ "cobertura": {
+  "con_identidad": [
+   "dbo.bitacora",
+   "dbo.operacion",
+   "dbo.orden_pago",
+   "dbo.partida_liquidada",
+   "dbo.partida_solicitada"
+  ],
+  "sin_identidad": [
+   "dbo.folio",
+   "dbo.moneda"
+  ],
+  "sin_camino": [],
+  "caminos_huerfanos": [],
+  "caminos_de_tabla_sin_identidad": []
+ },
+ "tablas": {
+  "dbo.bitacora": {
+   "identidad": true,
+   "filas_ahora": 685851,
+   "max_id_ahora": 685851,
+   "ident_current": 685851,
+   "fotos_inconsistentes": [],
+   "fotos": {
+    "respaldo": {
+     "filas": 685276,
+     "max_id": 685276
+    },
+    "congelamiento": {
+     "filas": 685847,
+     "max_id": 685847
+    },
+    "manifiesto_del_respaldo": {
+     "filas": 685276,
+     "max_id": 685276
+    }
+   },
+   "por_identidad": {
+    "corte": 685276,
+    "congelamiento": 685847,
+    "delta": 571,
+    "posterior": 4
+   },
+   "huecos": {
+    "cuantos": 0,
+    "muestra": [],
+    "cuenta_ingenua": 575,
+    "filas_mayores_al_corte": 575,
+    "nota": "MAX(id) - corte cuenta también los huecos: por eso se comparan conjuntos"
+   },
+   "caminos": [
+    {
+     "nombre": "bitácora (su fecha)",
+     "reloj": "servidor",
+     "que_sella": "la fecha de cada renglón: GETDATE() del servidor en el trigger",
+     "control_negativo": false,
+     "limites": {
+      "desde": "2026-11-26 10:54:59.543000",
+      "hasta": "2026-11-26 10:55:01.147000",
+      "fuente": "GETDATE() del servidor en las fotos del respaldo y del congelamiento (legado/vivo)"
+     },
+     "delta": 571,
+     "posterior": 4,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": true
+     }
+    }
+   ]
+  },
+  "dbo.folio": {
+   "identidad": false,
+   "filas_ahora": 2,
+   "max_id_ahora": null,
+   "ident_current": null,
+   "fotos_inconsistentes": [],
+   "fotos": {
+    "respaldo": {
+     "filas": 2,
+     "max_id": null
+    },
+    "congelamiento": {
+     "filas": 2,
+     "max_id": null
+    },
+    "manifiesto_del_respaldo": {
+     "filas": 2,
+     "max_id": null
+    }
+   },
+   "nota": "sin identidad (catálogo o consumible): no tiene corte por id; se compara completo"
+  },
+  "dbo.moneda": {
+   "identidad": false,
+   "filas_ahora": 12,
+   "max_id_ahora": null,
+   "ident_current": null,
+   "fotos_inconsistentes": [],
+   "fotos": {
+    "respaldo": {
+     "filas": 11,
+     "max_id": null
+    },
+    "congelamiento": {
+     "filas": 12,
+     "max_id": null
+    },
+    "manifiesto_del_respaldo": {
+     "filas": 11,
+     "max_id": null
+    }
+   },
+   "nota": "sin identidad (catálogo o consumible): no tiene corte por id; se compara completo"
+  },
+  "dbo.operacion": {
+   "identidad": true,
+   "filas_ahora": 412556,
+   "max_id_ahora": 412556,
+   "ident_current": 412556,
+   "fotos_inconsistentes": [],
+   "fotos": {
+    "respaldo": {
+     "filas": 412125,
+     "max_id": 412125
+    },
+    "congelamiento": {
+     "filas": 412546,
+     "max_id": 412546
+    },
+    "manifiesto_del_respaldo": {
+     "filas": 412125,
+     "max_id": 412125
+    }
+   },
+   "por_identidad": {
+    "corte": 412125,
+    "congelamiento": 412546,
+    "delta": 421,
+    "posterior": 10
+   },
+   "huecos": {
+    "cuantos": 0,
+    "muestra": [],
+    "cuenta_ingenua": 431,
+    "filas_mayores_al_corte": 431,
+    "nota": "MAX(id) - corte cuenta también los huecos: por eso se comparan conjuntos"
+   },
+   "caminos": [
+    {
+     "nombre": "folio FX (consumible)",
+     "reloj": "folio:FX",
+     "que_sella": "el folio que sp_registrar_operacion toma de dbo.folio al registrar: un contador aparte de la identidad",
+     "control_negativo": false,
+     "limites": {
+      "desde": "412125",
+      "hasta": "412546",
+      "fuente": "dbo.folio.siguiente de la serie FX en las fotos del respaldo y del congelamiento"
+     },
+     "delta": 421,
+     "posterior": 10,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": true
+     }
+    },
+    {
+     "nombre": "fecha_operacion (control negativo)",
+     "reloj": "negocio",
+     "que_sella": "la fecha de NEGOCIO que manda la sucursal: no es un sello de registro",
+     "control_negativo": true,
+     "limites": {
+      "desde": "2023-12-29 06:00:00",
+      "hasta": "2023-12-29 18:00:00",
+      "fuente": "respaldo_utc y congelamiento_utc del guion del delta, en hora de la Ciudad de México"
+     },
+     "delta": 416,
+     "posterior": 10,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 5,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [
+        412185,
+        412186,
+        412187,
+        412188,
+        412189
+       ],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 5,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [
+        412185,
+        412186,
+        412187,
+        412188,
+        412189
+       ],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": false
+     }
+    }
+   ]
+  },
+  "dbo.orden_pago": {
+   "identidad": true,
+   "filas_ahora": 270890,
+   "max_id_ahora": 270890,
+   "ident_current": 270890,
+   "fotos_inconsistentes": [],
+   "fotos": {
+    "respaldo": {
+     "filas": 270616,
+     "max_id": 270616
+    },
+    "congelamiento": {
+     "filas": 270886,
+     "max_id": 270886
+    },
+    "manifiesto_del_respaldo": {
+     "filas": 270616,
+     "max_id": 270616
+    }
+   },
+   "por_identidad": {
+    "corte": 270616,
+    "congelamiento": 270886,
+    "delta": 270,
+    "posterior": 4
+   },
+   "huecos": {
+    "cuantos": 0,
+    "muestra": [],
+    "cuenta_ingenua": 274,
+    "filas_mayores_al_corte": 274,
+    "nota": "MAX(id) - corte cuenta también los huecos: por eso se comparan conjuntos"
+   },
+   "caminos": [
+    {
+     "nombre": "bitácora (alta)",
+     "reloj": "servidor",
+     "que_sella": "el renglón «I» que el trigger escribe al insertar la orden",
+     "control_negativo": false,
+     "limites": {
+      "desde": "2026-11-26 10:54:59.543000",
+      "hasta": "2026-11-26 10:55:01.147000",
+      "fuente": "GETDATE() del servidor en las fotos del respaldo y del congelamiento (legado/vivo)"
+     },
+     "delta": 270,
+     "posterior": 4,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": true
+     }
+    },
+    {
+     "nombre": "fecha_registro",
+     "reloj": "negocio",
+     "que_sella": "la hora de negocio con la que la interfaz registra (o re-registra) la orden",
+     "control_negativo": false,
+     "limites": {
+      "desde": "2023-12-29 06:00:00",
+      "hasta": "2023-12-29 18:00:00",
+      "fuente": "respaldo_utc y congelamiento_utc del guion del delta, en hora de la Ciudad de México"
+     },
+     "delta": 270,
+     "posterior": 4,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": true
+     }
+    }
+   ]
+  },
+  "dbo.partida_liquidada": {
+   "identidad": true,
+   "filas_ahora": 894080,
+   "max_id_ahora": 894080,
+   "ident_current": 894080,
+   "fotos_inconsistentes": [],
+   "fotos": {
+    "respaldo": {
+     "filas": 893174,
+     "max_id": 893174
+    },
+    "congelamiento": {
+     "filas": 894067,
+     "max_id": 894067
+    },
+    "manifiesto_del_respaldo": {
+     "filas": 893174,
+     "max_id": 893174
+    }
+   },
+   "por_identidad": {
+    "corte": 893174,
+    "congelamiento": 894067,
+    "delta": 893,
+    "posterior": 13
+   },
+   "huecos": {
+    "cuantos": 0,
+    "muestra": [],
+    "cuenta_ingenua": 906,
+    "filas_mayores_al_corte": 906,
+    "nota": "MAX(id) - corte cuenta también los huecos: por eso se comparan conjuntos"
+   },
+   "caminos": [
+    {
+     "nombre": "bitácora (alta de su orden)",
+     "reloj": "servidor",
+     "que_sella": "la escribe sp_registrar_orden en la misma llamada que da de alta la orden: el renglón «I» de su orden",
+     "control_negativo": false,
+     "limites": {
+      "desde": "2026-11-26 10:54:59.543000",
+      "hasta": "2026-11-26 10:55:01.147000",
+      "fuente": "GETDATE() del servidor en las fotos del respaldo y del congelamiento (legado/vivo)"
+     },
+     "delta": 893,
+     "posterior": 13,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": true
+     }
+    },
+    {
+     "nombre": "fecha_hora (= fecha_registro)",
+     "reloj": "negocio",
+     "que_sella": "sp_registrar_orden le copia la fecha_registro de su orden",
+     "control_negativo": false,
+     "limites": {
+      "desde": "2023-12-29 06:00:00",
+      "hasta": "2023-12-29 18:00:00",
+      "fuente": "respaldo_utc y congelamiento_utc del guion del delta, en hora de la Ciudad de México"
+     },
+     "delta": 893,
+     "posterior": 13,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": true
+     }
+    }
+   ]
+  },
+  "dbo.partida_solicitada": {
+   "identidad": true,
+   "filas_ahora": 245140,
+   "max_id_ahora": 245140,
+   "ident_current": 245140,
+   "fotos_inconsistentes": [],
+   "fotos": {
+    "respaldo": {
+     "filas": 244869,
+     "max_id": 244869
+    },
+    "congelamiento": {
+     "filas": 245140,
+     "max_id": 245140
+    },
+    "manifiesto_del_respaldo": {
+     "filas": 244869,
+     "max_id": 244869
+    }
+   },
+   "por_identidad": {
+    "corte": 244869,
+    "congelamiento": 245140,
+    "delta": 271,
+    "posterior": 0
+   },
+   "huecos": {
+    "cuantos": 0,
+    "muestra": [],
+    "cuenta_ingenua": 271,
+    "filas_mayores_al_corte": 271,
+    "nota": "MAX(id) - corte cuenta también los huecos: por eso se comparan conjuntos"
+   },
+   "caminos": [
+    {
+     "nombre": "bitácora (liquidación de su orden)",
+     "reloj": "servidor",
+     "que_sella": "la escribe sp_registrar_liquidacion en la misma llamada que pasa la orden a LIQUIDADA: ese renglón «U»",
+     "control_negativo": false,
+     "limites": {
+      "desde": "2026-11-26 10:54:59.543000",
+      "hasta": "2026-11-26 10:55:01.147000",
+      "fuente": "GETDATE() del servidor en las fotos del respaldo y del congelamiento (legado/vivo)"
+     },
+     "delta": 271,
+     "posterior": 0,
+     "comparacion": {
+      "mayores_al_corte": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "delta": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "posterior": {
+       "solo_por_identidad": 0,
+       "solo_por_sellos": 0,
+       "muestra_solo_por_identidad": [],
+       "muestra_solo_por_sellos": []
+      },
+      "coincide": true
+     }
+    }
+   ]
+  }
+ },
+ "control_negativo": {
+  "camino": "fecha_operacion (control negativo)",
+  "esperadas": 5,
+  "nombradas": 5,
+  "altas_fechadas_hacia_atras": [
+   "412185 (FX-000412185 · sucursal 0012 · fecha 2023-12-28 11:00:00)",
+   "412186 (FX-000412186 · sucursal 0012 · fecha 2023-12-28 12:00:00)",
+   "412187 (FX-000412187 · sucursal 0012 · fecha 2023-12-28 12:00:00)",
+   "412188 (FX-000412188 · sucursal 0012 · fecha 2023-12-28 14:00:00)",
+   "412189 (FX-000412189 · sucursal 0012 · fecha 2023-12-28 15:00:00)"
+  ],
+  "perdidos_por_el_camino": 5,
+  "muestra_perdidos": [
+   412185,
+   412186,
+   412187,
+   412188,
+   412189
+  ],
+  "detectado": true,
+  "regla": "el camino por fecha_operacion falla y nombra las altas que la sucursal reenvió fechadas hacia atrás (oráculo: choques.altas_fechadas_hacia_atras del registro del vivo)"
+ },
+ "faltas": [],
+ "coincide": true,
+ "segundos": {
+  "corte": 1.0,
+  "lectura": 50.1,
+  "cifras": 15.4
+ }
+}
