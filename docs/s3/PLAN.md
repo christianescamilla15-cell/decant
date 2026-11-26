@@ -63,7 +63,8 @@ que dejó S2: toda salida del legado con consumidor queda comparada, reemplazada
      y el volcado saldría vacío. Hoy ninguno lo trae, pero el arnés no lo da por hecho.
    - Los efectos fuera de la base (correo, arranque de jobs, servidores enlazados, archivos) no se revierten: se
      declaran por objeto y se neutralizan o emulan durante la corrida.
-   - r3-T1 aparece como 100,299 diferencias, clasificadas como defecto del legado;
+   - r3-T1 aparece como unas 100 mil diferencias (100,299 en el catálogo; con el plan paralelo la cifra cambia de una
+     ejecución a otra, ver el avance del punto 6), clasificadas como defecto del legado;
    - r3-T3: `@@IDENTITY` devuelve un id ≠ la fila insertada y se detecta.
 10. **Convivencia** (en el CI, con el vecino emulado):
     - las banderas se encienden en orden (marca → conciliar → vencer → avisar al emulador) y la prueba de humo pasa;
@@ -247,6 +248,44 @@ choques preparados) y el emulador del corresponsal.
        7.4 s; el delta con sus controles, 300 s (controles 4 y 5, 148 s: recorren la huella del destino completo);
        el job, 9 min 16 s. Memoria pico de PostgreSQL: 1 GiB, el tope (incluye caché de páginas), sin cortes.
 6. Paridad de estado (escriben) y oráculo del corte (leen): las 6 trampas.
+   - **Avance (26-nov, en `corte/`; job `estado` de `carga.yml`, fuera del ruleset):**
+     - **Las 6 trampas observables, detectadas 6 de 6.** Cada una por una comparación que FALLA con la trampa y pasa
+       sin ella (el parche del TO-BE), nombrada desde los catálogos sellados después de detectar:
+       - r3-T1: 99,713 diferencias en `operacion.estatus` (corrida 45903816553), auditadas una por una como el JOIN
+         1:N (defecto del legado, pendiente de decisión). Con el parche en la copia, 0. La cifra NO es la del catálogo
+         (100,299) y no se repite: la misma copia da 100,011 y 100,271 en las dos ejecuciones siguientes, 100,259 en
+         el PR anterior, 100,156, 99,870 y 99,685 en el siguiente y 99,771, 100,399 y 100,065 en el último (10
+         ejecuciones de 4 corridas, entre 99,685 y 100,399); sin paralelismo, 54,394 las 3 veces. «Una orden cualquiera» cambia de una ejecución a otra con el plan de hoy;
+       - r3-T3: devolvió 685,277 (la bitácora) y la orden quedó con 270,617, el id que devuelve el TO-BE;
+       - r1-T2 y r3-T2: con el reloj del oráculo coinciden (108 órdenes); con el reloj propio del TO-BE, 8 y 0;
+       - r2-T1: el legado entrega al revés 2,371 de 4,603 pares contiguos de lo que su vista promete; el TO-BE, 0;
+       - r2-T3: el SQL copiado tal cual difiere en las horas de los 8 corresponsales; con el truncado replicado
+         coincide.
+       Las 2 latentes coinciden hoy (paso 7).
+     - **Paridad de estado (criterio 9):** 8 de 8 escritores del inventario del código, según el servidor
+       (`dm_exec_*_stats`). Corren en una copia temporal del respaldo (esquema `estado`: tablas, disparador y
+       escritores, con el reloj de `SESSION_CONTEXT`; nunca el original), en transacciones revertidas con la guarda de
+       `@@TRANCOUNT` en cada llamada:
+       - A, el día y su noche: las 855 llamadas del guion y el paso del job a las 23:30;
+       - B, la mesa;
+       - C, la contingencia con la primera orden nueva del día.
+       El efecto de cada etapa se compara con el del TO-BE por llave de negocio en las 7 tablas: igual en todo menos lo
+       que explican las trampas. Fuera de la base: ninguno en el inventario; el job corre por su comando, con el
+       Agent apagado.
+     - **Oráculo (ADR 0014):** capturado en el congelamiento del legado vivo, 12 de 12 objetos de lectura, 21 casos (7
+       en el borde del cierre de mes), en 1.9 s. El TO-BE los re-corre sobre la base cerrada con el delta del paso 4.
+       Con el reloj del oráculo coinciden los 21 (la lista del 30-nov, por el árbitro del TOP sin ORDER BY).
+     - **Controles negativos:** un procedimiento con su propio ROLLBACK dispara la guarda (y su volcado saldría con 0
+       cambios); sin el escenario C, el N de N falla nombrando a `dbo.sp_alta_manual_orden`; un lector sin caso hace
+       fallar el oráculo (prueba sin base).
+     - El lado TO-BE es el efecto escrito en SQL sobre la base de referencia (las reglas del dominio .NET y sus
+       parches), no el dominio corriendo: es un límite declarado (`corte/README.md`).
+     - Tiempos del PR con el volcado de la nocturna (corrida 45903816553, volcado de la 45900567255 lanzada a mano
+       sobre la rama): el job, 9 min 35 s; el arnés, 357 s (restaurar y verificar la base 21 s, delta 24 s, oráculo
+       4.5 s, copia 30 s, escenarios A 113 s, B 28 s y C 36 s, comparar 20 s). Memoria pico: PostgreSQL 1 GiB (el
+       tope, con caché de páginas), SQL Server 2,169 MiB de 4,096 y el arnés 2.0 GB de RSS. Sin volcado vigente la
+       base se construye (536 s) y el job pasa a 19 min 30 s (corrida 45898183988): lo evita la nocturna de `main`.
+       Nada se recortó de «Si aprieta».
 7. Latentes con plan variado: las 2.
 8. Runbook en el CI, banderas en orden y humo contra el vecino emulado.
 9. Lo que sólo se documenta.
@@ -286,6 +325,8 @@ choques preparados) y el emulador del corresponsal.
   - la ventana del corte;
   - qué hacer con los defectos que la paridad de estado mostrará: replicar o corregir r3-T1, el truncado de r2-T3 y el
     desempate del último minuto de r1-T1;
+  - las reglas propias de la contingencia (`sp_alta_manual_orden`), que el TO-BE hoy replica: folio nuevo aunque el
+    documento exista, sin partidas del cliente y sin marcar REEMPLAZADA al registro anterior;
   - dueño y fecha de cada objeto retirado;
   - quién procesa en el TO-BE los pendientes que el legado ya no va a terminar.
 - **Operación de la base:**

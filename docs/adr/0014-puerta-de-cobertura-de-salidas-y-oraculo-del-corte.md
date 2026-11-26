@@ -29,6 +29,42 @@ compara, y lo que no se compara pasa.
 - **Lo latente** se mide con las variantes del plan del piso (ADR 0011). Si el legado no coincide consigo mismo, es
   un defecto a decidir, no un contrato.
 
+## Al construir el oráculo (26-nov, paso 5)
+Lo que el código decidió y la propuesta no decía (`corte/oraculo.py`, `corte/estado_ci.py`, `legado/vivo`):
+- **Se captura dentro del legado vivo, en el congelamiento**: después de la foto del paso 2 y antes de lo que el
+  legado sigue escribiendo, cuando lo pide `DECANT_ORACULO=1`. Sólo lo enciende el job del corte: el job que observa
+  el ciclo para la puerta no, porque lo que ejecuta el arnés no es un consumidor y cambiaría la clasificación de los
+  «sin ejecución observada».
+- **Casos:** cada objeto de lectura del inventario (9 procedimientos, 2 vistas y la pantalla) con parámetros que salen
+  de los datos en el congelamiento: una operación re-registrada, una sin orden, la más reciente, el corresponsal con
+  más órdenes enviadas, el día del corte y su mes y el mes anterior. 21 casos, 7 en el borde del cierre de mes. Cada
+  uno guarda el instante del servidor justo antes de correr. N de N: un objeto de lectura sin caso hace fallar el
+  oráculo.
+- **El TO-BE re-corre sobre la base cerrada con el delta del paso 4** (el estado del congelamiento), con el reloj del
+  oráculo inyectado. Los conjuntos se comparan como multiconjuntos: los empates y el orden que no es contrato no
+  cuentan. Los números van por valor, porque la escala de un ROUND es la de cada motor.
+- **Tres comparaciones más, que son las que ven las trampas:**
+  - **el orden prometido**, del objeto o de la vista que lee, se cuenta en los dos lados. Un legado que incumple lo que
+    promete es defecto del legado (r2-T1);
+  - **el reloj propio**: el TO-BE corre también con su reloj (el de negocio del congelamiento). Si así no coincide, el
+    objeto depende del reloj y un TO-BE que no lo inyecte falla, nombrado (r1-T2; r3-T2, con el reloj dentro de una
+    cadena que ningún detector ve);
+  - **el SQL copiado tal cual**, donde los motores calculan distinto el mismo texto: si difiere, el TO-BE tiene que
+    replicar al legado mientras negocio no decida (r2-T3).
+- **El TOP sin ORDER BY** (T1 del catálogo original) de la lista del día se arbitra: el legado puede entregar otro
+  subconjunto del día, del tamaño del TOP. Se audita que lo sea; si no, es defecto nuestro.
+
+**Medido en el PR** (corridas 45898183988 y 45903816553, iguales): 12 de 12 objetos de lectura y 21 casos,
+capturados en 1.9 s con el reloj del servidor del runner (2026-11-26); el reloj propio del TO-BE, 2023-12-29 18:00. Con el reloj del
+oráculo coinciden los 21 (uno por el árbitro del TOP: la lista del 30-nov). Las trampas:
+- r1-T2: 108 órdenes por vencer; sin inyectar el reloj, 8;
+- r3-T2: 108 órdenes con antigüedad (79 de un corresponsal); sin inyectar el reloj, 0;
+- r2-T1: el legado entrega al revés 2,371 de 4,603 pares contiguos desde el 1-dic (88 de 161 desde el día del
+  corte), por el procedimiento y leyendo la vista; el TO-BE, 0;
+- r2-T3: el SQL copiado tal cual difiere en las horas de los 8 corresponsales, en los dos meses; con el truncado
+  replicado, coincide.
+Las latentes (r1-T1, r2-T2) coinciden hoy: son del paso siguiente, con el plan variado.
+
 ## Alternativas descartadas
 - **Sólo el código:** no ve consumidores externos ni el SQL que se arma afuera.
 - **Sólo las estadísticas (o que ellas recorten el inventario):** no ven los caminos que el ciclo no ejecutó
@@ -36,6 +72,10 @@ compara, y lo que no se compara pasa.
   salidas vio 0 de 3; la radiografía, 0 de 9 a ciegas en las tres rondas.
 - **Comparar contra una corrida nueva del legado después del corte:** el reloj ya avanzó y la salida cambia por eso,
   no por el TO-BE.
+- **Capturar el oráculo en el job que observa el ciclo:** sus ejecuciones contarían como consumo observado y la puerta
+  dejaría de ver «sin ejecución observada» los objetos que sólo el arnés corre.
+- **Comparar el orden tal como lo entrega el legado:** castigaría al TO-BE que ordena bien (r2-T1). El orden que
+  cuenta es el que el código promete.
 
 ## Consecuencias
 Las 6 trampas con efecto observable son la prueba de aceptación: cada una queda «vista» o con su renglón.

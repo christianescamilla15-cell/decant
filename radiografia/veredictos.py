@@ -11,6 +11,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 from radiografia import sqlserver
@@ -22,6 +24,18 @@ LIMITE_LOTE = 5000            # el TOP (5000) de sp_conciliar
 def _uno(cursor, sql: str, parametros: tuple = ()):
     cursor.execute(sql, parametros)
     return cursor.fetchone()[0]
+
+
+@contextmanager
+def revertida(cursor) -> Iterator[None]:
+    """Una transacción que SIEMPRE se revierte: lo que se ejecuta dentro se mide y no queda. La usan estos veredictos y
+    la paridad de estado del corte (`corte/estado.py`, ADR 0015). Si lo ejecutado ya se llevó la transacción (un
+    ROLLBACK propio), no hay nada que revertir: quien la usa tiene que revisar `@@TRANCOUNT` (la guarda del corte)."""
+    cursor.execute('BEGIN TRANSACTION')
+    try:
+        yield
+    finally:
+        cursor.execute('IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION')
 
 
 def _indice_unico_con(cursor, tabla: str, columna: str) -> int:
@@ -83,16 +97,13 @@ def veredictos(cursor) -> list[dict]:
     fecha_baja = _uno(cursor, "SELECT COUNT(*) FROM sys.columns WHERE object_id = OBJECT_ID('dbo.moneda') "
                               "AND system_type_id IN (40, 42, 58, 61)")
     moneda = inactivas[0]['moneda'] if inactivas else 'HRK'
-    cursor.execute('BEGIN TRANSACTION')
-    try:
+    with revertida(cursor):
         cursor.execute("""DECLARE @id int;
                           EXEC dbo.sp_registrar_operacion @fecha_operacion = '2023-12-29T10:00:00', @sucursal = '0001',
                                @canal = 'VENTANILLA', @cliente = N'PRUEBA DE VEREDICTO', @tipo = 'V',
                                @moneda = %s, @monto_divisa = 100, @tipo_cambio = 1, @id = @id OUTPUT;
                           SELECT @id""", (moneda,))
         aceptada = cursor.fetchone()[0]
-    finally:
-        cursor.execute('ROLLBACK TRANSACTION')
     r.append({'categoria': 'columna_sin_lectura', 'objeto': 'dbo.moneda.activa', 'clase': 'defecto real',
               'medicion': {'operaciones_en_monedas_inactivas': inactivas, 'columnas_de_fecha_en_moneda': fecha_baja,
                            'id_asignado_a_una_operacion_nueva_en_moneda_inactiva': aceptada},
