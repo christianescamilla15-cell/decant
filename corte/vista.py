@@ -26,6 +26,7 @@ def markdown(inv: dict, cruzado: dict, renglones_: list, evaluacion: dict) -> st
     ci = obs.get('ci') or {}
     conteo = {k: sum(1 for r in cruzado['objetos'].values() if r['ejecucion'] == k) for k in ETIQUETA}
     qs = obs.get('query_store') or {}
+    muestras = obs.get('muestras') or {}
     salida = [
         '# Inventario de salidas y consumidores del legado',
         '',
@@ -40,7 +41,8 @@ def markdown(inv: dict, cruzado: dict, renglones_: list, evaluacion: dict) -> st
         f"- **Escritores** (procedimientos, triggers y pasos de job; paridad de estado, ADR 0015): "
         f"{len(inv['escritores'])}.",
         f"- **Observación del ciclo:** corrida `{ci.get('corrida')}` (sha `{(ci.get('sha') or '')[:7]}`), "
-        f"{obs.get('segundos')} s, muestras {obs.get('muestras')}; Query Store `{qs.get('estado')}` con captura "
+        f"{obs.get('segundos')} s, {muestras.get('sesiones')} muestras de sesiones y "
+        f"{muestras.get('estadisticas')} de estadísticas; Query Store `{qs.get('estado')}` con captura "
         f"`{qs.get('captura')}`.",
         f"- **Ejecución:** observada {conteo[cruce.OBSERVADA]} · por quien la usa {conteo[cruce.POR_QUIEN_LA_USA]} · "
         f"sin ejecución observada {conteo[cruce.SIN_EJECUCION]} (clasifica; no recorta).",

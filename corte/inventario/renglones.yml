@@ -141,4 +141,31 @@ objetos:
     destino: pendiente
     nota: ronda 3, T3 (@@IDENTITY con trigger que inserta); escritor de contingencia, va a la paridad de estado.
 
-logins: []
+# ── consumidores: logins observados en el ciclo (sesiones) o que escribieron según la bitácora ────────────────────
+# Ninguno tiene paridad de CONSUMIDOR en S2: lo que escriben sí tiene (motor), pero no su re-apunte al TO-BE, su
+# credencial ni su permiso. `aplicaciones`: patrones de lo que se le vio conectarse; otra aplicación hace fallar.
+logins:
+  - login: sa
+    destino: pendiente
+    aplicaciones: ["pymssql=*", SQLCMD, bcp]
+    nota: >-
+      el administrador: con él entra TODO el ciclo (carga, pantalla, respaldo, legado vivo, bcp y la sonda de salud
+      del contenedor). El legado vivo además escribe dbo.moneda directo, sin procedimiento (altas y bajas de catálogo,
+      visibles en lo ad hoc). En un corte real cada uno es un consumidor con su login: el vigía los tiene que separar.
+
+  - login: svc_interfaz
+    destino: pendiente
+    nota: >-
+      según la bitácora, la interfaz de órdenes (altas y re-registros: sp_registrar_orden). Lo que escribe tiene
+      paridad del motor; el consumidor, no.
+
+  - login: svc_swift
+    destino: pendiente
+    nota: >-
+      según la bitácora, las confirmaciones del corresponsal (pasa a LIQUIDADA: sp_registrar_liquidacion, buzón).
+
+  - login: svc_agente
+    destino: pendiente
+    nota: >-
+      según la bitácora, el agente del job nocturno (concilia y vence: sp_conciliar). Si el TO-BE reemplaza al job, el
+      login se retira con dueño, fecha y la confirmación del vigía.

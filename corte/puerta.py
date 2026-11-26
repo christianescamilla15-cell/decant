@@ -23,6 +23,8 @@ from pathlib import Path
 from corte import codigo, cruce, renglones
 
 INVENTARIO = codigo.RAIZ / 'corte' / 'inventario'
+EJECUCION = {cruce.OBSERVADA: 'observada', cruce.POR_QUIEN_LA_USA: 'observada por quien la usa',
+             cruce.SIN_EJECUCION: 'sin ejecución observada'}
 OBSERVADO = INVENTARIO / 'observado.json'
 RENGLONES = INVENTARIO / 'renglones.yml'
 
@@ -95,7 +97,7 @@ def texto(r: dict) -> str:
         lineas.append(f"✘ pendientes ({len(r['pendientes'])}): "
                       + ', '.join(f'{t} {n}' for t, n in sorted(r['pendientes_por_tipo'].items())))
         for p in r['pendientes']:
-            detalle = ', '.join(x for x in (p['tipo'], p['acceso'], (p['ejecucion'] or '').replace('_', ' ')) if x)
+            detalle = ', '.join(x for x in (p['tipo'], p['acceso'], EJECUCION.get(p['ejecucion'])) if x)
             lineas.append(f"    - {p['clave']} ({detalle})")
     lineas.append(f"  sin ejecución observada: {len(r['sin_ejecucion_observada'])} (clasifica; no recorta)")
     lineas.append('Resultado: ' + ('VERDE' if r['verde'] else 'ROJO'))

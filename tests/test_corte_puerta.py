@@ -8,7 +8,7 @@ import shutil
 
 import pytest
 
-from corte import codigo, cruce, observar, puerta, renglones
+from corte import codigo, cruce, escribir, observar, puerta, renglones, vista
 
 RAIZ = codigo.RAIZ
 EVIDENCIA_REAL = 'tests/integracion/test_paridad.py::test_el_motor_no_tiene_defectos_nuestros_y_r08_replica_al_legado'
@@ -85,13 +85,15 @@ def test_la_puerta_nombra_un_objeto_sembrado_en_el_sql(tmp_path, capsys):
     argumentos = ['--sql', str(copia), '--observado', str(obs), '--renglones', str(puerta.RENGLONES),
                   '--json', str(tmp_path / 'r.json')]
     # control: sin la siembra, ningún objeto queda sin renglón (la puerta falla por otra cosa: pendientes)
-    assert puerta.main(argumentos) == 1
+    codigo_salida = puerta.main(argumentos)
+    assert codigo_salida == 1
     assert json.loads((tmp_path / 'r.json').read_text())['sin_renglon']['objetos'] == []
     with (copia / '05_procedimientos.sql').open('a', encoding='utf-8') as f:
         f.write('-- sembrado\nCREATE OR ALTER PROCEDURE dbo.sp_sembrado AS UPDATE dbo.folio SET siguiente = 0;\nGO\n')
     capsys.readouterr()
-    assert puerta.main(argumentos) == 1
+    codigo_salida = puerta.main(argumentos)
     salida = capsys.readouterr().out
+    assert codigo_salida == 1
     assert '✘ objetos sin renglón (1):\n    - dbo.sp_sembrado' in salida
     assert json.loads((tmp_path / 'r.json').read_text())['sin_renglon']['objetos'] == ['dbo.sp_sembrado']
 
@@ -180,8 +182,8 @@ def test_la_puerta_puede_salir_verde_y_un_pendiente_la_pone_en_rojo(inv):
 def test_una_observacion_que_no_termino_no_absuelve_a_los_consumidores(tmp_path, capsys):
     obs = tmp_path / 'observado.json'
     obs.write_text(json.dumps(observado(terminado=False)), encoding='utf-8')
-    assert puerta.main(['--observado', str(obs)]) == 1
-    assert 'no terminó' in capsys.readouterr().out
+    codigo_salida = puerta.main(['--observado', str(obs)])
+    assert codigo_salida == 1 and 'no terminó' in capsys.readouterr().out
     # control: la terminada no trae ese error
     obs.write_text(json.dumps(observado()), encoding='utf-8')
     puerta.main(['--observado', str(obs)])
@@ -274,3 +276,60 @@ def test_las_rutas_del_artefacto_y_de_lo_versionado():
     assert puerta.RENGLONES.is_file()
     # control: el artefacto del CI no se versiona (va en .gitignore)
     assert 'corte/observado-ci/' in (RAIZ / '.gitignore').read_text(encoding='utf-8').splitlines()
+
+
+# ── con la observación del CI versionada (corte/inventario/observado.json) ─────────────────────────────────────
+
+@pytest.fixture(scope='module')
+def versionado(inv):
+    obs = json.loads(puerta.OBSERVADO.read_text(encoding='utf-8'))
+    c = cruce.cruzar(inv, obs)
+    lista, formato = renglones.cargar(puerta.RENGLONES)
+    return obs, c, lista, puerta.evaluar(inv, c, lista, formato)
+
+
+def _ronda_3() -> list[str]:
+    """Los objetos de la tabla de medición de la ronda 3 (`señal → dbo.objeto`), leídos del catálogo."""
+    texto = (RAIZ / 'legado' / 'TRAMPAS_CIEGAS_3.md').read_text(encoding='utf-8')
+    return re.findall(r'^\| T\d \|.*→ (dbo\.\w+)`', texto, re.MULTILINE)
+
+
+def test_los_tres_de_la_ronda_3_estan_en_el_inventario_y_sin_ejecucion_observada(inv, versionado):
+    """Lo que S2 no vio (CONTROL_CIEGO_3: 0 de 3) porque nada del ciclo los ejecuta: aquí están, con su renglón."""
+    obs, c, lista, _ = versionado
+    tres = _ronda_3()
+    assert tres == ['dbo.sp_reflejar_estatus_operacion', 'dbo.sp_antiguedad_ordenes', 'dbo.sp_alta_manual_orden']
+    acceso = {o['id']: o['acceso'] for o in inv['objetos']}
+    assert [acceso[x] for x in tres] == ['escribe', 'lee', 'escribe']
+    assert [x for x in tres if x in inv['escritores']] == ['dbo.sp_reflejar_estatus_operacion',
+                                                          'dbo.sp_alta_manual_orden']
+    assert [c['objetos'][x]['ejecucion'] for x in tres] == [cruce.SIN_EJECUCION] * 3
+    assert {r.clave: r.destino for r in lista if r.clave in tres} == dict.fromkeys(tres, 'pendiente')
+    # control: la observación no está vacía; lo que el ciclo sí corre (legado vivo, pantalla, respaldo) se vio
+    assert obs['terminado'] and obs['ci']['corrida']
+    for corre in ('dbo.sp_registrar_operacion', 'dbo.sp_registrar_orden', 'dbo.sp_registrar_liquidacion',
+                  'dbo.tr_orden_pago_bitacora', 'dbo.sp_lista_operaciones', 'dbo.sp_reporte_ordenes'):
+        assert c['objetos'][corre]['ejecucion'] == cruce.OBSERVADA, corre
+
+
+def test_hoy_la_puerta_esta_en_rojo_por_pendientes_y_no_falta_ningun_renglon(versionado):
+    obs, c, lista, r = versionado
+    assert not r['verde']
+    assert r['sin_renglon'] == {'objetos': [], 'logins': [], 'aplicaciones': []}
+    assert not (r['renglones_invalidos'] or r['huerfanos'] or r['duplicados'] or r['formato'])
+    assert r['pendientes'] and all(p['clave'] for p in r['pendientes'])
+    # control: cada login observado (sesiones y bitácora) tiene renglón, y hay al menos uno de cada origen
+    origenes = {o for x in c['consumidores'].values() for o in x['origenes']}
+    assert origenes == {'sesiones (dm_exec_sessions)', 'bitácora (SUSER_SNAME del trigger)'}
+    assert {r_.clave for r_ in lista if r_.clase == 'login'} == set(c['consumidores'])
+
+
+def test_la_vista_legible_esta_al_dia_y_cambia_con_los_renglones(inv, versionado):
+    generado = escribir.generar()[escribir.VISTA]
+    assert escribir.VISTA.read_text(encoding='utf-8') == generado, 'corre python -m corte.escribir'
+    # control: otro destino en un renglón cambia la vista
+    _, c, lista, r = versionado
+    otra = [renglones.Renglon(x.clase, x.clave, 'pendiente' if x.destino != 'pendiente' else x.destino,
+                              x.evidencia, x.nota, x.dueno, x.fecha, x.confirmacion_vigia, x.aplicaciones)
+            for x in lista]
+    assert vista.markdown(inv, c, otra, puerta.evaluar(inv, c, otra, [])) != generado
