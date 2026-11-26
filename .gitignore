@@ -23,6 +23,8 @@ respaldos/
 paridad/datos/
 corte/observado-ci/
 corte/medido-ci/
+corte/carga-ci/
+corte/carga-trabajo/
 muestras/
 *.bak
 
