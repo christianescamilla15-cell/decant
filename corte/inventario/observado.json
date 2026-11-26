@@ -1,0 +1,465 @@
+{
+ "version": 1,
+ "que_es": "lo que el servidor del legado ejecutó y quién se conectó durante ./ciclo.sh (corte/observar.py)",
+ "ci": {
+  "repositorio": "christianescamilla15-cell/decant",
+  "corrida": "45844672532",
+  "intento": "1",
+  "sha": "942dfdd2c05e6f5f775dd5a2a46957fae1f2ff53",
+  "rama": "calidad/s3-puerta"
+ },
+ "inicio_utc": "2026-11-26T15:00:36+00:00",
+ "fin_utc": "2026-11-26T15:03:01+00:00",
+ "segundos": 144.8,
+ "intervalos": {
+  "sesiones_s": 0.25,
+  "estadisticas_s": 5.0
+ },
+ "muestras": {
+  "sesiones": 490,
+  "estadisticas": 25
+ },
+ "servidor": {
+  "version": "Microsoft SQL Server 2022 (RTM-CU28) (KB5125472) - 16.0.4325.4 (X64)",
+  "base_existe": true
+ },
+ "errores": {
+  "antes_de_conectar": 82,
+  "despues": 0,
+  "ultimos": []
+ },
+ "consumidores": [
+  {
+   "login": "sa",
+   "aplicacion": "SQLCMD",
+   "interfaz_cliente": "ODBC",
+   "bases": [
+    "master"
+   ],
+   "sesiones": 1,
+   "muestras": 1,
+   "primera_utc": "2026-11-26T15:01:09+00:00",
+   "ultima_utc": "2026-11-26T15:01:09+00:00",
+   "origen": "dm_exec_sessions"
+  },
+  {
+   "login": "sa",
+   "aplicacion": "bcp",
+   "interfaz_cliente": "ODBC",
+   "bases": [
+    "master"
+   ],
+   "sesiones": 2,
+   "muestras": 2,
+   "primera_utc": "2026-11-26T15:02:59+00:00",
+   "ultima_utc": "2026-11-26T15:03:00+00:00",
+   "origen": "dm_exec_sessions"
+  },
+  {
+   "login": "sa",
+   "aplicacion": "pymssql=2.4.6",
+   "interfaz_cliente": "DB-Library",
+   "bases": [
+    "BFN_DIVISAS",
+    "model",
+    "msdb"
+   ],
+   "sesiones": 7,
+   "muestras": 201,
+   "primera_utc": "2026-11-26T15:00:59+00:00",
+   "ultima_utc": "2026-11-26T15:02:24+00:00",
+   "origen": "dm_exec_sessions"
+  }
+ ],
+ "objetos_ejecutados": {
+  "dbo.sp_detalle_operacion": {
+   "tipo": "procedimiento",
+   "fuentes": [
+    "dm_exec_procedure_stats",
+    "query_store"
+   ],
+   "ejecuciones": 200,
+   "por_fuente": {
+    "dm_exec_procedure_stats": 200,
+    "query_store": 800
+   }
+  },
+  "dbo.sp_lista_operaciones": {
+   "tipo": "procedimiento",
+   "fuentes": [
+    "dm_exec_procedure_stats",
+    "dm_exec_requests",
+    "query_store"
+   ],
+   "ejecuciones": 4,
+   "por_fuente": {
+    "dm_exec_procedure_stats": 4,
+    "dm_exec_requests": 0,
+    "query_store": 10
+   }
+  },
+  "dbo.sp_registrar_liquidacion": {
+   "tipo": "procedimiento",
+   "fuentes": [
+    "dm_exec_procedure_stats",
+    "query_store"
+   ],
+   "ejecuciones": 162,
+   "por_fuente": {
+    "dm_exec_procedure_stats": 162,
+    "query_store": 757
+   }
+  },
+  "dbo.sp_registrar_operacion": {
+   "tipo": "procedimiento",
+   "fuentes": [
+    "dm_exec_procedure_stats",
+    "dm_exec_requests",
+    "query_store"
+   ],
+   "ejecuciones": 431,
+   "por_fuente": {
+    "dm_exec_procedure_stats": 431,
+    "dm_exec_requests": 0,
+    "query_store": 862
+   }
+  },
+  "dbo.sp_registrar_orden": {
+   "tipo": "procedimiento",
+   "fuentes": [
+    "dm_exec_procedure_stats",
+    "dm_exec_requests",
+    "query_store"
+   ],
+   "ejecuciones": 274,
+   "por_fuente": {
+    "dm_exec_procedure_stats": 274,
+    "dm_exec_requests": 0,
+    "query_store": 1454
+   }
+  },
+  "dbo.sp_reporte_ordenes": {
+   "tipo": "procedimiento",
+   "fuentes": [
+    "dm_exec_procedure_stats",
+    "dm_exec_requests",
+    "query_store"
+   ],
+   "ejecuciones": 1,
+   "por_fuente": {
+    "dm_exec_procedure_stats": 1,
+    "dm_exec_requests": 0,
+    "query_store": 1
+   }
+  },
+  "dbo.tr_orden_pago_bitacora": {
+   "tipo": "trigger",
+   "fuentes": [
+    "dm_exec_trigger_stats",
+    "query_store"
+   ],
+   "ejecuciones": 575,
+   "por_fuente": {
+    "dm_exec_trigger_stats": 575,
+    "query_store": 575
+   }
+  }
+ },
+ "quien_ejecuta": {
+  "dbo.sp_lista_operaciones": [
+   [
+    "sa",
+    "pymssql=2.4.6"
+   ]
+  ],
+  "dbo.sp_registrar_operacion": [
+   [
+    "sa",
+    "pymssql=2.4.6"
+   ]
+  ],
+  "dbo.sp_registrar_orden": [
+   [
+    "sa",
+    "pymssql=2.4.6"
+   ]
+  ],
+  "dbo.sp_reporte_ordenes": [
+   [
+    "sa",
+    "pymssql=2.4.6"
+   ]
+  ]
+ },
+ "ad_hoc": [
+  {
+   "lee": [
+    "dbo.operacion"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 13,
+   "ejecuciones": 57,
+   "truncados": 0
+  },
+  {
+   "lee": [
+    "dbo.orden_pago"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 12,
+   "ejecuciones": 56,
+   "truncados": 0
+  },
+  {
+   "lee": [
+    "dbo.bitacora"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 7,
+   "ejecuciones": 51,
+   "truncados": 0
+  },
+  {
+   "lee": [
+    "dbo.partida_solicitada"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 7,
+   "ejecuciones": 51,
+   "truncados": 0
+  },
+  {
+   "lee": [
+    "dbo.partida_liquidada"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 7,
+   "ejecuciones": 50,
+   "truncados": 0
+  },
+  {
+   "lee": [
+    "dbo.folio"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 6,
+   "ejecuciones": 14,
+   "truncados": 0
+  },
+  {
+   "lee": [
+    "dbo.partida_solicitada"
+   ],
+   "escribe": {
+    "dbo.partida_solicitada": [
+     "UPDATE"
+    ]
+   },
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 1,
+   "ejecuciones": 10,
+   "truncados": 0
+  },
+  {
+   "lee": [
+    "dbo.moneda"
+   ],
+   "escribe": {},
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 5,
+   "ejecuciones": 9,
+   "truncados": 0
+  },
+  {
+   "lee": [],
+   "escribe": {
+    "dbo.moneda": [
+     "INSERT"
+    ]
+   },
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 1,
+   "ejecuciones": 1,
+   "truncados": 0
+  },
+  {
+   "lee": [],
+   "escribe": {
+    "dbo.moneda": [
+     "UPDATE"
+    ]
+   },
+   "llama": [],
+   "efectos": [],
+   "sql_dinamico": [],
+   "reloj": [],
+   "lotes": 1,
+   "ejecuciones": 1,
+   "truncados": 0
+  }
+ ],
+ "ad_hoc_sin_objetos": 17,
+ "query_store": {
+  "estado": "READ_WRITE",
+  "captura": "AUTO",
+  "objetos": {
+   "dbo.sp_registrar_orden": 1454,
+   "dbo.sp_detalle_operacion": 800,
+   "dbo.sp_registrar_operacion": 862,
+   "dbo.sp_lista_operaciones": 10,
+   "dbo.tr_orden_pago_bitacora": 575,
+   "dbo.sp_reporte_ordenes": 1,
+   "dbo.sp_registrar_liquidacion": 757
+  }
+ },
+ "jobs": [
+  {
+   "job": "BFN - conciliacion nocturna",
+   "habilitado": true,
+   "ejecuciones_en_historial": 0,
+   "arranques_en_actividad": 0
+  }
+ ],
+ "catalogo": {
+  "modulos": [
+   {
+    "id": "dbo.sp_alta_manual_orden",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_antiguedad_ordenes",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_conciliar",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_constancia_operacion",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_detalle_operacion",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_liquidaciones_recientes",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_lista_operaciones",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_ordenes_por_vencer",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_reflejar_estatus_operacion",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_registrar_liquidacion",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_registrar_operacion",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_registrar_orden",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_reporte_ordenes",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_reporte_posicion",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.sp_tablero_corresponsales",
+    "tipo": "procedimiento"
+   },
+   {
+    "id": "dbo.tr_orden_pago_bitacora",
+    "tipo": "trigger"
+   },
+   {
+    "id": "dbo.vw_liquidaciones_recientes",
+    "tipo": "vista"
+   },
+   {
+    "id": "dbo.vw_reporte_ordenes",
+    "tipo": "vista"
+   }
+  ],
+  "jobs": [
+   "job:BFN - conciliacion nocturna"
+  ]
+ },
+ "bitacora": {
+  "origen": "dbo.bitacora.usuario (SUSER_SNAME() que guarda el trigger)",
+  "usuarios": [
+   {
+    "login": "sa",
+    "filas": 575,
+    "primera": "2026-11-26T09:02:22.423",
+    "ultima": "2026-11-26T09:02:23.853"
+   },
+   {
+    "login": "svc_agente",
+    "filas": 150580,
+    "primera": "2021-01-01T23:30:00",
+    "ultima": "2023-12-28T23:30:00"
+   },
+   {
+    "login": "svc_interfaz",
+    "filas": 390513,
+    "primera": "2021-01-01T00:24:11",
+    "ultima": "2023-12-29T03:44:36"
+   },
+   {
+    "login": "svc_swift",
+    "filas": 144183,
+    "primera": "2021-01-01T07:11:34",
+    "ultima": "2023-12-28T16:58:52"
+   }
+  ]
+ },
+ "terminado": true
+}

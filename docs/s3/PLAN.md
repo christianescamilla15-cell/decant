@@ -102,6 +102,16 @@ choques preparados) y el emulador del corresponsal.
 
 ## Orden de construcción
 1. Inventario y puerta en rojo: define el alcance y lista lo que falta.
+   - **Avance (26-nov, en `corte/`):**
+     - Desde el código salen 22 objetos (15 procedimientos, 2 vistas, 1 trigger, 1 job, 2 interfaces y la pantalla)
+       y 8 escritores (6 procedimientos, el trigger y el paso del job).
+     - El job `legado` muestrea el ciclo y deja el artefacto `ejecucion-observada`. Hay 7 objetos observados, 1 vista
+       observada por quien la usa y 14 sin ejecución observada, entre ellos los 3 de la ronda 3.
+     - Hay 4 logins: `sa` por las sesiones; `svc_interfaz`, `svc_swift` y `svc_agente` por la bitácora.
+     - Los renglones son 3 comparados y 6 reemplazados con paridad (lo que S2 ya compara), más 17 pendientes
+       (13 objetos y 4 logins).
+     - La puerta corre como job aparte, fuera del ruleset, y sale en rojo con esos 17 pendientes. La vista legible
+       está en `corte/inventario/INVENTARIO.md`.
 2. Corte por dos caminos y cifras de control por documento.
 3. Carga por mes (INSERT, reversa, `setval`) sobre la foto con índices únicos.
 4. Cuadre mes a mes y grieta plantada.
