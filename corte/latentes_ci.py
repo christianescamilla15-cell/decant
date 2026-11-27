@@ -51,6 +51,9 @@ from radiografia.veredictos import revertida
 # Lo que dicen los catálogos sellados del tamaño de cada universo: sólo para REPORTAR si coincide, después de medir.
 DEL_CATALOGO = {'r1-T1': ('dbo.sp_reporte_posicion', 9_341, 'pares día-moneda'),
                 'r2-T2': ('dbo.sp_constancia_operacion', 104_773, 'operaciones con varias órdenes')}
+# El catálogo de r1-T1: «la MISMA sentencia en un lote suelto … devuelve la última por id. Con ese recorrido cambian
+# 1,650 de 9,341». La variante que lo reproduce es el lote suelto SIN paralelismo; sólo se compara de noche (todo).
+CAMBIOS_DEL_CATALOGO = {'r1-T1': ('dbo.sp_reporte_posicion', 'lote suelto, MAXDOP 1', 1_650)}
 POR_ENTRADA = 25         # entradas del TO-BE corridas una por una (sin índices) contra la consulta de todas a la vez
 TROZO = 20_000
 
@@ -383,6 +386,19 @@ def resumen(informe: dict) -> str:
         lineas.append(f"**Servidor:** max degree of parallelism {p['max_degree_of_parallelism']} · cost threshold "
                       f"{p['cost_threshold_for_parallelism']} · {p['cpus']} CPU · MAXDOP de la base "
                       f"{p['maxdop_de_la_base']} (las variantes van en la copia, nunca en la configuración).")
+    medidas = informe.get('latentes', {})
+    if medidas:
+        por = {x: [o for o, m in medidas.items() if m['veredicto']['estado'] == x] for x in
+               ('detectada con el plan variado', 'sólo forzada (pista en la copia)', 'no se manifiesta')}
+        lineas.append(f"**Latentes detectadas con el plan variado: {len(por['detectada con el plan variado'])} de "
+                      f"{len(medidas)}** ({', '.join(por['detectada con el plan variado']) or 'ninguna'}); sólo "
+                      f"forzadas: {', '.join(por['sólo forzada (pista en la copia)']) or 'ninguna'}; sin manifestarse: "
+                      f"{', '.join(por['no se manifiesta']) or 'ninguna'}.")
+    for id_, c in informe.get('cambios_del_catalogo', {}).items():
+        lineas.append(f"**{id_} contra su catálogo:** «{c['variante']}» difiere del TO-BE en "
+                      f"{c['medido_contra_el_tobe']:,} de {c['de']:,} unidades "
+                      f"({'todo el universo' if c['completo'] else 'en la muestra'}); el catálogo, {c['catalogo']:,} "
+                      'de 9,341.')
     for objeto, m in informe.get('latentes', {}).items():
         v = m['veredicto']
         nombre = '; '.join(informe.get('nombres', {}).get(objeto, [])) or 'sin nombre en los catálogos'
@@ -539,6 +555,11 @@ def main(argv: list[str] | None = None) -> int:
                 id_: {'objeto': o, 'catalogo': n, 'medido': informe['latentes'][o]['unidades'], 'que': que,
                       'coincide': informe['latentes'][o]['unidades'] == n}
                 for id_, (o, n, que) in DEL_CATALOGO.items()}
+            informe['cambios_del_catalogo'] = {
+                id_: {'objeto': o, 'variante': v, 'catalogo': n, 'completo': args.completo,
+                      'medido_contra_el_tobe': informe['latentes'][o]['corridas'][v]['contra_tobe']['distintas'],
+                      'de': informe['latentes'][o]['corridas'][v]['contra_tobe']['unidades']}
+                for id_, (o, v, n) in CAMBIOS_DEL_CATALOGO.items()}
     except (Negado, NoCuadra, NoSeCopia) as error:
         informe['faltas'].append(f'{type(error).__name__}: {error}'[:3000])
         informe['error'] = traceback.format_exc()
